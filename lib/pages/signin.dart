@@ -1,0 +1,198 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:sound_stage/pages/bottomnav.dart';
+import 'package:sound_stage/services/auth.dart';
+
+class SignIn extends StatefulWidget {
+  const SignIn({super.key});
+
+  @override
+  State<SignIn> createState() => _SignInState();
+}
+
+class _SignInState extends State<SignIn> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    bool isLoggedIn = await AuthService().checkUserLoggedIn(context: context);
+
+    if (isLoggedIn) {
+      // If logged in, navigate to BottomNav immediately
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (BuildContext context) => const BottomNav()),
+        (route) => false,
+      );
+    } else {
+      setState(() {});
+    }
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      backgroundColor: Colors.white,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Stack(
+              children: [
+                Image.asset(
+                  "images/signin.jpg",
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  fit: BoxFit.cover,
+                ),
+                Positioned(
+                  bottom: 50,
+                  left: 0,
+                  right: 0,
+                  child: Container(
+                    padding: EdgeInsets.only(left: 20, right: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Experience the',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 40,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          'Music near you',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 40,
+                            fontWeight: FontWeight.bold,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        Text(
+                          'Immerse yourself in the world of music',
+                          style: TextStyle(
+                            color: Colors.black45,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 60),
+                        Column(
+                          children: [
+                            TextFormField(
+                              controller: _emailController,
+                              decoration: InputDecoration(
+                                labelText: 'Email',
+                                filled: true,
+                                fillColor: Colors.white70,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(40),
+                                ),
+                                prefixIcon: Icon(Icons.email),
+                              ),
+                            ),
+                            SizedBox(height: 20),
+                            TextFormField(
+                              controller: _passwordController,
+                              obscureText: true,
+                              decoration: InputDecoration(
+                                labelText: 'Password',
+                                filled: true,
+                                fillColor: Colors.white70,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                                prefixIcon: Icon(Icons.lock),
+                              ),
+                            ),
+                            SizedBox(height: 55),
+                            GestureDetector(
+                              onTap: () {
+                                HapticFeedback.mediumImpact();
+                                AuthService().signin(
+                                  context: context,
+                                  email: _emailController.text,
+                                  password: _passwordController.text,
+                                );
+                              },
+                              child: Container(
+                                height: 50,
+                                margin: EdgeInsets.only(left: 90, right: 90),
+                                decoration: BoxDecoration(
+                                  color: Color(0xff6351ec),
+                                  borderRadius: BorderRadius.circular(40),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Sign In',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Container(
+                              margin: EdgeInsets.only(top: 20),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Don\'t have an account? ',
+                                    style: TextStyle(
+                                      color: Colors.white54,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      HapticFeedback.mediumImpact();
+                                      Navigator.pushNamed(context, '/signup');
+                                    },
+                                    child: Text(
+                                      'Sign Up',
+                                      style: TextStyle(
+                                        color: Color(0xff6351ec),
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
