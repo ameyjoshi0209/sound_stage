@@ -47,4 +47,8 @@ class DatabaseMethods {
         .where("Category", isEqualTo: category)
         .snapshots();
   }
+
+  Future<Stream<QuerySnapshot>> getTickets() async {
+    return await FirebaseFirestore.instance.collection("Tickets").snapshots();
+  }
 }

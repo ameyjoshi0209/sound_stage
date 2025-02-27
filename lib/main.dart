@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:sound_stage/admin/ticket_event.dart';
 import 'package:sound_stage/admin/upload_event.dart';
 import 'package:sound_stage/pages/bottomnav.dart';
 import 'package:sound_stage/pages/categories_event.dart';
@@ -44,7 +45,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: SignIn(),
+      home: TicketEvent(),
       routes: {
         '/signup': (context) => const SignUp(),
         '/signin': (context) => const SignIn(),
