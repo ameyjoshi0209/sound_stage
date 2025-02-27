@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:sound_stage/admin/upload_event.dart';
 import 'package:sound_stage/pages/bottomnav.dart';
+import 'package:sound_stage/pages/categories_event.dart';
 import 'package:sound_stage/pages/signin.dart';
 import 'package:sound_stage/pages/signup.dart';
 import 'package:sound_stage/pages/user_profile.dart';

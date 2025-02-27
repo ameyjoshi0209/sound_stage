@@ -25,7 +25,7 @@ class _UploadEventState extends State<UploadEvent> {
     "Jazz",
     "Metal",
     "Classical",
-    "Rock band",
+    "Rock Band",
   ];
   String? value;
   final ImagePicker _picker = ImagePicker();

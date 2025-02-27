@@ -221,7 +221,7 @@ class _UserProfileState extends State<UserProfile> {
                   ),
                 ),
               ),
-              SizedBox(height: 55),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.1),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

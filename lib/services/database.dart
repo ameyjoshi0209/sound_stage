@@ -40,4 +40,11 @@ class DatabaseMethods {
         .collection("booking")
         .snapshots();
   }
+
+  Future<Stream<QuerySnapshot>> getEventCategories(String category) async {
+    return await FirebaseFirestore.instance
+        .collection("Event")
+        .where("Category", isEqualTo: category)
+        .snapshots();
+  }
 }
