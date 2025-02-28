@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:sound_stage/organizer/org_signin.dart';
 import 'package:sound_stage/pages/bottomnav.dart';
 import 'package:sound_stage/services/auth.dart';
 
@@ -175,6 +176,32 @@ class _SignInState extends State<SignIn> {
                                       'Sign Up',
                                       style: TextStyle(
                                         color: Color(0xff6351ec),
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              margin: EdgeInsets.only(top: 20),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      HapticFeedback.mediumImpact();
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => OrgSignIn(),
+                                        ),
+                                      );
+                                    },
+                                    child: Text(
+                                      'Organizers this way!',
+                                      style: TextStyle(
+                                        color: Colors.white,
                                         fontSize: 16,
                                       ),
                                     ),

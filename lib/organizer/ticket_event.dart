@@ -29,7 +29,6 @@ class _TicketEventState extends State<TicketEvent> {
       builder: (context, AsyncSnapshot snapshot) {
         return snapshot.hasData
             ? Column(
-              // Using Column instead of ListView
               children: List.generate(snapshot.data.docs.length, (index) {
                 DocumentSnapshot ds = snapshot.data.docs[index];
                 String inputDate = ds["Date"];
@@ -43,7 +42,7 @@ class _TicketEventState extends State<TicketEvent> {
                     : Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: Card(
-                        color: Color(0xfff0ebff),
+                        color: Colors.black54,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
                         ),
@@ -75,6 +74,7 @@ class _TicketEventState extends State<TicketEvent> {
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 18,
+                                            color: Colors.white,
                                           ),
                                         ),
                                         SizedBox(height: 5),
@@ -105,6 +105,7 @@ class _TicketEventState extends State<TicketEvent> {
                                               ds["Name"],
                                               style: TextStyle(
                                                 fontWeight: FontWeight.bold,
+                                                color: Colors.white,
                                               ),
                                             ),
                                           ],
@@ -117,14 +118,24 @@ class _TicketEventState extends State<TicketEvent> {
                                               color: Colors.green,
                                             ),
                                             SizedBox(width: 3),
-                                            Text(ds["Total"]),
+                                            Text(
+                                              ds["Total"],
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                              ),
+                                            ),
                                             SizedBox(width: 30),
                                             Icon(
                                               Icons.people,
                                               color: Colors.blue,
                                             ),
                                             SizedBox(width: 3),
-                                            Text(ds["Number"]),
+                                            Text(
+                                              ds["Number"],
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                              ),
+                                            ),
                                           ],
                                         ),
                                         SizedBox(height: 5),
@@ -135,67 +146,20 @@ class _TicketEventState extends State<TicketEvent> {
                                               color: Colors.orange,
                                             ),
                                             SizedBox(width: 5),
-                                            Text(ds["Date"]),
+                                            Text(
+                                              ds["Date"],
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                              ),
+                                            ),
                                           ],
                                         ),
-                                        // Container(
-                                        //   padding: EdgeInsets.symmetric(
-                                        //     horizontal: 10,
-                                        //     vertical: 5,
-                                        //   ),
-                                        //   decoration: BoxDecoration(
-                                        //     color: Color.fromARGB(
-                                        //       255,
-                                        //       205,
-                                        //       199,
-                                        //       240,
-                                        //     ),
-                                        //     borderRadius: BorderRadius.circular(
-                                        //       10,
-                                        //     ),
-                                        //   ),
-                                        //   child: Text(
-                                        //     status,
-                                        //     style: TextStyle(
-                                        //       color: Color.fromARGB(
-                                        //         255,
-                                        //         87,
-                                        //         66,
-                                        //         248,
-                                        //       ),
-                                        //     ),
-                                        //   ),
-                                        // ),
                                       ],
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                            // Padding(
-                            //   padding: const EdgeInsets.symmetric(
-                            //     horizontal: 16.0,
-                            //     vertical: 10.0,
-                            //   ),
-                            //   child: Row(
-                            //     mainAxisAlignment: MainAxisAlignment.end,
-                            //     children: [
-                            //       ElevatedButton(
-                            //         onPressed: () {},
-                            //         style: ElevatedButton.styleFrom(
-                            //           backgroundColor: Color(0xff6351ec),
-                            //           shape: RoundedRectangleBorder(
-                            //             borderRadius: BorderRadius.circular(50),
-                            //           ),
-                            //         ),
-                            //         child: Text(
-                            //           buttonText,
-                            //           style: TextStyle(color: Colors.white),
-                            //         ),
-                            //       ),
-                            //     ],
-                            //   ),
-                            // ),
                           ],
                         ),
                       ),
@@ -211,7 +175,14 @@ class _TicketEventState extends State<TicketEvent> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        margin: const EdgeInsets.only(top: 50.0, left: 20.0, right: 20.0),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF000000), Color(0xFF6A11CB)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        padding: const EdgeInsets.only(top: 50.0, left: 20.0, right: 20.0),
         child: Column(
           children: [
             Row(
@@ -220,20 +191,24 @@ class _TicketEventState extends State<TicketEvent> {
                   onTap: () {
                     Navigator.pop(context);
                   },
-                  child: Icon(Icons.arrow_back_ios_new_outlined),
+                  child: Icon(
+                    Icons.arrow_back_ios_new_outlined,
+                    color: Colors.white,
+                  ),
                 ),
                 SizedBox(width: MediaQuery.of(context).size.width / 4.5),
                 Text(
                   "Event Tickets",
                   style: TextStyle(
-                    color: Color(0xff6351ec),
+                    color: Colors.purpleAccent,
                     fontSize: 27.0,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ],
             ),
-            allTickets(),
+            SizedBox(height: 20),
+            Expanded(child: allTickets()),
           ],
         ),
       ),
