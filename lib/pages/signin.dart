@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:sound_stage/organizer/org_signin.dart';
 import 'package:sound_stage/pages/bottomnav.dart';
 import 'package:sound_stage/services/auth.dart';
 
@@ -123,34 +124,26 @@ class _SignInState extends State<SignIn> {
                               ),
                             ),
                             SizedBox(height: 55),
-                            GestureDetector(
-                              onTap: () {
-                                HapticFeedback.mediumImpact();
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Color(0xff6351ec),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                                minimumSize: Size(double.infinity, 50),
+                              ),
+                              onPressed: () async {
                                 AuthService().signin(
                                   context: context,
                                   email: _emailController.text,
                                   password: _passwordController.text,
                                 );
                               },
-                              child: Container(
-                                height: 50,
-                                margin: EdgeInsets.only(left: 90, right: 90),
-                                decoration: BoxDecoration(
-                                  color: Color(0xff6351ec),
-                                  borderRadius: BorderRadius.circular(40),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'Sign In',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
+                              child: Text(
+                                "Sign In",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.white,
                                 ),
                               ),
                             ),
@@ -175,6 +168,32 @@ class _SignInState extends State<SignIn> {
                                       'Sign Up',
                                       style: TextStyle(
                                         color: Color(0xff6351ec),
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              margin: EdgeInsets.only(top: 20),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      HapticFeedback.mediumImpact();
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => OrgSignIn(),
+                                        ),
+                                      );
+                                    },
+                                    child: Text(
+                                      'Organizers this way!',
+                                      style: TextStyle(
+                                        color: Colors.white,
                                         fontSize: 16,
                                       ),
                                     ),

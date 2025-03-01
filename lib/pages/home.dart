@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:sound_stage/pages/categories_event.dart';
 import 'package:sound_stage/pages/detailpage.dart';
 import 'package:sound_stage/services/database.dart';
 import 'package:sound_stage/services/shared_pref.dart';
@@ -287,136 +288,184 @@ class _HomeState extends State<Home> {
                   scrollDirection: Axis.horizontal,
                   children: [
                     // Categories (Jazz, Metal, Classical, etc.)
-                    Container(
-                      margin: EdgeInsets.only(bottom: 5, left: 20),
-                      child: Material(
-                        elevation: 3.0,
-                        borderRadius: BorderRadius.circular(25.0),
-                        child: Container(
-                          width: 125,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(25.0),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) =>
+                                    CategoriesEvent(eventCategory: "Jazz"),
                           ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.asset(
-                                "images/saxophone.png",
-                                height: 45,
-                                width: 45,
-                                fit: BoxFit.fill,
-                              ),
-                              Text(
-                                "Jazz",
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 20,
+                        );
+                      },
+                      child: Container(
+                        margin: EdgeInsets.only(bottom: 5, left: 20),
+                        child: Material(
+                          elevation: 3.0,
+                          borderRadius: BorderRadius.circular(25.0),
+                          child: Container(
+                            width: 125,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(25.0),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  "images/saxophone.png",
+                                  height: 45,
+                                  width: 45,
+                                  fit: BoxFit.fill,
                                 ),
-                              ),
-                            ],
+                                Text(
+                                  "Jazz",
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
                     SizedBox(width: 20.0),
-                    Container(
-                      margin: EdgeInsets.only(bottom: 5),
-                      child: Material(
-                        elevation: 3.0,
-                        borderRadius: BorderRadius.circular(25.0),
-                        child: Container(
-                          width: 125,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(25.0),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) =>
+                                    CategoriesEvent(eventCategory: "Metal"),
                           ),
-                          padding: EdgeInsets.all(10.0),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.asset(
-                                "images/guitar.png",
-                                height: 45,
-                                width: 45,
-                                fit: BoxFit.fill,
-                              ),
-                              Text(
-                                "Metal",
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 20,
+                        );
+                      },
+                      child: Container(
+                        margin: EdgeInsets.only(bottom: 5),
+                        child: Material(
+                          elevation: 3.0,
+                          borderRadius: BorderRadius.circular(25.0),
+                          child: Container(
+                            width: 125,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(25.0),
+                            ),
+                            padding: EdgeInsets.all(10.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  "images/guitar.png",
+                                  height: 45,
+                                  width: 45,
+                                  fit: BoxFit.fill,
                                 ),
-                              ),
-                            ],
+                                Text(
+                                  "Metal",
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
                     SizedBox(width: 20.0),
-                    Container(
-                      margin: EdgeInsets.only(bottom: 5),
-                      child: Material(
-                        elevation: 3.0,
-                        borderRadius: BorderRadius.circular(25.0),
-                        child: Container(
-                          width: 125,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(25.0),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) =>
+                                    CategoriesEvent(eventCategory: "Classical"),
                           ),
-                          padding: EdgeInsets.all(10.0),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.asset(
-                                "images/sitar.png",
-                                height: 45,
-                                width: 45,
-                                fit: BoxFit.fill,
-                              ),
-                              Text(
-                                "Classical",
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 20,
+                        );
+                      },
+                      child: Container(
+                        margin: EdgeInsets.only(bottom: 5),
+                        child: Material(
+                          elevation: 3.0,
+                          borderRadius: BorderRadius.circular(25.0),
+                          child: Container(
+                            width: 125,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(25.0),
+                            ),
+                            padding: EdgeInsets.all(10.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  "images/sitar.png",
+                                  height: 45,
+                                  width: 45,
+                                  fit: BoxFit.fill,
                                 ),
-                              ),
-                            ],
+                                Text(
+                                  "Classical",
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
                     SizedBox(width: 20.0),
-                    Container(
-                      margin: EdgeInsets.only(bottom: 5, right: 20),
-                      child: Material(
-                        elevation: 3.0,
-                        borderRadius: BorderRadius.circular(25.0),
-                        child: Container(
-                          width: 125,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(25.0),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) =>
+                                    CategoriesEvent(eventCategory: "Rock Band"),
                           ),
-                          padding: EdgeInsets.all(10.0),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.asset(
-                                "images/drums.png",
-                                height: 50,
-                                width: 50,
-                                fit: BoxFit.fill,
-                              ),
-                              Text(
-                                "Rock Band",
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 18,
+                        );
+                      },
+                      child: Container(
+                        margin: EdgeInsets.only(bottom: 5, right: 20),
+                        child: Material(
+                          elevation: 3.0,
+                          borderRadius: BorderRadius.circular(25.0),
+                          child: Container(
+                            width: 125,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(25.0),
+                            ),
+                            padding: EdgeInsets.all(10.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  "images/drums.png",
+                                  height: 50,
+                                  width: 50,
+                                  fit: BoxFit.fill,
                                 ),
-                              ),
-                            ],
+                                Text(
+                                  "Rock Band",
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
