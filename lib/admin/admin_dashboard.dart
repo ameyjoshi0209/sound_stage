@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:sound_stage/admin/admin_signin.dart';
+import 'package:sound_stage/admin/create_organizer.dart';
 import 'package:sound_stage/services/auth.dart';
 
-class OrganizerDashboard extends StatefulWidget {
+class AdminDashboard extends StatefulWidget {
   @override
-  _OrganizerDashboardState createState() => _OrganizerDashboardState();
+  _AdminDashboardState createState() => _AdminDashboardState();
 }
 
-class _OrganizerDashboardState extends State<OrganizerDashboard> {
+class _AdminDashboardState extends State<AdminDashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -16,9 +18,8 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Color(0xFF000000),
-              Color(0xFF6A11CB),
-            ], // Black to Purple Gradient
+              Color(0xFF006AFF), Color(0xFF191919), // Blue
+            ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -30,34 +31,38 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
             children: [
               SizedBox(height: 40),
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Center(
-                    child: Text(
-                      "Organizer Dashboard",
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
+                  TweenAnimationBuilder(
+                    tween: IntTween(begin: 0, end: "Welcome, Admin".length),
+                    duration: Duration(seconds: 1),
+                    builder: (context, value, child) {
+                      return Text(
+                        "Welcome, Admin".substring(0, value),
+                        style: TextStyle(
+                          fontSize: 34,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black, // Updated text color
+                        ),
+                      );
+                    },
                   ),
-                  Spacer(),
                   IconButton(
-                    icon: Icon(Icons.logout, color: Colors.white),
+                    icon: Icon(Icons.logout, size: 30, color: Colors.white),
                     onPressed: () {
                       HapticFeedback.lightImpact();
                       _showLogoutWarning(context);
                     },
                   ),
                 ],
-              ),
+              ), // Blue color for icons
               SizedBox(height: 34),
               Text(
                 "Event Insights",
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
-                  color: Colors.white,
+                  color: Colors.black, // Updated text color
                 ),
               ),
               SizedBox(height: 16),
@@ -66,7 +71,27 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
                   Expanded(
                     child: _buildRollingNumberCard(
                       context,
-                      "Total Collection",
+                      "Total Users",
+                      15000,
+                    ),
+                  ),
+                  SizedBox(width: 16),
+                  Expanded(
+                    child: _buildRollingNumberCard(
+                      context,
+                      "Total Events",
+                      1200,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildRollingNumberCard(
+                      context,
+                      "Total Collections",
                       15000,
                       isCurrency: true,
                     ),
@@ -75,7 +100,7 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
                   Expanded(
                     child: _buildRollingNumberCard(
                       context,
-                      "Participants",
+                      "Total Tickets Sold",
                       1200,
                     ),
                   ),
@@ -87,7 +112,7 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
-                  color: Colors.white,
+                  color: Colors.black, // Updated text color
                 ),
               ),
               Expanded(
@@ -98,18 +123,26 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
                     mainAxisSpacing: 16,
                   ),
                   children: [
-                    _buildSectionCard(context, "Post Events", Icons.add),
                     _buildSectionCard(
                       context,
-                      "Manage Participants",
-                      Icons.people,
+                      "Manage Users",
+                      Icons.person_pin_rounded,
                     ),
                     _buildSectionCard(
                       context,
-                      "Financial Reports",
-                      Icons.attach_money,
+                      "Manage Events",
+                      Icons.event_note_rounded,
                     ),
-                    _buildSectionCard(context, "Upcoming Events", Icons.event),
+                    _buildSectionCard(
+                      context,
+                      "Add Organizer",
+                      Icons.person_add_alt_1,
+                    ),
+                    _buildSectionCard(
+                      context,
+                      "Event Approvals",
+                      Icons.event_available_rounded,
+                    ),
                   ],
                 ),
               ),
@@ -127,7 +160,7 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
     bool isCurrency = false,
   }) {
     return Card(
-      color: Colors.black54,
+      color: Colors.white, // White background for cards
       elevation: 4,
       child: Padding(
         padding: EdgeInsets.all(16.0),
@@ -135,7 +168,7 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: TextStyle(fontSize: 16, color: Colors.white)),
+            Text(title, style: TextStyle(fontSize: 16, color: Colors.black)),
             SizedBox(height: 8),
             TweenAnimationBuilder<int>(
               tween: IntTween(begin: 0, end: endValue),
@@ -146,7 +179,7 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Colors.purpleAccent,
+                    color: Colors.blue, // Blue color for the number
                   ),
                 );
               },
@@ -159,21 +192,41 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
 
   Widget _buildSectionCard(BuildContext context, String title, IconData icon) {
     return Card(
-      color: Colors.black54,
+      color: Colors.white, // White background for cards
       elevation: 4,
       child: InkWell(
-        onTap: () {},
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) {
+                switch (title) {
+                  case "Add Organizer":
+                    return AdminCreateOrg();
+                  default:
+                    return Scaffold(
+                      appBar: AppBar(title: Text(title)),
+                      body: Center(child: Text("Coming Soon!")),
+                    );
+                }
+              },
+            ),
+          );
+        },
         child: Padding(
           padding: EdgeInsets.all(16.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 40, color: Colors.purpleAccent),
+              Icon(icon, size: 40, color: Colors.blue), // Blue color for icons
               SizedBox(height: 8),
               Text(
                 title,
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16, color: Colors.white),
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.black,
+                ), // Black text color
               ),
             ],
           ),
@@ -198,11 +251,11 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
             ),
             TextButton(
               onPressed: () {
-                AuthService().orgSignOut(context: context);
+                AuthService().adminSignOut(context: context);
               },
               child: Text(
                 "Log Out",
-                style: TextStyle(color: Color(0xff6351ec)),
+                style: TextStyle(color: Color(0xFF006AFF)),
               ),
             ),
           ],

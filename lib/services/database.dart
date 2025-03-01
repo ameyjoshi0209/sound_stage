@@ -3,7 +3,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class DatabaseMethods {
   Future addUserDetail(Map<String, dynamic> userInfoMap, String id) async {
     return await FirebaseFirestore.instance
+        .collection("members")
+        .doc("allUsers")
         .collection("users")
+        .doc(id)
+        .set(userInfoMap);
+  }
+
+  Future addOrganizerDetail(Map<String, dynamic> userInfoMap, String id) async {
+    return await FirebaseFirestore.instance
+        .collection("members")
+        .doc("allUsers")
+        .collection("organizers")
         .doc(id)
         .set(userInfoMap);
   }
@@ -21,6 +32,8 @@ class DatabaseMethods {
 
   Future addUserBooking(Map<String, dynamic> userInfoMap, String id) async {
     return await FirebaseFirestore.instance
+        .collection("members")
+        .doc("allUsers")
         .collection("users")
         .doc(id)
         .collection("booking")
@@ -35,6 +48,8 @@ class DatabaseMethods {
 
   Future<Stream<QuerySnapshot>> getbookings(String id) async {
     return await FirebaseFirestore.instance
+        .collection("members")
+        .doc("allUsers")
         .collection("users")
         .doc(id)
         .collection("booking")

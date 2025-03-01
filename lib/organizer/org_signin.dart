@@ -1,7 +1,11 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sound_stage/admin/admin_signin.dart';
-import 'package:sound_stage/pages/signin.dart'; // Import the AdminLogin page
+import 'package:sound_stage/organizer/org_dash.dart';
+import 'package:sound_stage/pages/signin.dart';
+import 'package:sound_stage/services/auth.dart'; // Import the AdminLogin page
 
 class OrgSignIn extends StatefulWidget {
   @override
@@ -12,6 +16,9 @@ class _OrgSignInState extends State<OrgSignIn> {
   bool _isPasswordVisible = false;
   bool _isOrg = true; // Track if organization login is active
 
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
   void _toggleSwitch(bool value) {
     if (value) {
       // Navigate to AdminLogin when switched
@@ -19,6 +26,28 @@ class _OrgSignInState extends State<OrgSignIn> {
         context,
         MaterialPageRoute(builder: (context) => AdminSignIn()),
       );
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    bool isLoggedIn = await AuthService().checkOrgLoggedIn(context: context);
+
+    if (isLoggedIn) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (BuildContext context) => OrganizerDashboard(),
+        ),
+        (route) => false,
+      );
+    } else {
+      setState(() {});
     }
   }
 
@@ -37,7 +66,7 @@ class _OrgSignInState extends State<OrgSignIn> {
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 50.0),
+          padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 30.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -68,9 +97,10 @@ class _OrgSignInState extends State<OrgSignIn> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       TextField(
+                        controller: emailController,
                         decoration: InputDecoration(
-                          labelText: "Organizer Username",
-                          hintText: "Enter username",
+                          labelText: "Organizer Email",
+                          hintText: "Enter email",
                           prefixIcon: Icon(
                             Icons.person,
                             color: Color(0xFFDF014F),
@@ -84,6 +114,7 @@ class _OrgSignInState extends State<OrgSignIn> {
                       ),
                       SizedBox(height: 16),
                       TextField(
+                        controller: passwordController,
                         obscureText: !_isPasswordVisible,
                         decoration: InputDecoration(
                           labelText: "Organizer Password",
@@ -132,7 +163,14 @@ class _OrgSignInState extends State<OrgSignIn> {
                           ),
                           minimumSize: Size(double.infinity, 50),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          HapticFeedback.lightImpact();
+                          AuthService().orgSignIn(
+                            context: context,
+                            email: emailController.text,
+                            password: passwordController.text,
+                          );
+                        },
                         child: Text(
                           "Organizer Sign In",
                           style: TextStyle(fontSize: 18, color: Colors.white),
