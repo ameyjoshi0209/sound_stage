@@ -1,9 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:sound_stage/admin/admin_manage_users.dart';
 import 'package:sound_stage/admin/admin_signin.dart';
 import 'package:sound_stage/admin/create_organizer.dart';
 import 'package:sound_stage/services/auth.dart';
+import 'package:sound_stage/services/database.dart';
 
 class AdminDashboard extends StatefulWidget {
   @override
@@ -11,6 +14,19 @@ class AdminDashboard extends StatefulWidget {
 }
 
 class _AdminDashboardState extends State<AdminDashboard> {
+  Stream? getAllUsers;
+
+  ontheload() async {
+    getAllUsers = await DatabaseMethods().getAllUsers();
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    ontheload();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,10 +85,15 @@ class _AdminDashboardState extends State<AdminDashboard> {
               Row(
                 children: [
                   Expanded(
-                    child: _buildRollingNumberCard(
-                      context,
-                      "Total Users",
-                      15000,
+                    child: StreamBuilder(
+                      stream: getAllUsers,
+                      builder: (context, snapshot) {
+                        return _buildRollingNumberCard(
+                          context,
+                          "Total Users",
+                          snapshot.hasData ? snapshot.data.docs.length : 0,
+                        );
+                      },
                     ),
                   ),
                   SizedBox(width: 16),
@@ -203,6 +224,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 switch (title) {
                   case "Add Organizer":
                     return AdminCreateOrg();
+                  case "Manage Users":
+                    return AdminManageProfiles();
                   default:
                     return Scaffold(
                       appBar: AppBar(title: Text(title)),
