@@ -2,7 +2,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:sound_stage/admin/admin_dashboard.dart';
+import 'package:sound_stage/admin/admin_manage_users.dart';
 import 'package:sound_stage/admin/admin_signin.dart';
+import 'package:sound_stage/admin/admin_view_profile.dart';
 import 'package:sound_stage/admin/create_organizer.dart';
 import 'package:sound_stage/organizer/org_dash.dart';
 import 'package:sound_stage/organizer/org_signin.dart';
@@ -51,7 +53,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: SignIn(),
+      home: AdminManageProfiles(),
       routes: {
         '/signup': (context) => const SignUp(),
         '/signin': (context) => const SignIn(),

@@ -62,4 +62,23 @@ class DatabaseMethods {
   Future<Stream<QuerySnapshot>> getAllUsers() async {
     return await FirebaseFirestore.instance.collection("users").snapshots();
   }
+
+  Future<Stream<QuerySnapshot>> getUserByIdAndRole(
+    String id,
+    String role,
+  ) async {
+    if (role == "customer") {
+      return await FirebaseFirestore.instance
+          .collection("users")
+          .where('userid', isEqualTo: id)
+          .snapshots();
+    } else if (role == "organizer") {
+      return await FirebaseFirestore.instance
+          .collection("users")
+          .where('orgid', isEqualTo: id)
+          .snapshots();
+    } else {
+      throw Exception("Invalid role: $role");
+    }
+  }
 }

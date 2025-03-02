@@ -174,6 +174,7 @@ class _UserProfileState extends State<UserProfile> {
                       "phone": phoneController.text,
                       "age": ageController.text,
                       "userid": id,
+                      "role": "customer",
                     };
 
                     await DatabaseMethods()
