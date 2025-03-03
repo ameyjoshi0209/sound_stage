@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:sound_stage/admin/admin_event_approvals.dart';
+import 'package:sound_stage/admin/admin_manage_events.dart';
 import 'package:sound_stage/admin/admin_manage_users.dart';
 import 'package:sound_stage/admin/admin_signin.dart';
 import 'package:sound_stage/admin/create_organizer.dart';
@@ -98,10 +100,22 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   ),
                   SizedBox(width: 16),
                   Expanded(
-                    child: _buildRollingNumberCard(
-                      context,
-                      "Total Events",
-                      1200,
+                    child: StreamBuilder(
+                      stream:
+                          FirebaseFirestore.instance
+                              .collection("Event")
+                              .snapshots(),
+                      builder: (context, snapshot) {
+                        int totalEvents =
+                            snapshot.hasData
+                                ? snapshot.data?.docs.length ?? 0
+                                : 0;
+                        return _buildRollingNumberCard(
+                          context,
+                          "Total Events",
+                          totalEvents,
+                        );
+                      },
                     ),
                   ),
                 ],
@@ -226,6 +240,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     return AdminCreateOrg();
                   case "Manage Users":
                     return AdminManageProfiles();
+                  case "Manage Events":
+                    return AdminManageEvents();
+                  case "Event Approvals":
+                    return AdminApproveEvents();
                   default:
                     return Scaffold(
                       appBar: AppBar(title: Text(title)),

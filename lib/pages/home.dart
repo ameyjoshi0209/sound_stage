@@ -49,7 +49,7 @@ class _HomeState extends State<Home> {
                   underAge = true;
                 }
 
-                return hasPassed || underAge
+                return hasPassed || underAge || ds["EventApproved"] == false
                     ? Container()
                     : GestureDetector(
                       onTap: () {

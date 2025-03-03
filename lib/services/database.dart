@@ -33,6 +33,12 @@ class DatabaseMethods {
         .snapshots();
   }
 
+  Future approveEvent(String id) async {
+    return await FirebaseFirestore.instance.collection("Event").doc(id).update({
+      "EventApproved": true,
+    });
+  }
+
   Future addUserBooking(Map<String, dynamic> userInfoMap, String id) async {
     return await FirebaseFirestore.instance
         .collection("users")

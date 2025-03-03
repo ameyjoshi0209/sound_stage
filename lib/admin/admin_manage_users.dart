@@ -114,7 +114,10 @@ class _AdminManageProfilesState extends State<AdminManageProfiles> {
 
             // Row of buttons for filter selection
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 18.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 18.0,
+                vertical: 10,
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -245,6 +248,7 @@ class _AdminManageProfilesState extends State<AdminManageProfiles> {
         List<DocumentSnapshot> filteredUsers = filterUsers(snapshot.data.docs);
 
         return ListView.builder(
+          padding: EdgeInsets.zero,
           itemCount: filteredUsers.length,
           itemBuilder: (context, index) {
             var ds = filteredUsers[index];

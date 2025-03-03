@@ -389,6 +389,8 @@ class _UploadEventState extends State<UploadEvent> {
                     "Date": DateFormat("dd-MM-yyyy").format(selectedDate),
                     "Time": formatTimeOfDay(selectedTime),
                     "OrganizerId": id,
+                    "EventApproved": false,
+                    "EventId": addId,
                   };
                   await DatabaseMethods().addEvent(uploadevent, addId).then((
                     value,
