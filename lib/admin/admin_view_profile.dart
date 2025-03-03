@@ -188,7 +188,7 @@ class _AdminViewProfileState extends State<AdminViewProfile> {
                 children: [
                   // AppBar-like Content in Body, Fixed at the Top
                   Padding(
-                    padding: EdgeInsets.only(top: 40, bottom: 10),
+                    padding: EdgeInsets.only(top: 45, bottom: 10),
                     child: Row(
                       children: [
                         IconButton(
@@ -197,15 +197,18 @@ class _AdminViewProfileState extends State<AdminViewProfile> {
                             Navigator.pop(context); // Navigate back
                           },
                         ),
-                        SizedBox(width: 25),
+                        Spacer(), // Adds flexible space between the icon and the text
                         Text(
-                          "Create Organizer Profile",
+                          "Organizer Profile",
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
                           ),
                         ),
+                        Spacer(
+                          flex: 2,
+                        ), // Adds flexible space after the text to push it to the center
                       ],
                     ),
                   ),
