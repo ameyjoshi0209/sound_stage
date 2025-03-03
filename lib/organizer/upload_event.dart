@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:random_string/random_string.dart';
 import 'package:sound_stage/services/database.dart';
+import 'package:sound_stage/services/shared_pref.dart';
 
 class UploadEvent extends StatefulWidget {
   const UploadEvent({super.key});
@@ -15,11 +16,18 @@ class UploadEvent extends StatefulWidget {
 }
 
 class _UploadEventState extends State<UploadEvent> {
+  String? id;
+
   TextEditingController nameController = TextEditingController();
   TextEditingController priceController = TextEditingController();
   TextEditingController detailController = TextEditingController();
   TextEditingController locationController = TextEditingController();
   TextEditingController ageController = TextEditingController();
+
+  getthesharedpref() async {
+    id = await SharedPreferenceHelper().getOrganizerId();
+    setState(() {});
+  }
 
   final List<String> eventcategory = [
     "Jazz",
@@ -78,6 +86,17 @@ class _UploadEventState extends State<UploadEvent> {
         selectedTime = pickedTime;
       });
     }
+  }
+
+  ontheload() async {
+    await getthesharedpref();
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    ontheload();
+    super.initState();
   }
 
   @override
@@ -369,6 +388,7 @@ class _UploadEventState extends State<UploadEvent> {
                     "Details": detailController.text,
                     "Date": DateFormat("dd-MM-yyyy").format(selectedDate),
                     "Time": formatTimeOfDay(selectedTime),
+                    "OrganizerId": id,
                   };
                   await DatabaseMethods().addEvent(uploadevent, addId).then((
                     value,

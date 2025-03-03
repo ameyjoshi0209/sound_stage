@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:sound_stage/services/auth.dart';
 import 'package:sound_stage/services/database.dart';
-import 'package:sound_stage/services/shared_pref.dart';
 
 class AdminViewProfile extends StatefulWidget {
   String? role;

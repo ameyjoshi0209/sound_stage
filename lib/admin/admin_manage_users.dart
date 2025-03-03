@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:sound_stage/admin/admin_view_profile.dart';
 import 'package:sound_stage/services/database.dart';
 
@@ -87,6 +88,7 @@ class _AdminManageProfilesState extends State<AdminManageProfiles> {
                           searchQuery.isEmpty
                               ? GestureDetector(
                                 onTap: () {
+                                  HapticFeedback.lightImpact();
                                   Navigator.pop(context);
                                 },
                                 child: Icon(
@@ -119,6 +121,7 @@ class _AdminManageProfilesState extends State<AdminManageProfiles> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
+                        HapticFeedback.lightImpact();
                         setState(() {
                           selectedFilter =
                               'All'; // Set the selected filter to "All"
@@ -140,6 +143,7 @@ class _AdminManageProfilesState extends State<AdminManageProfiles> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
+                        HapticFeedback.lightImpact();
                         setState(() {
                           selectedFilter =
                               'customer'; // Set the selected filter to "User"
@@ -161,6 +165,7 @@ class _AdminManageProfilesState extends State<AdminManageProfiles> {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
+                        HapticFeedback.lightImpact();
                         setState(() {
                           selectedFilter =
                               'organizer'; // Set the selected filter to "organizer"

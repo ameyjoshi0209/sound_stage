@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:sound_stage/organizer/ticket_event.dart';
+import 'package:sound_stage/organizer/upload_event.dart';
+import 'package:sound_stage/organizer/view_events.dart';
 import 'package:sound_stage/services/auth.dart';
 
 class OrganizerDashboard extends StatefulWidget {
@@ -101,15 +104,15 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
                     _buildSectionCard(context, "Post Events", Icons.add),
                     _buildSectionCard(
                       context,
-                      "Manage Participants",
-                      Icons.people,
+                      "View Tickets",
+                      Icons.event_seat,
                     ),
                     _buildSectionCard(
                       context,
                       "Financial Reports",
                       Icons.attach_money,
                     ),
-                    _buildSectionCard(context, "Upcoming Events", Icons.event),
+                    _buildSectionCard(context, "Manage Events", Icons.event),
                   ],
                 ),
               ),
@@ -162,7 +165,28 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
       color: Colors.black54,
       elevation: 4,
       child: InkWell(
-        onTap: () {},
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) {
+                switch (title) {
+                  case "Post Events":
+                    return UploadEvent();
+                  case "View Tickets":
+                    return ViewEvents(manage: false);
+                  case "Manage Events":
+                    return ViewEvents(manage: true);
+                  default:
+                    return Scaffold(
+                      appBar: AppBar(title: Text(title)),
+                      body: Center(child: Text("Coming Soon!")),
+                    );
+                }
+              },
+            ),
+          );
+        },
         child: Padding(
           padding: EdgeInsets.all(16.0),
           child: Column(

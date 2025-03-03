@@ -53,7 +53,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: AdminManageProfiles(),
+      home: SignIn(),
       routes: {
         '/signup': (context) => const SignUp(),
         '/signin': (context) => const SignIn(),

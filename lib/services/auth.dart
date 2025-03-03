@@ -305,7 +305,7 @@ class AuthService {
     try {
       DocumentSnapshot userDoc =
           await FirebaseFirestore.instance
-              .collection("admin")
+              .collection("users")
               .doc("admin")
               .get();
       if (userDoc.exists) {

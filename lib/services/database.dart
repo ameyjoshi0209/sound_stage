@@ -26,6 +26,13 @@ class DatabaseMethods {
     return await FirebaseFirestore.instance.collection("Event").snapshots();
   }
 
+  Future<Stream<QuerySnapshot>> getEventByOrganizerId(String id) async {
+    return await FirebaseFirestore.instance
+        .collection("Event")
+        .where('OrganizerId', isEqualTo: id)
+        .snapshots();
+  }
+
   Future addUserBooking(Map<String, dynamic> userInfoMap, String id) async {
     return await FirebaseFirestore.instance
         .collection("users")
