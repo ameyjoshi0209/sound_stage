@@ -4,6 +4,7 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:sound_stage/admin/admin_dashboard.dart';
 import 'package:sound_stage/admin/admin_manage_users.dart';
 import 'package:sound_stage/admin/admin_signin.dart';
+import 'package:sound_stage/admin/admin_view_event.dart';
 import 'package:sound_stage/admin/admin_view_profile.dart';
 import 'package:sound_stage/admin/create_organizer.dart';
 import 'package:sound_stage/organizer/org_dash.dart';
@@ -53,7 +54,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: AdminSignIn(),
+      home: SignIn(),
       routes: {
         '/signup': (context) => const SignUp(),
         '/signin': (context) => const SignIn(),

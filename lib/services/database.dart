@@ -33,6 +33,13 @@ class DatabaseMethods {
         .snapshots();
   }
 
+  Future<Stream<QuerySnapshot>> getEventById(String id) async {
+    return await FirebaseFirestore.instance
+        .collection("Event")
+        .where('EventId', isEqualTo: id)
+        .snapshots();
+  }
+
   Future approveEvent(String id) async {
     return await FirebaseFirestore.instance.collection("Event").doc(id).update({
       "EventApproved": true,
