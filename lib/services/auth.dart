@@ -86,17 +86,13 @@ class AuthService {
               .doc(userId)
               .get();
       if (userDoc.exists) {
-        // Assuming the user document contains 'username' field
-        String username = userDoc['name'];
-
         // Save user details
         await SharedPreferenceHelper().saveUserEmail(email);
         await SharedPreferenceHelper().saveUserPassword(password);
         await SharedPreferenceHelper().saveUserId(
           FirebaseAuth.instance.currentUser!.uid,
         );
-        await SharedPreferenceHelper().saveUserName(username);
-        // Navigate to BottomNav screen without delay
+        await SharedPreferenceHelper().saveUserName(userDoc['name']);
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(

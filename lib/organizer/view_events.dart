@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:sound_stage/organizer/org_event_detail.dart';
 import 'package:sound_stage/services/database.dart';
 import 'package:sound_stage/services/shared_pref.dart';
 
@@ -48,6 +49,7 @@ class _ViewEventsState extends State<ViewEvents> {
                   DocumentSnapshot ds = snapshot.data.docs[index];
                   return BookingCard(
                     manage: widget.manage!,
+                    eventId: ds["EventId"],
                     ageAllowed: ds["AgeAllowed"],
                     category: ds["Category"],
                     date: ds["Date"],
@@ -131,6 +133,7 @@ class _ViewEventsState extends State<ViewEvents> {
 }
 
 class BookingCard extends StatelessWidget {
+  final String eventId;
   final String ageAllowed;
   final String category;
   final String date;
@@ -142,6 +145,7 @@ class BookingCard extends StatelessWidget {
   final bool manage;
 
   const BookingCard({
+    required this.eventId,
     required this.ageAllowed,
     required this.category,
     required this.date,
@@ -157,181 +161,206 @@ class BookingCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Card(
-        elevation: 6,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Image at the top with date overlay
-            Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                  child: Image.asset(
-                    'images/event.jpg',
-                    height: 200,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                // White background container with date overlay
-                Positioned(
-                  top: 10,
-                  left: 16,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.7),
-                      borderRadius: BorderRadius.circular(
-                        12,
-                      ), // Border radius added
-                    ),
-                    child: Text(
-                      date,
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            // Card details below the image
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      child: GestureDetector(
+        onTap: () {
+          if (manage) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => OrgViewEvent(eventId: eventId),
+              ),
+            );
+          }
+        },
+        child: Card(
+          elevation: 6,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Image at the top with date overlay
+              Stack(
                 children: [
-                  // Booking Name and Age Allowed in the same row
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        name,
+                  ClipRRect(
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(20),
+                    ),
+                    child: Image.asset(
+                      'images/event.jpg',
+                      height: 200,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  // White background container with date overlay
+                  Positioned(
+                    top: 10,
+                    left: 16,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.7),
+                        borderRadius: BorderRadius.circular(
+                          12,
+                        ), // Border radius added
+                      ),
+                      child: Text(
+                        date,
                         style: TextStyle(
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          fontSize: 22,
+                          color: Colors.black,
                         ),
                       ),
-                      // Age allowed displayed in the same row with icon
-                      Row(
-                        children: [
-                          Icon(Icons.person, size: 20, color: Colors.orange),
-                          SizedBox(width: 5),
-                          Text(
-                            ageAllowed + '+',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.orange,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 4),
-                  // Location
-                  Row(
-                    children: [
-                      Icon(Icons.location_on, size: 18, color: Colors.blue),
-                      SizedBox(width: 5),
-                      Text(
-                        location,
-                        style: TextStyle(color: Colors.blueGrey, fontSize: 16),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 12),
-                  // Price and Age Allowed (moved ageAllowed to name row)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.attach_money,
-                            size: 20,
-                            color: Colors.green,
-                          ),
-                          SizedBox(width: 5),
-                          Text(
-                            price,
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 12),
-                  // Date and Time
-                  Row(
-                    children: [
-                      Icon(Icons.date_range, size: 20, color: Colors.orange),
-                      SizedBox(width: 5),
-                      Text(date, style: TextStyle(fontSize: 16)),
-                    ],
-                  ),
-                  SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Icon(Icons.access_time, size: 20, color: Colors.purple),
-                      SizedBox(width: 5),
-                      Text(time, style: TextStyle(fontSize: 16)),
-                    ],
-                  ),
-                  SizedBox(height: 12),
-                  // Details section
-                  Container(
-                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.blueGrey.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      details,
-                      style: TextStyle(fontSize: 14, color: Colors.black87),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  SizedBox(height: 20),
-                  if (manage)
+                ],
+              ),
+              // Card details below the image
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Booking Name and Age Allowed in the same row
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
-                          ),
-                          child: Text(
-                            'Edit',
-                            style: TextStyle(color: Colors.white),
+                        Text(
+                          name,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 22,
                           ),
                         ),
-                        SizedBox(width: 10),
-                        ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
-                          ),
-                          child: Text(
-                            'Delete',
-                            style: TextStyle(color: Colors.white),
+                        // Age allowed displayed in the same row with icon
+                        Row(
+                          children: [
+                            Icon(Icons.person, size: 20, color: Colors.orange),
+                            SizedBox(width: 5),
+                            Text(
+                              ageAllowed + '+',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.orange,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 4),
+                    // Location
+                    Row(
+                      children: [
+                        Icon(Icons.location_on, size: 18, color: Colors.blue),
+                        SizedBox(width: 5),
+                        Text(
+                          location,
+                          style: TextStyle(
+                            color: Colors.blueGrey,
+                            fontSize: 16,
                           ),
                         ),
                       ],
                     ),
-                ],
+                    SizedBox(height: 12),
+                    // Price and Age Allowed (moved ageAllowed to name row)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.attach_money,
+                              size: 20,
+                              color: Colors.green,
+                            ),
+                            SizedBox(width: 5),
+                            Text(
+                              price,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 12),
+                    // Date and Time
+                    Row(
+                      children: [
+                        Icon(Icons.date_range, size: 20, color: Colors.orange),
+                        SizedBox(width: 5),
+                        Text(date, style: TextStyle(fontSize: 16)),
+                      ],
+                    ),
+                    SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Icon(Icons.access_time, size: 20, color: Colors.purple),
+                        SizedBox(width: 5),
+                        Text(time, style: TextStyle(fontSize: 16)),
+                      ],
+                    ),
+                    SizedBox(height: 12),
+                    // Details section
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        vertical: 10,
+                        horizontal: 16,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.blueGrey.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        details,
+                        style: TextStyle(fontSize: 14, color: Colors.black87),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    if (manage)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {},
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue,
+                            ),
+                            child: Text(
+                              'Edit',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          ElevatedButton(
+                            onPressed: () {},
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red,
+                            ),
+                            child: Text(
+                              'Delete',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
