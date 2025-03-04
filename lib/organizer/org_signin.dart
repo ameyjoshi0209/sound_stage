@@ -1,10 +1,7 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sound_stage/admin/admin_signin.dart';
 import 'package:sound_stage/organizer/org_dash.dart';
-import 'package:sound_stage/pages/signin.dart';
 import 'package:sound_stage/services/auth.dart'; // Import the AdminLogin page
 
 class OrgSignIn extends StatefulWidget {

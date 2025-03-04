@@ -3,8 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class DatabaseMethods {
   Future addUserDetail(Map<String, dynamic> userInfoMap, String id) async {
     return await FirebaseFirestore.instance
-        .collection("members")
-        .doc("allUsers")
         .collection("users")
         .doc(id)
         .set(userInfoMap);
@@ -12,9 +10,7 @@ class DatabaseMethods {
 
   Future addOrganizerDetail(Map<String, dynamic> userInfoMap, String id) async {
     return await FirebaseFirestore.instance
-        .collection("members")
-        .doc("allUsers")
-        .collection("organizers")
+        .collection("users")
         .doc(id)
         .set(userInfoMap);
   }
@@ -30,10 +26,28 @@ class DatabaseMethods {
     return await FirebaseFirestore.instance.collection("Event").snapshots();
   }
 
+  Future<Stream<QuerySnapshot>> getEventByOrganizerId(String id) async {
+    return await FirebaseFirestore.instance
+        .collection("Event")
+        .where('OrganizerId', isEqualTo: id)
+        .snapshots();
+  }
+
+  Future<Stream<QuerySnapshot>> getEventById(String id) async {
+    return await FirebaseFirestore.instance
+        .collection("Event")
+        .where('EventId', isEqualTo: id)
+        .snapshots();
+  }
+
+  Future approveEvent(String id) async {
+    return await FirebaseFirestore.instance.collection("Event").doc(id).update({
+      "EventApproved": true,
+    });
+  }
+
   Future addUserBooking(Map<String, dynamic> userInfoMap, String id) async {
     return await FirebaseFirestore.instance
-        .collection("members")
-        .doc("allUsers")
         .collection("users")
         .doc(id)
         .collection("booking")
@@ -48,8 +62,6 @@ class DatabaseMethods {
 
   Future<Stream<QuerySnapshot>> getbookings(String id) async {
     return await FirebaseFirestore.instance
-        .collection("members")
-        .doc("allUsers")
         .collection("users")
         .doc(id)
         .collection("booking")
@@ -65,5 +77,28 @@ class DatabaseMethods {
 
   Future<Stream<QuerySnapshot>> getTickets() async {
     return await FirebaseFirestore.instance.collection("Tickets").snapshots();
+  }
+
+  Future<Stream<QuerySnapshot>> getAllUsers() async {
+    return await FirebaseFirestore.instance.collection("users").snapshots();
+  }
+
+  Future<Stream<QuerySnapshot>> getUserByIdAndRole(
+    String id,
+    String role,
+  ) async {
+    if (role == "customer") {
+      return await FirebaseFirestore.instance
+          .collection("users")
+          .where('userid', isEqualTo: id)
+          .snapshots();
+    } else if (role == "organizer") {
+      return await FirebaseFirestore.instance
+          .collection("users")
+          .where('orgid', isEqualTo: id)
+          .snapshots();
+    } else {
+      throw Exception("Invalid role: $role");
+    }
   }
 }

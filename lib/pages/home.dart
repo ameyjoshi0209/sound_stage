@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:sound_stage/pages/categories_event.dart';
 import 'package:sound_stage/pages/detailpage.dart';
@@ -16,6 +17,8 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   Stream? eventStream;
   late int userAge = 0;
+  String searchQuery = '';
+  TextEditingController searchController = TextEditingController();
 
   ontheload() async {
     eventStream = await DatabaseMethods().getallEvents();
@@ -49,7 +52,7 @@ class _HomeState extends State<Home> {
                   underAge = true;
                 }
 
-                return hasPassed || underAge
+                return hasPassed || underAge || ds["EventApproved"] == false
                     ? Container()
                     : GestureDetector(
                       onTap: () {
@@ -58,6 +61,8 @@ class _HomeState extends State<Home> {
                           MaterialPageRoute(
                             builder:
                                 (context) => DetailPage(
+                                  category: ds["Category"],
+                                  ageAllowed: ds["AgeAllowed"],
                                   date: ds["Date"],
                                   details: ds["Details"],
                                   image: ds["Image"],
@@ -178,7 +183,7 @@ class _HomeState extends State<Home> {
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Color(0xffe3e6ff), Color(0xffd5dbff), Colors.white],
+              colors: [Color(0xFF9A8DFF), Color(0xffd5dbff), Colors.white],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -252,32 +257,62 @@ class _HomeState extends State<Home> {
                 ),
               ),
               SizedBox(height: 30.0),
-              Container(
-                margin: EdgeInsets.only(right: 20.0, left: 20),
-                padding: EdgeInsets.only(left: 20.0),
-                width: MediaQuery.of(context).size.width,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(30.0),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Color.fromRGBO(
-                        14,
-                        14,
-                        14,
-                        0.23,
-                      ), // Light shadow color with opacity
-                      spreadRadius: 1, // How far the shadow spreads
-                      blurRadius: 6, // The blur radius to make the shadow soft
-                      offset: Offset(0, 2), // Position of the shadow (x, y)
-                    ),
-                  ],
-                ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
                 child: TextField(
+                  controller: searchController,
+                  onChanged: (query) {
+                    setState(() {
+                      searchQuery =
+                          query; // Update the search query when the user types
+                    });
+                  },
                   decoration: InputDecoration(
-                    suffixIcon: Icon(Icons.search_outlined),
-                    border: InputBorder.none,
-                    hintText: "Search for events",
+                    hintText: 'Search for users...',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      borderSide: BorderSide.none,
+                    ),
+                    prefixIcon: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          searchQuery = '';
+                          searchController
+                              .clear(); // Clear the text field when tapping the back icon
+                        });
+                      },
+                      child: AnimatedSwitcher(
+                        duration: Duration(milliseconds: 300),
+                        transitionBuilder: (
+                          Widget child,
+                          Animation<double> animation,
+                        ) {
+                          // You can use ScaleTransition, FadeTransition, etc.
+                          return ScaleTransition(
+                            scale: animation,
+                            child: child,
+                          );
+                        },
+                        child:
+                            searchQuery.isEmpty
+                                ? GestureDetector(
+                                  onTap: () {
+                                    HapticFeedback.lightImpact();
+                                    Navigator.pop(context);
+                                  },
+                                  child: Icon(
+                                    Icons.search_outlined, // Back icon
+                                    key: ValueKey('back'),
+                                  ),
+                                )
+                                : Icon(
+                                  Icons.close, // Close icon when typing
+                                  key: ValueKey('close'),
+                                ),
+                      ),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
                   ),
                 ),
               ),

@@ -60,6 +60,8 @@ class _CategoriesEventState extends State<CategoriesEvent> {
                           MaterialPageRoute(
                             builder:
                                 (context) => DetailPage(
+                                  ageAllowed: ds["AgeAllowed"],
+                                  category: ds["Category"],
                                   date: ds["Date"],
                                   details: ds["Details"],
                                   image: ds["Image"],

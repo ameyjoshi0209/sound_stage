@@ -36,6 +36,9 @@ class AuthService {
         "name": name,
         "email": email,
         "password": password,
+        "role": "customer",
+        "phone": "",
+        "age": "",
         "userid": signupID,
       };
       await DatabaseMethods().addUserDetail(uploadUser, signupID).then((value) {
@@ -79,8 +82,6 @@ class AuthService {
       String userId = FirebaseAuth.instance.currentUser!.uid;
       DocumentSnapshot userDoc =
           await FirebaseFirestore.instance
-              .collection("members")
-              .doc("allUsers")
               .collection("users")
               .doc(userId)
               .get();
@@ -178,6 +179,7 @@ class AuthService {
         "orgaddress": orgAddress,
         "orgwebsite": orgWebsite,
         "orgfacebook": orgFacebook,
+        "role": "organizer",
         "orgid": signupID,
       };
       await DatabaseMethods()
@@ -223,13 +225,10 @@ class AuthService {
       String userId = FirebaseAuth.instance.currentUser!.uid;
       DocumentSnapshot userDoc =
           await FirebaseFirestore.instance
-              .collection("members")
-              .doc("allUsers")
-              .collection("organizers")
+              .collection("users")
               .doc(userId)
               .get();
       if (userDoc.exists) {
-        // Assuming the user document contains 'username' field
         String name = userDoc['orgname'];
 
         await Future.delayed(const Duration(seconds: 1));
@@ -306,13 +305,20 @@ class AuthService {
     try {
       DocumentSnapshot userDoc =
           await FirebaseFirestore.instance
-              .collection("members")
-              .doc("allUsers")
-              .collection("admin")
-              .doc('admin1')
+              .collection("users")
+              .doc("admin")
               .get();
       if (userDoc.exists) {
-        // Assuming the user document contains 'username' field
+        if (email != userDoc['adminEmail'] ||
+            password != userDoc['adminPassword']) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Colors.red,
+              content: const Text('Invalid Admin Credentials'),
+            ),
+          );
+          return;
+        }
 
         await Future.delayed(const Duration(seconds: 1));
         await SharedPreferenceHelper().saveAdminEmail(email);

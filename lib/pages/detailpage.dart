@@ -9,7 +9,7 @@ import 'package:sound_stage/services/database.dart';
 import 'package:sound_stage/services/shared_pref.dart';
 
 class DetailPage extends StatefulWidget {
-  String image, name, location, date, details, price;
+  String image, name, location, date, details, price, ageAllowed, category;
   DetailPage({
     required this.image,
     required this.name,
@@ -17,6 +17,8 @@ class DetailPage extends StatefulWidget {
     required this.date,
     required this.details,
     required this.price,
+    required this.ageAllowed,
+    required this.category,
   });
 
   @override
@@ -165,7 +167,41 @@ class _DetailPageState extends State<DetailPage> {
                     ),
                   ),
                 ),
-                SizedBox(height: 20), // Additional space
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: GridView.count(
+                    crossAxisCount: 2,
+                    shrinkWrap: true, // To avoid infinite height in GridView
+                    physics:
+                        NeverScrollableScrollPhysics(), // Disable scrolling in GridView
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio:
+                        3, // Adjust aspect ratio for rectangular grid items
+                    children: [
+                      // Age Restriction
+                      _buildInfoCard(
+                        Icons.accessibility_new,
+                        'Age Restriction',
+                        widget.ageAllowed,
+                      ),
+
+                      // Category
+                      _buildInfoCard(
+                        Icons.category,
+                        'Category',
+                        widget.category,
+                      ),
+
+                      // Price
+                      _buildInfoCard(
+                        Icons.attach_money,
+                        'Price',
+                        '₹ ${widget.price}',
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
@@ -298,7 +334,7 @@ class _DetailPageState extends State<DetailPage> {
                   Row(
                     children: [
                       Text(
-                        "₹ " + total.toString(),
+                        "₹ $total",
                         style: TextStyle(
                           fontSize: 25,
                           color: Color(0xff6351ea),
@@ -433,5 +469,40 @@ class _DetailPageState extends State<DetailPage> {
   calculateAmount(String amount) {
     final calculatedAmount = int.parse(amount) * 100;
     return calculatedAmount.toString();
+  }
+
+  Widget _buildInfoCard(IconData icon, String title, String value) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.deepPurple.shade100,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white, width: 2),
+      ),
+      child: Row(
+        children: [
+          SizedBox(width: 10),
+          Icon(icon, color: Colors.black87, size: 30), // Icon as prefix
+          const SizedBox(width: 13),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 5),
+              Text(
+                title,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              Text(
+                value,
+                style: TextStyle(color: Colors.deepPurple, fontSize: 14),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }
