@@ -172,7 +172,7 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
               builder: (context) {
                 switch (title) {
                   case "Post Events":
-                    return UploadEvent();
+                    return UploadEvent(edit: false);
                   case "View Tickets":
                     return ViewEvents(manage: false);
                   case "Manage Events":

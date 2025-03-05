@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sound_stage/organizer/org_event_detail.dart';
+import 'package:sound_stage/organizer/upload_event.dart';
 import 'package:sound_stage/services/database.dart';
 import 'package:sound_stage/services/shared_pref.dart';
 
@@ -58,6 +59,7 @@ class _ViewEventsState extends State<ViewEvents> {
                     name: ds["Name"],
                     price: ds["Price"],
                     time: ds["Time"],
+                    approvalStatus: ds["EventApproved"],
                   );
                 },
               ),
@@ -143,6 +145,7 @@ class BookingCard extends StatelessWidget {
   final String price;
   final String time;
   final bool manage;
+  final bool approvalStatus;
 
   const BookingCard({
     required this.eventId,
@@ -155,6 +158,7 @@ class BookingCard extends StatelessWidget {
     required this.price,
     required this.time,
     required this.manage,
+    required this.approvalStatus,
   });
 
   @override
@@ -329,12 +333,23 @@ class BookingCard extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 20),
-                    if (manage)
+                    if (manage && approvalStatus)
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) => UploadEvent(
+                                        eventId: eventId,
+                                        edit: true,
+                                      ),
+                                ),
+                              );
+                            },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.blue,
                             ),
@@ -352,6 +367,20 @@ class BookingCard extends StatelessWidget {
                             child: Text(
                               'Delete',
                               style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      ),
+                    if (approvalStatus == false)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            'Event approval pending',
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ],

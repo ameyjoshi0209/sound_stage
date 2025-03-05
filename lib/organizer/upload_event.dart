@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -9,7 +10,9 @@ import 'package:sound_stage/services/database.dart';
 import 'package:sound_stage/services/shared_pref.dart';
 
 class UploadEvent extends StatefulWidget {
-  const UploadEvent({super.key});
+  final bool edit;
+  String? eventId; // Pass the event ID to edit the specific event
+  UploadEvent({super.key, this.eventId, required this.edit});
 
   @override
   State<UploadEvent> createState() => _UploadEventState();
@@ -38,6 +41,34 @@ class _UploadEventState extends State<UploadEvent> {
   String? value;
   final ImagePicker _picker = ImagePicker();
   File? selectedImage;
+
+  Future<void> getEventData() async {
+    DocumentSnapshot eventDoc =
+        await FirebaseFirestore.instance
+            .collection(
+              'Event',
+            ) // Assuming your events are in a collection named 'events'
+            .doc(widget.eventId)
+            .get();
+
+    if (eventDoc.exists) {
+      var eventData = eventDoc.data() as Map<String, dynamic>;
+
+      nameController.text = eventData['Name'];
+      priceController.text = eventData['Price'];
+      detailController.text = eventData['Details'];
+      locationController.text = eventData['Location'];
+      ageController.text = eventData['AgeAllowed'];
+      value = eventData['Category'];
+      selectedDate = DateFormat('dd-mm-yyy').parse(eventData['Date']);
+      DateTime parsedTime = DateFormat.jm().parse(eventData['Time']);
+      selectedTime = TimeOfDay(
+        hour: parsedTime.hour,
+        minute: parsedTime.minute,
+      );
+      // If you have an image URL, you can also fetch and display it here
+    }
+  }
 
   Future getImage() async {
     var image = await _picker.pickImage(source: ImageSource.gallery);
@@ -90,6 +121,8 @@ class _UploadEventState extends State<UploadEvent> {
 
   ontheload() async {
     await getthesharedpref();
+    if (widget.edit)
+      await getEventData(); // Fetch event data when loading the scree
     setState(() {});
   }
 
@@ -377,7 +410,6 @@ class _UploadEventState extends State<UploadEvent> {
                 onTap: () async {
                   HapticFeedback.lightImpact();
                   String addId = randomAlphaNumeric(10);
-
                   Map<String, dynamic> uploadevent = {
                     "Image": "",
                     "Name": nameController.text,
@@ -390,28 +422,31 @@ class _UploadEventState extends State<UploadEvent> {
                     "Time": formatTimeOfDay(selectedTime),
                     "OrganizerId": id,
                     "EventApproved": false,
-                    "EventId": addId,
+                    "EventId": widget.edit ? widget.eventId : addId,
                   };
-                  await DatabaseMethods().addEvent(uploadevent, addId).then((
-                    value,
-                  ) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        backgroundColor: Colors.green,
-                        content: Text(
-                          "Event uploaded successfully!",
-                          style: TextStyle(fontSize: 20.0),
-                        ),
-                      ),
-                    );
-                    setState(() {
-                      nameController.text = "";
-                      priceController.text = "";
-                      detailController.text = "";
-                      locationController.text = "";
-                      ageController.text = "";
-                    });
-                  });
+                  await DatabaseMethods()
+                      .addEvent(
+                        uploadevent,
+                        widget.edit ? widget.eventId! : addId,
+                      )
+                      .then((value) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: Colors.green,
+                            content: Text(
+                              "Event uploaded successfully!",
+                              style: TextStyle(fontSize: 20.0),
+                            ),
+                          ),
+                        );
+                        setState(() {
+                          nameController.text = "";
+                          priceController.text = "";
+                          detailController.text = "";
+                          locationController.text = "";
+                          ageController.text = "";
+                        });
+                      });
                 },
                 child: Center(
                   child: Container(

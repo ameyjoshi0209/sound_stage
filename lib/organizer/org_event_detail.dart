@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:sound_stage/organizer/upload_event.dart';
 import 'package:sound_stage/services/database.dart';
 
 class OrgViewEvent extends StatefulWidget {
@@ -69,7 +70,6 @@ class _OrgViewEventState extends State<OrgViewEvent> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Image of the Event with rounded corners and shadow
                     ClipRRect(
                       borderRadius: BorderRadius.circular(26),
                       child: Image.asset(
@@ -186,51 +186,59 @@ class _OrgViewEventState extends State<OrgViewEvent> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                minimumSize: Size(double.infinity, 50),
-                                backgroundColor: Colors.deepPurple,
-                              ),
-                              onPressed: () async {
-                                await DatabaseMethods().approveEvent(
-                                  widget.eventId!,
-                                );
-                              },
-                              child: Text(
-                                'Edit Event',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
+                    if (ds['EventApproved'] == true)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  minimumSize: Size(double.infinity, 50),
+                                  backgroundColor: Colors.deepPurple,
+                                ),
+                                onPressed: () async {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) => UploadEvent(
+                                            edit: true,
+                                            eventId: widget.eventId!,
+                                          ),
+                                    ),
+                                  );
+                                },
+                                child: Text(
+                                  'Edit Event',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                          SizedBox(width: 20),
-                          Expanded(
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                minimumSize: Size(double.infinity, 50),
-                                backgroundColor: Colors.red.shade500,
-                              ),
-                              onPressed: () {},
-                              child: Text(
-                                'Delete Event',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
+                            SizedBox(width: 20),
+                            Expanded(
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  minimumSize: Size(double.infinity, 50),
+                                  backgroundColor: Colors.red.shade500,
+                                ),
+                                onPressed: () {},
+                                child: Text(
+                                  'Delete Event',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
                     const SizedBox(height: 50),
                   ],
                 ),
