@@ -72,8 +72,8 @@ class _OrgViewEventState extends State<OrgViewEvent> {
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(26),
-                      child: Image.asset(
-                        'images/event.jpg', // Use your own image URL
+                      child: Image.network(
+                        ds['Image'], // Use your own image URL
                         width: double.infinity,
                         height: MediaQuery.of(context).size.height / 2.1,
                         fit: BoxFit.cover,

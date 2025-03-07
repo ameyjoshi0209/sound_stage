@@ -70,8 +70,8 @@ class _AdminViewEventState extends State<AdminViewEvent> {
                     // Image of the Event with rounded corners and shadow
                     ClipRRect(
                       borderRadius: BorderRadius.circular(26),
-                      child: Image.asset(
-                        'images/event.jpg', // Use your own image URL
+                      child: Image.network(
+                        ds["Image"], // Use your own image URL
                         width: double.infinity,
                         height: MediaQuery.of(context).size.height / 2.1,
                         fit: BoxFit.cover,

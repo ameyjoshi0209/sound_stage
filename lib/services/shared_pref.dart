@@ -7,6 +7,7 @@ class SharedPreferenceHelper {
   static String userPhoneKey = "USERPHONEKEY";
   static String userAgeKey = "USERAGEKEY";
   static String userPasswordKey = "USERPASSWORDKEY";
+  static String userImageKey = "USERIMAGEKEY";
 
   static String organizerIdKey = "ORGANIZERKEY";
   static String organizerEmailKey = "ORGANIZEREMAILKEY";
@@ -46,6 +47,11 @@ class SharedPreferenceHelper {
     return prefs.setString(userAgeKey, getUserAge);
   }
 
+  Future<bool> saveUserImage(String getUserImage) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.setString(userImageKey, getUserImage);
+  }
+
   Future<String?> getUserId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(userIdKey);
@@ -76,6 +82,11 @@ class SharedPreferenceHelper {
     return prefs.getString(userAgeKey);
   }
 
+  Future<String?> getUserImage() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString(userImageKey);
+  }
+
   Future<String?> removeUserId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove(userIdKey);
@@ -104,6 +115,11 @@ class SharedPreferenceHelper {
   Future<String?> removeUserAge() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove(userAgeKey);
+  }
+
+  Future<String?> removeUserImage() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove(userImageKey);
   }
 
   Future<bool> saveOrganizerId(String getOrganizerId) async {

@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:random_string/random_string.dart';
+import 'package:sound_stage/services/cloudinary_service.dart';
 import 'package:sound_stage/services/database.dart';
 import 'package:sound_stage/services/shared_pref.dart';
 
@@ -72,7 +73,9 @@ class _UploadEventState extends State<UploadEvent> {
 
   Future getImage() async {
     var image = await _picker.pickImage(source: ImageSource.gallery);
-    selectedImage = File(image!.path);
+    if (image != null) {
+      selectedImage = File(image.path);
+    }
     setState(() {});
   }
 
@@ -168,8 +171,8 @@ class _UploadEventState extends State<UploadEvent> {
                       borderRadius: BorderRadius.circular(10),
                       child: Image.file(
                         selectedImage!,
-                        height: 150,
-                        width: 150,
+                        height: 200,
+                        width: double.infinity,
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -180,13 +183,21 @@ class _UploadEventState extends State<UploadEvent> {
                         getImage();
                       },
                       child: Container(
-                        height: 150,
-                        width: 150,
+                        height: 200,
+                        width: double.infinity,
                         decoration: BoxDecoration(
-                          border: Border.all(),
+                          color: Color(0xffececf8),
                           borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: Colors.deepPurple,
+                            width: 1,
+                          ),
                         ),
-                        child: Icon(Icons.camera_alt_rounded),
+                        child: Icon(
+                          Icons.add_a_photo,
+                          color: Colors.black,
+                          size: 30,
+                        ),
                       ),
                     ),
                   ),
@@ -410,8 +421,9 @@ class _UploadEventState extends State<UploadEvent> {
                 onTap: () async {
                   HapticFeedback.lightImpact();
                   String addId = randomAlphaNumeric(10);
+                  String? url = await uploadtoCloudinary(selectedImage);
                   Map<String, dynamic> uploadevent = {
-                    "Image": "",
+                    "Image": url,
                     "Name": nameController.text,
                     "Price": priceController.text,
                     "Category": value,
@@ -445,6 +457,8 @@ class _UploadEventState extends State<UploadEvent> {
                           detailController.text = "";
                           locationController.text = "";
                           ageController.text = "";
+                          selectedImage = null;
+                          value = null;
                         });
                       });
                 },

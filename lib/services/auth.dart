@@ -93,6 +93,9 @@ class AuthService {
           FirebaseAuth.instance.currentUser!.uid,
         );
         await SharedPreferenceHelper().saveUserName(userDoc['name']);
+        await SharedPreferenceHelper().saveUserPhone(userDoc['phone']);
+        await SharedPreferenceHelper().saveUserAge(userDoc['age']);
+        await SharedPreferenceHelper().saveUserImage(userDoc['image']);
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
@@ -128,6 +131,8 @@ class AuthService {
       await SharedPreferenceHelper().removeUserPassword();
       await SharedPreferenceHelper().removeUserName();
       await SharedPreferenceHelper().removeUserPhone();
+      await SharedPreferenceHelper().removeUserAge();
+      await SharedPreferenceHelper().removeUserImage();
 
       Navigator.pushNamedAndRemoveUntil(context, '/signin', (route) => false);
     } catch (e) {

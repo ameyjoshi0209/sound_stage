@@ -22,7 +22,11 @@ class _HomeState extends State<Home> {
 
   ontheload() async {
     eventStream = await DatabaseMethods().getallEvents();
-    userAge = int.parse(await SharedPreferenceHelper().getUserAge() ?? "0");
+    try {
+      userAge = int.parse(await SharedPreferenceHelper().getUserAge() ?? "0");
+    } catch (e) {
+      userAge = 0; // Default to 0 if parsing fails
+    }
     setState(() {});
   }
 
@@ -83,8 +87,8 @@ class _HomeState extends State<Home> {
                               children: [
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(15.0),
-                                  child: Image.asset(
-                                    "images/event.jpg",
+                                  child: Image.network(
+                                    ds["Image"],
                                     height: 260,
                                     width: MediaQuery.of(context).size.width,
                                     fit: BoxFit.cover,

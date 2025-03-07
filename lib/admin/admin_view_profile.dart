@@ -79,7 +79,7 @@ class _AdminViewProfileState extends State<AdminViewProfile> {
                       children: [
                         CircleAvatar(
                           radius: 80,
-                          backgroundImage: AssetImage("images/profile.jpg"),
+                          backgroundImage: NetworkImage(user["Image"]),
                         ),
                         Positioned(
                           bottom: 0,

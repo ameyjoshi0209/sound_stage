@@ -51,7 +51,7 @@ class _CategoriesEventState extends State<CategoriesEvent> {
                   underAge = true;
                 }
 
-                return hasPassed || underAge
+                return hasPassed || underAge || ds['EventApproved'] == false
                     ? Container()
                     : GestureDetector(
                       onTap: () {
@@ -82,8 +82,8 @@ class _CategoriesEventState extends State<CategoriesEvent> {
                               children: [
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(15.0),
-                                  child: Image.asset(
-                                    "images/event.jpg",
+                                  child: Image.network(
+                                    ds["Image"],
                                     height: 260,
                                     width: MediaQuery.of(context).size.width,
                                     fit: BoxFit.cover,

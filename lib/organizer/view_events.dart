@@ -58,6 +58,7 @@ class _ViewEventsState extends State<ViewEvents> {
                     location: ds["Location"],
                     name: ds["Name"],
                     price: ds["Price"],
+                    image: ds["Image"],
                     time: ds["Time"],
                     approvalStatus: ds["EventApproved"],
                   );
@@ -146,6 +147,7 @@ class BookingCard extends StatelessWidget {
   final String time;
   final bool manage;
   final bool approvalStatus;
+  final String image;
 
   const BookingCard({
     required this.eventId,
@@ -159,6 +161,7 @@ class BookingCard extends StatelessWidget {
     required this.time,
     required this.manage,
     required this.approvalStatus,
+    required this.image,
   });
 
   @override
@@ -191,8 +194,8 @@ class BookingCard extends StatelessWidget {
                     borderRadius: BorderRadius.vertical(
                       top: Radius.circular(20),
                     ),
-                    child: Image.asset(
-                      'images/event.jpg',
+                    child: Image.network(
+                      image,
                       height: 200,
                       width: double.infinity,
                       fit: BoxFit.cover,

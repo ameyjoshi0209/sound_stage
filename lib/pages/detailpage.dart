@@ -58,8 +58,8 @@ class _DetailPageState extends State<DetailPage> {
               children: [
                 Stack(
                   children: [
-                    Image.asset(
-                      "images/event.jpg", // Use widget.image
+                    Image.network(
+                      widget.image, // Use widget.image
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.height / 2,
                       fit: BoxFit.cover,
@@ -159,7 +159,7 @@ class _DetailPageState extends State<DetailPage> {
                 Padding(
                   padding: const EdgeInsets.only(left: 20),
                   child: Text(
-                    "lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+                    widget.details,
                     style: TextStyle(
                       fontSize: 18,
                       color: Colors.black,
@@ -401,6 +401,8 @@ class _DetailPageState extends State<DetailPage> {
               "Number": ticket.toString(),
               "Total": total.toString(),
               "Event": widget.name,
+              "Price": widget.price,
+              "Image": widget.image,
               "Location": widget.location,
               "Date": widget.date,
               "Name": name,
