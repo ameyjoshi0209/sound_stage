@@ -39,7 +39,7 @@ class _UploadEventState extends State<UploadEvent> {
     "Classical",
     "Rock Band",
   ];
-  String? value;
+  String? value, imageurl;
   final ImagePicker _picker = ImagePicker();
   File? selectedImage;
 
@@ -67,7 +67,7 @@ class _UploadEventState extends State<UploadEvent> {
         hour: parsedTime.hour,
         minute: parsedTime.minute,
       );
-      // If you have an image URL, you can also fetch and display it here
+      imageurl = eventData['Image'];
     }
   }
 
@@ -124,8 +124,9 @@ class _UploadEventState extends State<UploadEvent> {
 
   ontheload() async {
     await getthesharedpref();
-    if (widget.edit)
+    if (widget.edit) {
       await getEventData(); // Fetch event data when loading the scree
+    }
     setState(() {});
   }
 
@@ -165,42 +166,63 @@ class _UploadEventState extends State<UploadEvent> {
                 ],
               ),
               SizedBox(height: 20),
-              selectedImage != null
-                  ? Center(
+              if (selectedImage == null && imageurl == null)
+                GestureDetector(
+                  onTap: () {
+                    getImage();
+                  },
+                  child: Center(
+                    child: Container(
+                      height: 200,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Color(0xffececf8),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: Colors.deepPurple, width: 1),
+                      ),
+                      child: Icon(
+                        Icons.add_a_photo,
+                        color: Colors.black,
+                        size: 30,
+                      ),
+                    ),
+                  ),
+                )
+              else if (selectedImage != null || imageurl == null)
+                GestureDetector(
+                  onTap: () {
+                    getImage();
+                  },
+                  child: Center(
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: Image.file(
-                        selectedImage!,
+                        selectedImage!, // Fallback to selectedImage if imageUrl is null
                         height: 200,
                         width: double.infinity,
                         fit: BoxFit.cover,
                       ),
                     ),
-                  )
-                  : Center(
-                    child: GestureDetector(
-                      onTap: () {
-                        getImage();
-                      },
-                      child: Container(
+                  ),
+                )
+              else if (selectedImage == null && imageurl != null)
+                GestureDetector(
+                  onTap: () {
+                    getImage();
+                  },
+                  child: Center(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Image.network(
+                        imageurl!, // Fallback to selectedImage if imageUrl is null
                         height: 200,
                         width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: Color(0xffececf8),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: Colors.deepPurple,
-                            width: 1,
-                          ),
-                        ),
-                        child: Icon(
-                          Icons.add_a_photo,
-                          color: Colors.black,
-                          size: 30,
-                        ),
+                        fit: BoxFit.cover,
                       ),
                     ),
                   ),
+                ),
+
               SizedBox(height: 20),
               Text(
                 "Event name",
@@ -422,8 +444,21 @@ class _UploadEventState extends State<UploadEvent> {
                   HapticFeedback.lightImpact();
                   String addId = randomAlphaNumeric(10);
                   String? url = await uploadtoCloudinary(selectedImage);
+                  String? uploadedImageUrl;
+                  if (widget.edit) {
+                    if (imageurl == null) {
+                      uploadedImageUrl = url;
+                    } else {
+                      if (imageurl == url) {
+                        uploadedImageUrl = url;
+                      } else {
+                        await deleteFromCloudinary(imageurl!);
+                        uploadedImageUrl = url;
+                      }
+                    }
+                  }
                   Map<String, dynamic> uploadevent = {
-                    "Image": url,
+                    "Image": widget.edit ? uploadedImageUrl : url,
                     "Name": nameController.text,
                     "Price": priceController.text,
                     "Category": value,
@@ -451,15 +486,19 @@ class _UploadEventState extends State<UploadEvent> {
                             ),
                           ),
                         );
-                        setState(() {
-                          nameController.text = "";
-                          priceController.text = "";
-                          detailController.text = "";
-                          locationController.text = "";
-                          ageController.text = "";
-                          selectedImage = null;
-                          value = null;
-                        });
+                        widget.edit
+                            ? setState(() {})
+                            : setState(() {
+                              nameController.clear();
+                              priceController.clear();
+                              detailController.clear();
+                              locationController.clear();
+                              ageController.clear();
+                              selectedImage = null;
+                              value = null;
+                              imageurl = null;
+                              selectedDate = DateTime.now();
+                            });
                       });
                 },
                 child: Center(

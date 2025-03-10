@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:sound_stage/services/auth.dart';
+import 'package:sound_stage/services/cloudinary_service.dart';
 
 class AdminCreateOrg extends StatefulWidget {
   @override
@@ -15,6 +19,17 @@ class _AdminCreateOrgState extends State<AdminCreateOrg> {
   final TextEditingController _orgAddressController = TextEditingController();
   final TextEditingController _orgWebsiteController = TextEditingController();
   final TextEditingController _orgFacebookController = TextEditingController();
+
+  final ImagePicker _picker = ImagePicker();
+  File? selectedImage;
+
+  Future getImage() async {
+    var image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      selectedImage = File(image.path);
+    }
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +58,7 @@ class _AdminCreateOrgState extends State<AdminCreateOrg> {
                   IconButton(
                     icon: Icon(Icons.arrow_back_ios_new_rounded),
                     onPressed: () {
+                      HapticFeedback.lightImpact();
                       Navigator.pop(context); // Navigate back
                     },
                   ),
@@ -65,14 +81,47 @@ class _AdminCreateOrgState extends State<AdminCreateOrg> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Center(
-                      child: CircleAvatar(
-                        radius: 80,
-                        backgroundImage: AssetImage(
-                          'images/profile.jpg',
-                        ), // Static image
-                        backgroundColor: Colors.blue,
+                      child: GestureDetector(
+                        onTap: () {
+                          getImage();
+                        },
+                        child: Stack(
+                          children: [
+                            CircleAvatar(
+                              radius: 80,
+                              backgroundImage:
+                                  selectedImage == null
+                                      ? AssetImage('images/profile.png')
+                                      : FileImage(
+                                        selectedImage!,
+                                      ), // Static image
+                              backgroundColor: Colors.white,
+                            ),
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: CircleAvatar(
+                                radius: 20,
+                                backgroundColor: Colors.white,
+                                child:
+                                    selectedImage == null
+                                        ? Icon(
+                                          Icons.add_a_photo,
+                                          color: Color(0xFF2575FC),
+                                          size: 20,
+                                        )
+                                        : Icon(
+                                          Icons.edit,
+                                          color: Color(0xFF2575FC),
+                                          size: 20,
+                                        ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
+
                     SizedBox(height: 40),
                     _buildTextField(
                       label: "Email Address",
@@ -148,6 +197,12 @@ class _AdminCreateOrgState extends State<AdminCreateOrg> {
                       child: ElevatedButton(
                         onPressed: () async {
                           HapticFeedback.mediumImpact();
+                          String? profileurl;
+                          if (selectedImage != null) {
+                            profileurl = await uploadtoCloudinary(
+                              selectedImage,
+                            );
+                          }
                           AuthService().registerOrg(
                             context: context,
                             orgName: _orgNameController.text,
@@ -157,6 +212,7 @@ class _AdminCreateOrgState extends State<AdminCreateOrg> {
                             orgAddress: _orgAddressController.text,
                             orgWebsite: _orgWebsiteController.text,
                             orgFacebook: _orgFacebookController.text,
+                            orgImage: selectedImage == null ? null : profileurl,
                           );
                           setState(() {
                             _orgNameController.clear();
@@ -166,6 +222,7 @@ class _AdminCreateOrgState extends State<AdminCreateOrg> {
                             _orgAddressController.clear();
                             _orgWebsiteController.clear();
                             _orgFacebookController.clear();
+                            selectedImage = null;
                           });
                         },
                         style: ElevatedButton.styleFrom(

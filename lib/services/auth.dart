@@ -37,8 +37,9 @@ class AuthService {
         "email": email,
         "password": password,
         "role": "customer",
-        "phone": "",
-        "age": "",
+        "phone": null,
+        "age": null,
+        "image": null,
         "userid": signupID,
       };
       await DatabaseMethods().addUserDetail(uploadUser, signupID).then((value) {
@@ -164,6 +165,7 @@ class AuthService {
     required String? orgAddress,
     required String? orgWebsite,
     required String? orgFacebook,
+    required String? orgImage,
   }) async {
     try {
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -180,6 +182,7 @@ class AuthService {
         "orgaddress": orgAddress,
         "orgwebsite": orgWebsite,
         "orgfacebook": orgFacebook,
+        "orgimage": orgImage,
         "role": "organizer",
         "orgid": signupID,
       };

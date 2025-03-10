@@ -41,6 +41,7 @@ class _AdminApproveEventsState extends State<AdminApproveEvents> {
                       ? Container()
                       : BookingCard(
                         eventid: ds["EventId"],
+                        image: ds["Image"],
                         ageAllowed: ds["AgeAllowed"],
                         category: ds["Category"],
                         date: ds["Date"],
@@ -144,6 +145,7 @@ class BookingCard extends StatelessWidget {
   final String price;
   final String time;
   final String eventid;
+  final String image;
 
   const BookingCard({
     required this.ageAllowed,
@@ -155,6 +157,7 @@ class BookingCard extends StatelessWidget {
     required this.price,
     required this.time,
     required this.eventid,
+    required this.image,
   });
 
   @override
@@ -188,8 +191,8 @@ class BookingCard extends StatelessWidget {
                     borderRadius: BorderRadius.vertical(
                       top: Radius.circular(20),
                     ),
-                    child: Image.asset(
-                      'images/event.jpg',
+                    child: Image.network(
+                      image,
                       height: 200,
                       width: double.infinity,
                       fit: BoxFit.cover,

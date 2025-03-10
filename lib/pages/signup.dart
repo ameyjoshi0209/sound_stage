@@ -97,11 +97,14 @@ class _SignUpState extends State<SignUp> {
                               decoration: InputDecoration(
                                 labelText: 'Name',
                                 filled: true,
-                                fillColor: Colors.white70,
+                                fillColor: Colors.white,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(50),
                                 ),
-                                prefixIcon: Icon(Icons.person),
+                                prefixIcon: Icon(
+                                  Icons.person,
+                                  color: Color(0xff6351ec),
+                                ),
                               ),
                             ),
                             SizedBox(height: 20),
@@ -110,11 +113,14 @@ class _SignUpState extends State<SignUp> {
                               decoration: InputDecoration(
                                 labelText: 'Email',
                                 filled: true,
-                                fillColor: Colors.white70,
+                                fillColor: Colors.white,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(50),
                                 ),
-                                prefixIcon: Icon(Icons.email),
+                                prefixIcon: Icon(
+                                  Icons.email,
+                                  color: Color(0xff6351ec),
+                                ),
                               ),
                             ),
                             SizedBox(height: 20),
@@ -124,11 +130,14 @@ class _SignUpState extends State<SignUp> {
                               decoration: InputDecoration(
                                 labelText: 'Password',
                                 filled: true,
-                                fillColor: Colors.white70,
+                                fillColor: Colors.white,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(50),
                                 ),
-                                prefixIcon: Icon(Icons.lock),
+                                prefixIcon: Icon(
+                                  Icons.lock,
+                                  color: Color(0xff6351ec),
+                                ),
                               ),
                             ),
                             SizedBox(height: 20),
@@ -138,16 +147,30 @@ class _SignUpState extends State<SignUp> {
                               decoration: InputDecoration(
                                 labelText: 'Confirm Password',
                                 filled: true,
-                                fillColor: Colors.white70,
+                                fillColor: Colors.white,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(50),
                                 ),
-                                prefixIcon: Icon(Icons.lock),
+                                prefixIcon: Icon(
+                                  Icons.lock,
+                                  color: Color(0xff6351ec),
+                                ),
                               ),
                             ),
                             SizedBox(height: 50),
-                            GestureDetector(
-                              onTap: () async {
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Color(0xFF2A2A2A),
+                                side: BorderSide(
+                                  color: Color(0xff6351ec),
+                                  width: 2,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                                minimumSize: Size(double.infinity, 50),
+                              ),
+                              onPressed: () async {
                                 HapticFeedback.mediumImpact();
                                 AuthService().signup(
                                   context: context,
@@ -158,25 +181,11 @@ class _SignUpState extends State<SignUp> {
                                       _confirmpasswordController.text,
                                 );
                               },
-                              child: Container(
-                                height: 50,
-                                margin: EdgeInsets.only(left: 90, right: 90),
-                                decoration: BoxDecoration(
-                                  color: Color(0xff6351ec),
-                                  borderRadius: BorderRadius.circular(40),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'Sign Up',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
+                              child: Text(
+                                "Sign Up",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.white,
                                 ),
                               ),
                             ),
@@ -188,7 +197,7 @@ class _SignUpState extends State<SignUp> {
                                   Text(
                                     'Already have an account? ',
                                     style: TextStyle(
-                                      color: Colors.white54,
+                                      color: Colors.white60,
                                       fontSize: 16,
                                     ),
                                   ),
@@ -200,7 +209,7 @@ class _SignUpState extends State<SignUp> {
                                     child: Text(
                                       'Sign In',
                                       style: TextStyle(
-                                        color: Color(0xff6351ec),
+                                        color: Colors.white,
                                         fontSize: 16,
                                       ),
                                     ),

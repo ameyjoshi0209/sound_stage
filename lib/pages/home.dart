@@ -19,6 +19,7 @@ class _HomeState extends State<Home> {
   late int userAge = 0;
   String searchQuery = '';
   TextEditingController searchController = TextEditingController();
+  FocusNode focusNode = FocusNode();
 
   ontheload() async {
     eventStream = await DatabaseMethods().getallEvents();
@@ -34,6 +35,13 @@ class _HomeState extends State<Home> {
   void initState() {
     ontheload();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    focusNode.dispose();
+    super.dispose();
   }
 
   Widget allEvents() {
@@ -180,369 +188,382 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        // Wrap the whole body in a SingleChildScrollView
-        child: Container(
-          padding: EdgeInsets.only(top: 50.0),
-          width: MediaQuery.of(context).size.width,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF9A8DFF), Color(0xffd5dbff), Colors.white],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+      body: GestureDetector(
+        onTap: () {
+          focusNode
+              .unfocus(); // Step 1: Unfocus the FocusNode when tapping anywhere on the screen
+        },
+        child: SingleChildScrollView(
+          // Wrap the whole body in a SingleChildScrollView
+          child: Container(
+            padding: EdgeInsets.only(top: 50.0),
+            width: MediaQuery.of(context).size.width,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF9A8DFF), Color(0xffd5dbff), Colors.white],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
             ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 15.0),
-                child: Row(
-                  children: [
-                    Icon(Icons.location_on_outlined),
-                    Text(
-                      "San Francisco, SH",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.w500,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 15.0),
+                  child: Row(
+                    children: [
+                      Icon(Icons.location_on_outlined),
+                      Text(
+                        "San Francisco, SH",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 20.0),
-              Padding(
-                padding: const EdgeInsets.only(left: 20.0),
-                child: FutureBuilder<String?>(
-                  future: SharedPreferenceHelper().getUserName(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Text(
-                        "Hello, ...",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 35.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      );
-                    } else if (snapshot.hasError) {
-                      return Text(
-                        "Hello, Guest!",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 35.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      );
-                    } else {
-                      return Text(
-                        "Hello, ${snapshot.data}!",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 35.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      );
-                    }
-                  },
-                ),
-              ),
-              SizedBox(height: 10.0),
-              Padding(
-                padding: const EdgeInsets.only(left: 20.0),
-                child: Text(
-                  "There are events near your location",
-                  style: TextStyle(
-                    color: Color(0xff6351ec),
-                    fontSize: 26.0,
-                    fontWeight: FontWeight.bold,
+                    ],
                   ),
                 ),
-              ),
-              SizedBox(height: 30.0),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: TextField(
-                  controller: searchController,
-                  onChanged: (query) {
-                    setState(() {
-                      searchQuery =
-                          query; // Update the search query when the user types
-                    });
-                  },
-                  decoration: InputDecoration(
-                    hintText: 'Search for users...',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      borderSide: BorderSide.none,
+                SizedBox(height: 20.0),
+                Padding(
+                  padding: const EdgeInsets.only(left: 20.0),
+                  child: FutureBuilder<String?>(
+                    future: SharedPreferenceHelper().getUserName(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Text(
+                          "Hello, ...",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 35.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        );
+                      } else if (snapshot.hasError) {
+                        return Text(
+                          "Hello, Guest!",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 35.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        );
+                      } else {
+                        return Text(
+                          "Hello, ${snapshot.data}!",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 35.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                ),
+                SizedBox(height: 10.0),
+                Padding(
+                  padding: const EdgeInsets.only(left: 20.0),
+                  child: Text(
+                    "There are events near your location",
+                    style: TextStyle(
+                      color: Color(0xff6351ec),
+                      fontSize: 26.0,
+                      fontWeight: FontWeight.bold,
                     ),
-                    prefixIcon: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          searchQuery = '';
-                          searchController
-                              .clear(); // Clear the text field when tapping the back icon
-                        });
-                      },
-                      child: AnimatedSwitcher(
-                        duration: Duration(milliseconds: 300),
-                        transitionBuilder: (
-                          Widget child,
-                          Animation<double> animation,
-                        ) {
-                          // You can use ScaleTransition, FadeTransition, etc.
-                          return ScaleTransition(
-                            scale: animation,
-                            child: child,
+                  ),
+                ),
+                SizedBox(height: 30.0),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: TextField(
+                    controller: searchController,
+                    focusNode: focusNode,
+                    onChanged: (query) {
+                      setState(() {
+                        searchQuery =
+                            query; // Update the search query when the user types
+                      });
+                    },
+                    decoration: InputDecoration(
+                      hintText: 'whats on your mind?',
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 20.0,
+                        vertical: 15.0,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: BorderSide.none,
+                      ),
+                      prefixIcon: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            searchQuery = '';
+                            searchController
+                                .clear(); // Clear the text field when tapping the back icon
+                          });
+                        },
+                        child: AnimatedSwitcher(
+                          duration: Duration(milliseconds: 300),
+                          transitionBuilder: (
+                            Widget child,
+                            Animation<double> animation,
+                          ) {
+                            // You can use ScaleTransition, FadeTransition, etc.
+                            return ScaleTransition(
+                              scale: animation,
+                              child: child,
+                            );
+                          },
+                          child:
+                              searchQuery.isEmpty
+                                  ? GestureDetector(
+                                    onTap: () {
+                                      HapticFeedback.lightImpact();
+                                      Navigator.pop(context);
+                                    },
+                                    child: Icon(
+                                      Icons.search_outlined, // Back icon
+                                      key: ValueKey('back'),
+                                    ),
+                                  )
+                                  : Icon(
+                                    Icons.close, // Close icon when typing
+                                    key: ValueKey('close'),
+                                  ),
+                        ),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 30.0),
+                Container(
+                  height: 125.0,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    children: [
+                      // Categories (Jazz, Metal, Classical, etc.)
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      CategoriesEvent(eventCategory: "Jazz"),
+                            ),
                           );
                         },
-                        child:
-                            searchQuery.isEmpty
-                                ? GestureDetector(
-                                  onTap: () {
-                                    HapticFeedback.lightImpact();
-                                    Navigator.pop(context);
-                                  },
-                                  child: Icon(
-                                    Icons.search_outlined, // Back icon
-                                    key: ValueKey('back'),
+                        child: Container(
+                          margin: EdgeInsets.only(bottom: 5, left: 20),
+                          child: Material(
+                            elevation: 3.0,
+                            borderRadius: BorderRadius.circular(25.0),
+                            child: Container(
+                              width: 125,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(25.0),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Image.asset(
+                                    "images/saxophone.png",
+                                    height: 45,
+                                    width: 45,
+                                    fit: BoxFit.fill,
                                   ),
-                                )
-                                : Icon(
-                                  Icons.close, // Close icon when typing
-                                  key: ValueKey('close'),
-                                ),
+                                  Text(
+                                    "Jazz",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
+                      SizedBox(width: 20.0),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      CategoriesEvent(eventCategory: "Metal"),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          margin: EdgeInsets.only(bottom: 5),
+                          child: Material(
+                            elevation: 3.0,
+                            borderRadius: BorderRadius.circular(25.0),
+                            child: Container(
+                              width: 125,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(25.0),
+                              ),
+                              padding: EdgeInsets.all(10.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Image.asset(
+                                    "images/guitar.png",
+                                    height: 45,
+                                    width: 45,
+                                    fit: BoxFit.fill,
+                                  ),
+                                  Text(
+                                    "Metal",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 20.0),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => CategoriesEvent(
+                                    eventCategory: "Classical",
+                                  ),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          margin: EdgeInsets.only(bottom: 5),
+                          child: Material(
+                            elevation: 3.0,
+                            borderRadius: BorderRadius.circular(25.0),
+                            child: Container(
+                              width: 125,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(25.0),
+                              ),
+                              padding: EdgeInsets.all(10.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Image.asset(
+                                    "images/sitar.png",
+                                    height: 45,
+                                    width: 45,
+                                    fit: BoxFit.fill,
+                                  ),
+                                  Text(
+                                    "Classical",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 20.0),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => CategoriesEvent(
+                                    eventCategory: "Rock Band",
+                                  ),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          margin: EdgeInsets.only(bottom: 5, right: 20),
+                          child: Material(
+                            elevation: 3.0,
+                            borderRadius: BorderRadius.circular(25.0),
+                            child: Container(
+                              width: 125,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(25.0),
+                              ),
+                              padding: EdgeInsets.all(10.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Image.asset(
+                                    "images/drums.png",
+                                    height: 50,
+                                    width: 50,
+                                    fit: BoxFit.fill,
+                                  ),
+                                  Text(
+                                    "Rock Band",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-              SizedBox(height: 30.0),
-              Container(
-                height: 125.0,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
+                SizedBox(height: 30.0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Categories (Jazz, Metal, Classical, etc.)
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder:
-                                (context) =>
-                                    CategoriesEvent(eventCategory: "Jazz"),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        margin: EdgeInsets.only(bottom: 5, left: 20),
-                        child: Material(
-                          elevation: 3.0,
-                          borderRadius: BorderRadius.circular(25.0),
-                          child: Container(
-                            width: 125,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(25.0),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Image.asset(
-                                  "images/saxophone.png",
-                                  height: 45,
-                                  width: 45,
-                                  fit: BoxFit.fill,
-                                ),
-                                Text(
-                                  "Jazz",
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 20,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20),
+                      child: Text(
+                        "Upcoming Events",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 23,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-                    SizedBox(width: 20.0),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder:
-                                (context) =>
-                                    CategoriesEvent(eventCategory: "Metal"),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        margin: EdgeInsets.only(bottom: 5),
-                        child: Material(
-                          elevation: 3.0,
-                          borderRadius: BorderRadius.circular(25.0),
-                          child: Container(
-                            width: 125,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(25.0),
-                            ),
-                            padding: EdgeInsets.all(10.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Image.asset(
-                                  "images/guitar.png",
-                                  height: 45,
-                                  width: 45,
-                                  fit: BoxFit.fill,
-                                ),
-                                Text(
-                                  "Metal",
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 20,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 20.0),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder:
-                                (context) =>
-                                    CategoriesEvent(eventCategory: "Classical"),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        margin: EdgeInsets.only(bottom: 5),
-                        child: Material(
-                          elevation: 3.0,
-                          borderRadius: BorderRadius.circular(25.0),
-                          child: Container(
-                            width: 125,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(25.0),
-                            ),
-                            padding: EdgeInsets.all(10.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Image.asset(
-                                  "images/sitar.png",
-                                  height: 45,
-                                  width: 45,
-                                  fit: BoxFit.fill,
-                                ),
-                                Text(
-                                  "Classical",
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 20,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 20.0),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder:
-                                (context) =>
-                                    CategoriesEvent(eventCategory: "Rock Band"),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        margin: EdgeInsets.only(bottom: 5, right: 20),
-                        child: Material(
-                          elevation: 3.0,
-                          borderRadius: BorderRadius.circular(25.0),
-                          child: Container(
-                            width: 125,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(25.0),
-                            ),
-                            padding: EdgeInsets.all(10.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Image.asset(
-                                  "images/drums.png",
-                                  height: 50,
-                                  width: 50,
-                                  fit: BoxFit.fill,
-                                ),
-                                Text(
-                                  "Rock Band",
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 18,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 20.0),
+                      child: Text(
+                        "see all",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
                   ],
                 ),
-              ),
-              SizedBox(height: 30.0),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20),
-                    child: Text(
-                      "Upcoming Events",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 23,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 20.0),
-                    child: Text(
-                      "see all",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 30.0),
-              allEvents(), // List of events
-            ],
+                SizedBox(height: 30.0),
+                allEvents(), // List of events
+              ],
+            ),
           ),
         ),
       ),

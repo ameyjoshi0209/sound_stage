@@ -22,6 +22,8 @@ class _UserProfileState extends State<UserProfile> {
 
   String? id, name, email, password, phone, age, image;
 
+  bool isPasswordVisible = false;
+
   // Declare controllers at the class level
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
@@ -115,10 +117,10 @@ class _UserProfileState extends State<UserProfile> {
                         },
                         child: CircleAvatar(
                           radius: 80,
-                          backgroundImage: NetworkImage(
-                            image ??
-                                'https://www.kindpng.com/picc/m/495-4952535_create-digital-profile-icon-blue-user-profile-icon.png',
-                          ),
+                          backgroundImage:
+                              image == null
+                                  ? AssetImage('images/profile.png')
+                                  : NetworkImage(image!), // Static image
                         ),
                       )
                       : CircleAvatar(
@@ -185,16 +187,26 @@ class _UserProfileState extends State<UserProfile> {
                       phoneController.text,
                     );
                     SharedPreferenceHelper().saveUserAge(ageController.text);
-                    String? profileurl = await uploadtoCloudinary(
-                      selectedImage,
-                    );
+                    String? profileurl;
+                    if (image == null) {
+                      profileurl = await uploadtoCloudinary(selectedImage);
+                      SharedPreferenceHelper().saveUserImage(profileurl);
+                    } else {
+                      if (selectedImage != null) {
+                        await deleteFromCloudinary(image!);
+                        profileurl = await uploadtoCloudinary(selectedImage);
+                        SharedPreferenceHelper().saveUserImage(profileurl);
+                      } else {
+                        profileurl = image;
+                      }
+                    }
                     Map<String, dynamic> userInfoMap = {
                       "name": nameController.text,
                       "email": emailController.text,
                       "password": passwordController.text,
                       "phone": phoneController.text,
                       "age": ageController.text,
-                      "image": selectedImage == null ? image : profileurl,
+                      "image": profileurl,
                       "userid": id,
                       "role": "customer",
                     };
@@ -300,7 +312,10 @@ class _UserProfileState extends State<UserProfile> {
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: TextField(
         controller: controller, // Use the passed controller
-        obscureText: isPassword,
+        obscureText:
+            isPassword
+                ? !isPasswordVisible
+                : false, // Toggle visibility for password
         readOnly: isDate,
         decoration: InputDecoration(
           labelText: label,
@@ -320,7 +335,19 @@ class _UserProfileState extends State<UserProfile> {
           prefixIcon: Icon(icon, color: Color(0xff6351ec)),
           suffixIcon:
               isPassword
-                  ? Icon(Icons.visibility_off, color: Colors.grey)
+                  ? IconButton(
+                    icon: Icon(
+                      isPasswordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                      color: Colors.grey,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        isPasswordVisible = !isPasswordVisible;
+                      });
+                    },
+                  )
                   : isDate
                   ? GestureDetector(
                     onTap: () {

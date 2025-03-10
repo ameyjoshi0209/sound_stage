@@ -52,20 +52,13 @@ class _AdminViewProfileState extends State<AdminViewProfile> {
               centerTitle: true,
               backgroundColor: Colors.transparent,
               elevation: 0,
-              actions: [
-                IconButton(
-                  padding: EdgeInsets.only(right: 10),
-                  icon: Icon(
-                    Icons.logout_rounded,
-                    color: Colors.black,
-                    size: 29,
-                    semanticLabel: 'Logout',
-                  ),
-                  onPressed: () {
-                    HapticFeedback.mediumImpact();
-                  },
-                ),
-              ],
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back_ios_new_rounded),
+                color: Colors.black,
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
             ),
             body: SingleChildScrollView(
               child: Padding(
@@ -79,20 +72,10 @@ class _AdminViewProfileState extends State<AdminViewProfile> {
                       children: [
                         CircleAvatar(
                           radius: 80,
-                          backgroundImage: NetworkImage(user["Image"]),
-                        ),
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: CircleAvatar(
-                            radius: 15,
-                            backgroundColor: Color(0xff6351ec),
-                            child: Icon(
-                              Icons.camera_alt,
-                              color: Colors.black,
-                              size: 18,
-                            ),
-                          ),
+                          backgroundImage:
+                              user["image"] == null
+                                  ? AssetImage('images/profile.png')
+                                  : NetworkImage(user["image"]!),
                         ),
                       ],
                     ),
@@ -219,9 +202,10 @@ class _AdminViewProfileState extends State<AdminViewProfile> {
                           Center(
                             child: CircleAvatar(
                               radius: 80,
-                              backgroundImage: AssetImage(
-                                'images/profile.jpg',
-                              ), // Static image
+                              backgroundImage:
+                                  user["orgimage"] == null
+                                      ? AssetImage('images/profile.png')
+                                      : NetworkImage(user["orgimage"]!),
                               backgroundColor: Colors.blue,
                             ),
                           ),
@@ -342,8 +326,8 @@ class _AdminViewProfileState extends State<AdminViewProfile> {
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: TextField(
         controller: _controller, // Set the controller to the TextField
-        obscureText: isPassword,
-        readOnly: isDate, // Make it read-only if isDate is true
+        obscureText: false,
+        readOnly: true, // Make it read-only if isDate is true
         decoration: InputDecoration(
           labelText: label,
           labelStyle: TextStyle(color: Colors.white, fontSize: 16),

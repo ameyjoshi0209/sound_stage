@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'data.dart';
+import 'package:crypto/crypto.dart';
+import 'dart:convert';
 
 Future<String> uploadtoCloudinary(File? selectedImage) async {
   String cloudname = cloudName;
@@ -34,4 +36,47 @@ Future<String> uploadtoCloudinary(File? selectedImage) async {
   } else {
     return '';
   }
+}
+
+Future deleteFromCloudinary(String imageLink) async {
+  var publicId = imageLink.split('/').last.split('.')[0];
+
+  String cloudname = cloudName;
+  String apiKey = apikey; // Your Cloudinary API key
+  String apiSecret = apiSecretKey; // Your Cloudinary API Secret
+
+  var uri = Uri.parse(
+    'https://api.cloudinary.com/v1_1/$cloudname/image/destroy',
+  );
+
+  var request = http.MultipartRequest('POST', uri);
+
+  request.fields['public_id'] =
+      publicId; // The public ID of the image you want to delete
+  request.fields['api_key'] = apiKey; // Your Cloudinary API key
+  request.fields['timestamp'] =
+      DateTime.now().millisecondsSinceEpoch.toString();
+
+  // Generate the signature using the public ID and timestamp
+  String signature = generateSignature(publicId, apiSecret);
+  request.fields['signature'] = signature;
+
+  var response = await request.send();
+  var responseBody = await response.stream.bytesToString();
+
+  print(responseBody);
+}
+
+// Helper function to generate the signature
+String generateSignature(String publicId, String apiSecret) {
+  String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+
+  // Create the signature string
+  String signatureString = 'public_id=$publicId&timestamp=$timestamp$apiSecret';
+
+  // Generate the SHA-1 hash of the signature string
+  var bytes = utf8.encode(signatureString); // Convert to bytes
+  var hash = sha1.convert(bytes); // Generate SHA-1 hash
+
+  return hash.toString(); // Return the hash as a string
 }
