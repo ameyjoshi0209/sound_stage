@@ -1,30 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
+import 'package:sound_stage/pages/qr_ticket.dart';
 import 'package:sound_stage/services/database.dart';
 import 'package:sound_stage/services/shared_pref.dart';
-
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primaryColor: Color(0xff6351ec),
-        colorScheme: ColorScheme.fromSwatch().copyWith(
-          secondary: Color(0xff8071f2),
-          primary: Color(0xff6351ec),
-        ),
-        scaffoldBackgroundColor: Color(0xffede9ff),
-      ),
-      home: Booking(),
-    );
-  }
-}
 
 class Booking extends StatefulWidget {
   const Booking({super.key});
@@ -69,13 +49,14 @@ class _BookingState extends State<Booking> {
                   DocumentSnapshot ds = snapshot.data.docs[index];
                   return BookingCard(
                     image: ds['Image'],
-                    title: ds['Event'],
+                    title: ds['EventName'],
                     location: ds['Location'],
-                    status: 'Paid',
-                    buttonText: 'View Ticket',
                     amount: ds['Total'],
                     people: ds['Number'] + ' People',
                     date: ds['Date'],
+                    eventId: ds['EventId'],
+                    customerId: id!,
+                    bookingId: ds["BookingId"],
                   );
                 },
               ),
@@ -154,104 +135,131 @@ class BookingCard extends StatelessWidget {
   final String image;
   final String title;
   final String location;
-  final String status;
-  final String buttonText;
   final String amount;
   final String people;
   final String date;
+  final String eventId;
+  final String customerId;
+  final String bookingId;
 
   const BookingCard({
     required this.image,
     required this.title,
     required this.location,
-    required this.status,
-    required this.buttonText,
     required this.amount,
     required this.people,
     required this.date,
+    required this.eventId,
+    required this.customerId,
+    required this.bookingId,
   });
+
+  String formatDate(String date) {
+    DateTime parsedDate = DateFormat('dd-MM-yyyy').parse(date);
+    return DateFormat(
+      'd, MMM yyyy',
+    ).format(parsedDate); // Returns the date in "12, Dec 2023" format
+  }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 8.0),
       child: Card(
         color: Color(0xfff0ebff),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         elevation: 8,
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(15),
-                    child: Image.network(
-                      image,
-                      height: 140,
-                      width: 140,
-                      fit: BoxFit.cover,
+            // Stack to overlay date on top of image
+            Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(25),
+                  child: Image.network(
+                    image,
+                    height: 190,
+                    width: double.infinity, // Ensures image covers the width
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                // Positioned date at the top-left corner
+                Positioned(
+                  top: 10,
+                  left: 10,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.5), // Background color
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: Text(
+                      formatDate(date), // Format the date
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
                   ),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          title,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
+                ),
+              ],
+            ),
+            // Padding for spacing
+            SizedBox(height: 15),
+            // Data content
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23),
+                  ),
+                  SizedBox(height: 5),
+                  Row(
+                    children: [
+                      Icon(Icons.location_on, color: Colors.redAccent.shade200),
+                      Text(
+                        location,
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontSize: 17,
                         ),
-                        SizedBox(height: 5),
-                        Text(location, style: TextStyle(color: Colors.grey)),
-                        SizedBox(height: 5),
-                        Row(
-                          children: [
-                            Icon(Icons.attach_money, color: Colors.green),
-                            SizedBox(width: 3),
-                            Text(amount),
-                            SizedBox(width: 10),
-                            Icon(Icons.people, color: Colors.blue),
-                            SizedBox(width: 3),
-                            Text(people),
-                          ],
-                        ),
-                        SizedBox(height: 5),
-                        Row(
-                          children: [
-                            Icon(Icons.date_range, color: Colors.orange),
-                            SizedBox(width: 5),
-                            Text(date),
-                          ],
-                        ),
-                        SizedBox(height: 5),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 5,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Color.fromARGB(255, 205, 199, 240),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Text(
-                            status,
-                            style: TextStyle(
-                              color: Color.fromARGB(255, 87, 66, 248),
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 15),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Icon(Icons.attach_money, color: Colors.green),
+                      SizedBox(width: 2),
+                      Text(amount),
+                      SizedBox(width: 15),
+                      Icon(Icons.people, color: Colors.blue),
+                      SizedBox(width: 5),
+                      Text(people),
+                      SizedBox(width: 15),
+                    ],
+                  ),
+                  SizedBox(height: 5),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: Color.fromARGB(255, 205, 199, 240),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      "Active",
+                      style: TextStyle(color: Color.fromARGB(255, 87, 66, 248)),
                     ),
                   ),
                 ],
               ),
             ),
+            // Button at the bottom
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 16.0,
@@ -261,7 +269,20 @@ class BookingCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      HapticFeedback.lightImpact();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) => QrTicket(
+                                customerId: customerId,
+                                eventId: eventId,
+                                bookingId: bookingId,
+                              ),
+                        ),
+                      );
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xff6351ec),
                       shape: RoundedRectangleBorder(
@@ -269,7 +290,7 @@ class BookingCard extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      buttonText,
+                      "View Ticket",
                       style: TextStyle(color: Colors.white),
                     ),
                   ),

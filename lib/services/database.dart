@@ -46,18 +46,36 @@ class DatabaseMethods {
     });
   }
 
-  Future addUserBooking(Map<String, dynamic> userInfoMap, String id) async {
+  Future addUserBooking(
+    Map<String, dynamic> userInfoMap,
+    String id,
+    String bookId,
+  ) async {
     return await FirebaseFirestore.instance
         .collection("users")
         .doc(id)
         .collection("booking")
-        .add(userInfoMap);
+        .doc(bookId)
+        .set(userInfoMap);
   }
 
   Future addAdminTickets(Map<String, dynamic> userInfoMap) async {
     return await FirebaseFirestore.instance
         .collection("Tickets")
         .add(userInfoMap);
+  }
+
+  Future updateBookingStatus(
+    String customerId,
+    String eventId,
+    String bookingId,
+  ) async {
+    return await FirebaseFirestore.instance
+        .collection("users")
+        .doc(customerId)
+        .collection("booking")
+        .doc(bookingId)
+        .update({"Attended": false});
   }
 
   Future<Stream<QuerySnapshot>> getbookings(String id) async {
@@ -100,5 +118,16 @@ class DatabaseMethods {
     } else {
       throw Exception("Invalid role: $role");
     }
+  }
+
+  Future<Stream<DocumentSnapshot<Map<String, dynamic>>>> getBookingsByUserId(
+    String id,
+  ) async {
+    return await FirebaseFirestore.instance
+        .collection("users")
+        .doc(id)
+        .collection("booking")
+        .doc(id)
+        .snapshots();
   }
 }

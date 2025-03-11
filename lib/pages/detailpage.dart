@@ -4,12 +4,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:http/http.dart' as http;
+import 'package:random_string/random_string.dart';
+import 'package:sound_stage/pages/qr_ticket.dart';
 import 'package:sound_stage/services/data.dart';
 import 'package:sound_stage/services/database.dart';
 import 'package:sound_stage/services/shared_pref.dart';
 
 class DetailPage extends StatefulWidget {
-  String image, name, location, date, details, price, ageAllowed, category;
+  String image,
+      name,
+      location,
+      date,
+      details,
+      price,
+      ageAllowed,
+      category,
+      eventid;
   DetailPage({
     required this.image,
     required this.name,
@@ -19,6 +29,7 @@ class DetailPage extends StatefulWidget {
     required this.price,
     required this.ageAllowed,
     required this.category,
+    required this.eventid,
   });
 
   @override
@@ -30,7 +41,7 @@ class _DetailPageState extends State<DetailPage> {
   int ticket = 1;
   int total = 0;
 
-  String? email, id, name;
+  String? email, id, name, userImage;
 
   @override
   void initState() {
@@ -43,6 +54,7 @@ class _DetailPageState extends State<DetailPage> {
     name = await SharedPreferenceHelper().getUserName();
     email = await SharedPreferenceHelper().getUserEmail();
     id = await SharedPreferenceHelper().getUserId();
+    userImage = await SharedPreferenceHelper().getUserImage();
     setState(() {});
   }
 
@@ -402,38 +414,57 @@ class _DetailPageState extends State<DetailPage> {
       await Stripe.instance
           .presentPaymentSheet()
           .then((value) async {
+            String addId = randomAlphaNumeric(10);
             Map<String, dynamic> bookingdetail = {
               "Number": ticket.toString(),
               "Total": total.toString(),
-              "Event": widget.name,
-              "Price": widget.price,
-              "Image": widget.image,
-              "Location": widget.location,
-              "Date": widget.date,
-              "Name": name,
-              "Email": email,
-              "ID": id,
+              "EventName": widget.name,
+              "EventPrice": widget.price,
+              "EventImage": widget.image,
+              "EventLocation": widget.location,
+              "EventDate": widget.date,
+              "CustomerName": name,
+              "CustomerEmail": email,
+              "CustomerId": id,
+              "EventId": widget.eventid,
+              "BookingId": addId,
+              "CustomerImage": userImage,
+              "Attended": false,
             };
-            await DatabaseMethods().addUserBooking(bookingdetail, id!).then((
-              value,
-            ) async {
-              await DatabaseMethods().addAdminTickets(bookingdetail);
-            });
+            await DatabaseMethods()
+                .addUserBooking(bookingdetail, id!, addId)
+                .then((value) async {
+                  await DatabaseMethods().addAdminTickets(bookingdetail);
+                });
             showDialog(
               context: context,
               builder:
                   (_) => AlertDialog(
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(Icons.check_circle, color: Colors.green),
-                            Text("Payment Successful"),
-                          ],
-                        ),
-                      ],
+                    title: Text(
+                      "Payment Successful",
+                      style: TextStyle(color: Colors.green),
                     ),
+                    content: Text(
+                      "You have successfully booked $ticket tickets for ${widget.name}",
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => QrTicket(
+                                    customerId: id,
+                                    eventId: widget.eventid,
+                                    bookingId: addId,
+                                  ),
+                            ),
+                          );
+                        },
+                        child: Text("OK"),
+                      ),
+                    ],
                   ),
             );
             paymentIntent = null;

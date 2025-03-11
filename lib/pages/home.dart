@@ -73,6 +73,7 @@ class _HomeState extends State<Home> {
                           MaterialPageRoute(
                             builder:
                                 (context) => DetailPage(
+                                  eventid: ds["EventId"],
                                   category: ds["Category"],
                                   ageAllowed: ds["AgeAllowed"],
                                   date: ds["Date"],
