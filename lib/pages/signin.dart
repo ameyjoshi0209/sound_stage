@@ -135,12 +135,12 @@ class _SignInState extends State<SignIn> {
                                 backgroundColor: Color(0xFF2A2A2A),
                                 side: BorderSide(
                                   color: Color(0xff6351ec),
-                                  width: 2,
+                                  width: 3,
                                 ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(50),
                                 ),
-                                minimumSize: Size(double.infinity, 50),
+                                minimumSize: Size(double.infinity, 55),
                               ),
                               onPressed: () async {
                                 HapticFeedback.mediumImpact();

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:sound_stage/organizer/org_profile.dart';
+import 'package:sound_stage/organizer/qr_scanner.dart';
 import 'package:sound_stage/organizer/ticket_event.dart';
 import 'package:sound_stage/organizer/upload_event.dart';
 import 'package:sound_stage/organizer/view_events.dart';
@@ -119,6 +120,7 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
                       Icons.attach_money,
                     ),
                     _buildSectionCard(context, "Manage Events", Icons.event),
+                    _buildSectionCard(context, "Scan", Icons.qr_code),
                   ],
                 ),
               ),
@@ -183,6 +185,8 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
                     return ViewEvents(manage: false);
                   case "Manage Events":
                     return ViewEvents(manage: true);
+                  case "Scan":
+                    return QrScanner();
                   default:
                     return Scaffold(
                       appBar: AppBar(title: Text(title)),
@@ -193,6 +197,7 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
             ),
           );
         },
+
         child: Padding(
           padding: EdgeInsets.all(16.0),
           child: Column(
