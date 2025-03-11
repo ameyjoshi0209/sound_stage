@@ -1,23 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:sound_stage/services/auth.dart';
+import 'package:sound_stage/services/cloudinary_service.dart';
 import 'package:sound_stage/services/database.dart';
 import 'package:sound_stage/services/shared_pref.dart';
-
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark(),
-      home: UserProfile(),
-    );
-  }
-}
 
 class UserProfile extends StatefulWidget {
   @override
@@ -28,7 +17,12 @@ class _UserProfileState extends State<UserProfile> {
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay(hour: 10, minute: 0);
 
-  String? id, name, email, password, phone, age;
+  final ImagePicker _picker = ImagePicker();
+  File? selectedImage;
+
+  String? id, name, email, password, phone, age, image;
+
+  bool isPasswordVisible = false;
 
   // Declare controllers at the class level
   TextEditingController nameController = TextEditingController();
@@ -44,6 +38,7 @@ class _UserProfileState extends State<UserProfile> {
     password = await SharedPreferenceHelper().getUserPassword();
     phone = await SharedPreferenceHelper().getUserPhone();
     age = await SharedPreferenceHelper().getUserAge();
+    image = await SharedPreferenceHelper().getUserImage();
 
     // Initialize the controllers with the retrieved values
     nameController.text = name ?? '';
@@ -63,6 +58,14 @@ class _UserProfileState extends State<UserProfile> {
   void initState() {
     ontheload();
     super.initState();
+  }
+
+  Future getImage() async {
+    var image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      selectedImage = File(image.path);
+    }
+    setState(() {});
   }
 
   @override
@@ -107,21 +110,37 @@ class _UserProfileState extends State<UserProfile> {
               // Profile Picture with Camera Icon
               Stack(
                 children: [
-                  CircleAvatar(
-                    radius: 80,
-                    backgroundImage: AssetImage("images/profile.jpg"),
-                  ),
+                  selectedImage == null
+                      ? GestureDetector(
+                        onTap: () {
+                          getImage();
+                        },
+                        child: CircleAvatar(
+                          radius: 80,
+                          backgroundImage:
+                              image == null
+                                  ? AssetImage('images/profile.png')
+                                  : NetworkImage(image!), // Static image
+                        ),
+                      )
+                      : CircleAvatar(
+                        radius: 80,
+                        backgroundImage: FileImage(selectedImage!),
+                      ),
                   Positioned(
                     bottom: 0,
                     right: 0,
                     child: CircleAvatar(
                       radius: 15,
                       backgroundColor: Color(0xff6351ec),
-                      child: Icon(
-                        Icons.camera_alt,
-                        color: Colors.black,
-                        size: 18,
-                      ),
+                      child:
+                          selectedImage == null
+                              ? Icon(
+                                Icons.camera_alt,
+                                color: Colors.black,
+                                size: 18,
+                              )
+                              : Icon(Icons.edit, color: Colors.black, size: 18),
                     ),
                   ),
                 ],
@@ -155,6 +174,7 @@ class _UserProfileState extends State<UserProfile> {
                 height: 50,
                 child: ElevatedButton(
                   onPressed: () async {
+                    HapticFeedback.lightImpact();
                     // Update data in shared pref and database
                     SharedPreferenceHelper().saveUserEmail(
                       emailController.text,
@@ -167,12 +187,26 @@ class _UserProfileState extends State<UserProfile> {
                       phoneController.text,
                     );
                     SharedPreferenceHelper().saveUserAge(ageController.text);
+                    String? profileurl;
+                    if (image == null) {
+                      profileurl = await uploadtoCloudinary(selectedImage);
+                      SharedPreferenceHelper().saveUserImage(profileurl);
+                    } else {
+                      if (selectedImage != null) {
+                        await deleteFromCloudinary(image!);
+                        profileurl = await uploadtoCloudinary(selectedImage);
+                        SharedPreferenceHelper().saveUserImage(profileurl);
+                      } else {
+                        profileurl = image;
+                      }
+                    }
                     Map<String, dynamic> userInfoMap = {
                       "name": nameController.text,
                       "email": emailController.text,
                       "password": passwordController.text,
                       "phone": phoneController.text,
                       "age": ageController.text,
+                      "image": profileurl,
                       "userid": id,
                       "role": "customer",
                     };
@@ -278,7 +312,10 @@ class _UserProfileState extends State<UserProfile> {
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: TextField(
         controller: controller, // Use the passed controller
-        obscureText: isPassword,
+        obscureText:
+            isPassword
+                ? !isPasswordVisible
+                : false, // Toggle visibility for password
         readOnly: isDate,
         decoration: InputDecoration(
           labelText: label,
@@ -298,7 +335,19 @@ class _UserProfileState extends State<UserProfile> {
           prefixIcon: Icon(icon, color: Color(0xff6351ec)),
           suffixIcon:
               isPassword
-                  ? Icon(Icons.visibility_off, color: Colors.grey)
+                  ? IconButton(
+                    icon: Icon(
+                      isPasswordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                      color: Colors.grey,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        isPasswordVisible = !isPasswordVisible;
+                      });
+                    },
+                  )
                   : isDate
                   ? GestureDetector(
                     onTap: () {

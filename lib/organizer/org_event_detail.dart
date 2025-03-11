@@ -1,17 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:sound_stage/organizer/upload_event.dart';
 import 'package:sound_stage/services/database.dart';
 
-class AdminViewEvent extends StatefulWidget {
+class OrgViewEvent extends StatefulWidget {
   String? eventId;
-  String? viewMode;
-  AdminViewEvent({required this.eventId, required this.viewMode});
+  OrgViewEvent({required this.eventId});
 
   @override
-  State<AdminViewEvent> createState() => _AdminViewEventState();
+  State<OrgViewEvent> createState() => _OrgViewEventState();
 }
 
-class _AdminViewEventState extends State<AdminViewEvent> {
+class _OrgViewEventState extends State<OrgViewEvent> {
   Stream? eventStream;
 
   ontheload() async {
@@ -56,7 +56,10 @@ class _AdminViewEventState extends State<AdminViewEvent> {
               Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [Colors.blue.shade900, Colors.blue.shade200],
+                    colors: [
+                      Colors.deepPurple.shade500,
+                      Colors.purple.shade100,
+                    ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -67,11 +70,10 @@ class _AdminViewEventState extends State<AdminViewEvent> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Image of the Event with rounded corners and shadow
                     ClipRRect(
                       borderRadius: BorderRadius.circular(26),
                       child: Image.network(
-                        ds["Image"], // Use your own image URL
+                        ds['Image'], // Use your own image URL
                         width: double.infinity,
                         height: MediaQuery.of(context).size.height / 2.1,
                         fit: BoxFit.cover,
@@ -184,33 +186,40 @@ class _AdminViewEventState extends State<AdminViewEvent> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          if (widget.viewMode == 'approve')
+                    if (ds['EventApproved'] == true)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
                             Expanded(
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   minimumSize: Size(double.infinity, 50),
-                                  backgroundColor: Colors.green.shade500,
+                                  backgroundColor: Colors.deepPurple,
                                 ),
                                 onPressed: () async {
-                                  await DatabaseMethods().approveEvent(
-                                    widget.eventId!,
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) => UploadEvent(
+                                            edit: true,
+                                            eventId: widget.eventId!,
+                                          ),
+                                    ),
                                   );
                                 },
                                 child: Text(
-                                  'Approve Event',
+                                  'Edit Event',
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 16,
                                   ),
                                 ),
                               ),
-                            )
-                          else if (widget.viewMode == 'manage')
+                            ),
+                            SizedBox(width: 20),
                             Expanded(
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
@@ -227,10 +236,10 @@ class _AdminViewEventState extends State<AdminViewEvent> {
                                 ),
                               ),
                             ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 50),
                   ],
                 ),
               ),

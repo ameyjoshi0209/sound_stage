@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:sound_stage/organizer/org_profile.dart';
+import 'package:sound_stage/organizer/qr_scanner.dart';
 import 'package:sound_stage/organizer/ticket_event.dart';
 import 'package:sound_stage/organizer/upload_event.dart';
 import 'package:sound_stage/organizer/view_events.dart';
@@ -38,7 +40,7 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
                     child: Text(
                       "Organizer Dashboard",
                       style: TextStyle(
-                        fontSize: 24,
+                        fontSize: 26,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
@@ -46,10 +48,15 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
                   ),
                   Spacer(),
                   IconButton(
-                    icon: Icon(Icons.logout, color: Colors.white),
+                    icon: Icon(Icons.person, color: Colors.white, size: 30),
                     onPressed: () {
                       HapticFeedback.lightImpact();
-                      _showLogoutWarning(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => OrganizerProfile(),
+                        ),
+                      );
                     },
                   ),
                 ],
@@ -113,6 +120,7 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
                       Icons.attach_money,
                     ),
                     _buildSectionCard(context, "Manage Events", Icons.event),
+                    _buildSectionCard(context, "Scan", Icons.qr_code),
                   ],
                 ),
               ),
@@ -172,11 +180,13 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
               builder: (context) {
                 switch (title) {
                   case "Post Events":
-                    return UploadEvent();
+                    return UploadEvent(edit: false);
                   case "View Tickets":
                     return ViewEvents(manage: false);
                   case "Manage Events":
                     return ViewEvents(manage: true);
+                  case "Scan":
+                    return QrScanner();
                   default:
                     return Scaffold(
                       appBar: AppBar(title: Text(title)),
@@ -187,6 +197,7 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
             ),
           );
         },
+
         child: Padding(
           padding: EdgeInsets.all(16.0),
           child: Column(
@@ -203,35 +214,6 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
           ),
         ),
       ),
-    );
-  }
-
-  void _showLogoutWarning(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Log out?"),
-          content: Text("Are you sure you want to log out of this account?"),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              child: Text("Cancel"),
-            ),
-            TextButton(
-              onPressed: () {
-                AuthService().orgSignOut(context: context);
-              },
-              child: Text(
-                "Log Out",
-                style: TextStyle(color: Color(0xff6351ec)),
-              ),
-            ),
-          ],
-        );
-      },
     );
   }
 }

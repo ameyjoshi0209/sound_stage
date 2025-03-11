@@ -102,11 +102,14 @@ class _SignInState extends State<SignIn> {
                               decoration: InputDecoration(
                                 labelText: 'Email',
                                 filled: true,
-                                fillColor: Colors.white70,
+                                fillColor: Colors.white,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(40),
                                 ),
-                                prefixIcon: Icon(Icons.email),
+                                prefixIcon: Icon(
+                                  Icons.email,
+                                  color: Color(0xff6351ec),
+                                ),
                               ),
                             ),
                             SizedBox(height: 20),
@@ -116,24 +119,32 @@ class _SignInState extends State<SignIn> {
                               decoration: InputDecoration(
                                 labelText: 'Password',
                                 filled: true,
-                                fillColor: Colors.white70,
+                                fillColor: Colors.white,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(50),
                                 ),
-                                prefixIcon: Icon(Icons.lock),
+                                prefixIcon: Icon(
+                                  Icons.lock,
+                                  color: Color(0xff6351ec),
+                                ),
                               ),
                             ),
                             SizedBox(height: 55),
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Color(0xff6351ec),
+                                backgroundColor: Color(0xFF2A2A2A),
+                                side: BorderSide(
+                                  color: Color(0xff6351ec),
+                                  width: 3,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(50),
                                 ),
-                                minimumSize: Size(double.infinity, 50),
+                                minimumSize: Size(double.infinity, 55),
                               ),
                               onPressed: () async {
-                                AuthService().signin(
+                                HapticFeedback.mediumImpact();
+                                await AuthService().signin(
                                   context: context,
                                   email: _emailController.text,
                                   password: _passwordController.text,
@@ -142,7 +153,7 @@ class _SignInState extends State<SignIn> {
                               child: Text(
                                 "Sign In",
                                 style: TextStyle(
-                                  fontSize: 18,
+                                  fontSize: 20,
                                   color: Colors.white,
                                 ),
                               ),

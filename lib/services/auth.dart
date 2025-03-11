@@ -37,8 +37,9 @@ class AuthService {
         "email": email,
         "password": password,
         "role": "customer",
-        "phone": "",
-        "age": "",
+        "phone": null,
+        "age": null,
+        "image": null,
         "userid": signupID,
       };
       await DatabaseMethods().addUserDetail(uploadUser, signupID).then((value) {
@@ -86,17 +87,16 @@ class AuthService {
               .doc(userId)
               .get();
       if (userDoc.exists) {
-        // Assuming the user document contains 'username' field
-        String username = userDoc['name'];
-
         // Save user details
         await SharedPreferenceHelper().saveUserEmail(email);
         await SharedPreferenceHelper().saveUserPassword(password);
         await SharedPreferenceHelper().saveUserId(
           FirebaseAuth.instance.currentUser!.uid,
         );
-        await SharedPreferenceHelper().saveUserName(username);
-        // Navigate to BottomNav screen without delay
+        await SharedPreferenceHelper().saveUserName(userDoc['name']);
+        await SharedPreferenceHelper().saveUserPhone(userDoc['phone']);
+        await SharedPreferenceHelper().saveUserAge(userDoc['age']);
+        await SharedPreferenceHelper().saveUserImage(userDoc['image']);
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
@@ -132,6 +132,8 @@ class AuthService {
       await SharedPreferenceHelper().removeUserPassword();
       await SharedPreferenceHelper().removeUserName();
       await SharedPreferenceHelper().removeUserPhone();
+      await SharedPreferenceHelper().removeUserAge();
+      await SharedPreferenceHelper().removeUserImage();
 
       Navigator.pushNamedAndRemoveUntil(context, '/signin', (route) => false);
     } catch (e) {
@@ -163,6 +165,7 @@ class AuthService {
     required String? orgAddress,
     required String? orgWebsite,
     required String? orgFacebook,
+    required String? orgImage,
   }) async {
     try {
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -179,6 +182,7 @@ class AuthService {
         "orgaddress": orgAddress,
         "orgwebsite": orgWebsite,
         "orgfacebook": orgFacebook,
+        "orgimage": orgImage,
         "role": "organizer",
         "orgid": signupID,
       };

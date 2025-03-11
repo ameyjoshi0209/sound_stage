@@ -56,8 +56,8 @@ class _TicketEventState extends State<TicketEvent> {
                                 children: [
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(15),
-                                    child: Image.asset(
-                                      'images/profile.jpg',
+                                    child: Image.network(
+                                      ds["Image"],
                                       height: 140,
                                       width: 140,
                                       fit: BoxFit.cover,

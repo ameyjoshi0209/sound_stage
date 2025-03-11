@@ -68,7 +68,7 @@ class _BookingState extends State<Booking> {
                 itemBuilder: (context, index) {
                   DocumentSnapshot ds = snapshot.data.docs[index];
                   return BookingCard(
-                    image: 'images/event.jpg',
+                    image: ds['Image'],
                     title: ds['Event'],
                     location: ds['Location'],
                     status: 'Paid',
@@ -188,7 +188,7 @@ class BookingCard extends StatelessWidget {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(15),
-                    child: Image.asset(
+                    child: Image.network(
                       image,
                       height: 140,
                       width: 140,

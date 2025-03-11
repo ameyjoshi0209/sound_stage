@@ -58,8 +58,8 @@ class _DetailPageState extends State<DetailPage> {
               children: [
                 Stack(
                   children: [
-                    Image.asset(
-                      "images/event.jpg", // Use widget.image
+                    Image.network(
+                      widget.image, // Use widget.image
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.height / 2,
                       fit: BoxFit.cover,
@@ -78,7 +78,7 @@ class _DetailPageState extends State<DetailPage> {
                             },
                             child: Container(
                               padding: EdgeInsets.all(8),
-                              margin: const EdgeInsets.only(top: 40, left: 20),
+                              margin: const EdgeInsets.only(top: 50, left: 20),
                               decoration: BoxDecoration(
                                 color: Colors.white70,
                                 borderRadius: BorderRadius.circular(30),
@@ -90,20 +90,25 @@ class _DetailPageState extends State<DetailPage> {
                             ),
                           ),
                           Container(
-                            padding: EdgeInsets.only(left: 20, bottom: 20),
+                            padding: EdgeInsets.only(
+                              left: 20,
+                              bottom: 10,
+                              right: 20,
+                            ),
                             width: MediaQuery.of(context).size.width,
-                            decoration: BoxDecoration(color: Colors.black54),
+                            decoration: BoxDecoration(color: Colors.black45),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   widget.name,
                                   style: TextStyle(
-                                    fontSize: 30,
+                                    fontSize: 35,
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
+                                SizedBox(height: 2),
                                 Row(
                                   children: [
                                     Icon(
@@ -145,7 +150,7 @@ class _DetailPageState extends State<DetailPage> {
                 ),
                 SizedBox(height: 20), // Additional space
                 Padding(
-                  padding: const EdgeInsets.only(left: 20),
+                  padding: const EdgeInsets.only(left: 15, right: 15),
                   child: Text(
                     "About the event",
                     style: TextStyle(
@@ -157,9 +162,9 @@ class _DetailPageState extends State<DetailPage> {
                 ),
                 SizedBox(height: 20),
                 Padding(
-                  padding: const EdgeInsets.only(left: 20),
+                  padding: const EdgeInsets.only(left: 15, right: 15),
                   child: Text(
-                    "lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+                    widget.details,
                     style: TextStyle(
                       fontSize: 18,
                       color: Colors.black,
@@ -195,7 +200,7 @@ class _DetailPageState extends State<DetailPage> {
 
                       // Price
                       _buildInfoCard(
-                        Icons.attach_money,
+                        Icons.currency_rupee_rounded,
                         'Price',
                         '₹ ${widget.price}',
                       ),
@@ -401,6 +406,8 @@ class _DetailPageState extends State<DetailPage> {
               "Number": ticket.toString(),
               "Total": total.toString(),
               "Event": widget.name,
+              "Price": widget.price,
+              "Image": widget.image,
               "Location": widget.location,
               "Date": widget.date,
               "Name": name,

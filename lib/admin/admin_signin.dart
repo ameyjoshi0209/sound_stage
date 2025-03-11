@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:sound_stage/admin/admin_dashboard.dart';
 import 'package:sound_stage/organizer/org_signin.dart';
 import 'package:sound_stage/services/auth.dart'; // Import the OrgLogin page
@@ -161,6 +162,7 @@ class _AdminSignInState extends State<AdminSignIn> {
                           minimumSize: Size(double.infinity, 50),
                         ),
                         onPressed: () {
+                          HapticFeedback.mediumImpact();
                           AuthService().adminSignIn(
                             context: context,
                             email: emailController.text,

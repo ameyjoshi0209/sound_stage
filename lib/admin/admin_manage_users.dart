@@ -14,6 +14,7 @@ class _AdminManageProfilesState extends State<AdminManageProfiles> {
   String searchQuery = ''; // Declare search query
   String selectedFilter = 'All'; // Declare filter selection
   TextEditingController searchController = TextEditingController();
+  FocusNode focusNode = FocusNode();
 
   // Function to load users data
   ontheload() async {
@@ -29,8 +30,8 @@ class _AdminManageProfilesState extends State<AdminManageProfiles> {
 
   @override
   void dispose() {
-    // Dispose the controller when no longer needed to prevent memory leaks
     searchController.dispose();
+    focusNode.dispose();
     super.dispose();
   }
 
@@ -55,6 +56,7 @@ class _AdminManageProfilesState extends State<AdminManageProfiles> {
               padding: const EdgeInsets.all(16.0),
               child: TextField(
                 controller: searchController,
+                focusNode: focusNode,
                 onChanged: (query) {
                   setState(() {
                     searchQuery =
@@ -63,6 +65,10 @@ class _AdminManageProfilesState extends State<AdminManageProfiles> {
                 },
                 decoration: InputDecoration(
                   hintText: 'Search for users...',
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 20.0,
+                    vertical: 15.0,
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30),
                     borderSide: BorderSide.none,
@@ -280,18 +286,28 @@ class _AdminManageProfilesState extends State<AdminManageProfiles> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(26),
                 ),
-                margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                margin: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
                 child: ListTile(
                   contentPadding: EdgeInsets.symmetric(
                     vertical: 12,
                     horizontal: 16,
                   ),
-                  leading: CircleAvatar(
-                    radius: 30,
-                    backgroundImage: NetworkImage(
-                      'https://www.example.com/image1.jpg', // Placeholder image
-                    ),
-                  ),
+                  leading:
+                      ds['role'] == 'organizer'
+                          ? CircleAvatar(
+                            radius: 30,
+                            backgroundImage:
+                                ds['orgimage'] != null
+                                    ? NetworkImage(ds['orgimage'])
+                                    : AssetImage('images/profile.png'),
+                          )
+                          : CircleAvatar(
+                            radius: 30,
+                            backgroundImage:
+                                ds['image'] != null
+                                    ? NetworkImage(ds['image'])
+                                    : AssetImage('images/profile.png'),
+                          ),
                   title: Text(
                     displayName,
                     style: TextStyle(fontWeight: FontWeight.bold),

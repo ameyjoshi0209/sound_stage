@@ -41,6 +41,7 @@ dependencies:
   flutter_stripe:
   http:
   shared_preferences:
+  crypto:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

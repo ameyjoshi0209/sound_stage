@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:sound_stage/admin/admin_event_approvals.dart';
-import 'package:sound_stage/admin/admin_manage_events.dart';
 import 'package:sound_stage/admin/admin_manage_users.dart';
 import 'package:sound_stage/admin/admin_signin.dart';
 import 'package:sound_stage/admin/create_organizer.dart';
@@ -165,8 +164,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     ),
                     _buildSectionCard(
                       context,
-                      "Manage Events",
-                      Icons.event_note_rounded,
+                      "Download Reports",
+                      Icons.receipt_long_rounded,
                     ),
                     _buildSectionCard(
                       context,
@@ -240,8 +239,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     return AdminCreateOrg();
                   case "Manage Users":
                     return AdminManageProfiles();
-                  case "Manage Events":
-                    return AdminManageEvents();
                   case "Event Approvals":
                     return AdminApproveEvents();
                   default:
