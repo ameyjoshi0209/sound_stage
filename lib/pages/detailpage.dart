@@ -456,7 +456,6 @@ class _DetailPageState extends State<DetailPage> {
                               builder:
                                   (context) => QrTicket(
                                     customerId: id,
-                                    eventId: widget.eventid,
                                     bookingId: addId,
                                   ),
                             ),

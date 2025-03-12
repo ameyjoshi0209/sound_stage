@@ -54,7 +54,6 @@ class _BookingState extends State<Booking> {
                     amount: ds['Total'],
                     people: ds['Number'] + ' People',
                     date: ds['Date'],
-                    eventId: ds['EventId'],
                     customerId: id!,
                     bookingId: ds["BookingId"],
                   );
@@ -138,7 +137,6 @@ class BookingCard extends StatelessWidget {
   final String amount;
   final String people;
   final String date;
-  final String eventId;
   final String customerId;
   final String bookingId;
 
@@ -149,7 +147,6 @@ class BookingCard extends StatelessWidget {
     required this.amount,
     required this.people,
     required this.date,
-    required this.eventId,
     required this.customerId,
     required this.bookingId,
   });
@@ -277,7 +274,6 @@ class BookingCard extends StatelessWidget {
                           builder:
                               (context) => QrTicket(
                                 customerId: customerId,
-                                eventId: eventId,
                                 bookingId: bookingId,
                               ),
                         ),

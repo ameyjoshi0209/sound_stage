@@ -1,6 +1,10 @@
+// This file contains the code to interact with the Firestore database.
+// It contains functions to add, update, and fetch data from the Firestore database.
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DatabaseMethods {
+  // ADDING USER DATA TO FIRESTORE DATABASE USING USERID
   Future addUserDetail(Map<String, dynamic> userInfoMap, String id) async {
     return await FirebaseFirestore.instance
         .collection("users")
@@ -8,6 +12,7 @@ class DatabaseMethods {
         .set(userInfoMap);
   }
 
+  // ADDING ORGANIZER DATA TO FIRESTORE DATABASE USING ORGANIZERID
   Future addOrganizerDetail(Map<String, dynamic> userInfoMap, String id) async {
     return await FirebaseFirestore.instance
         .collection("users")
@@ -15,6 +20,7 @@ class DatabaseMethods {
         .set(userInfoMap);
   }
 
+  // ADDING EVENT DATA TO FIRESTORE DATABASE USING EVENTID
   Future addEvent(Map<String, dynamic> userInfoMap, String id) async {
     return await FirebaseFirestore.instance
         .collection("Event")
@@ -22,10 +28,12 @@ class DatabaseMethods {
         .set(userInfoMap);
   }
 
+  // FETCHING ALL EVENTS DATA FROM FIRESTORE DATABASE USING USERID
   Future<Stream<QuerySnapshot>> getallEvents() async {
     return await FirebaseFirestore.instance.collection("Event").snapshots();
   }
 
+  // FETCHING ALL EVENTS DATA FROM FIRESTORE DATABASE USING ORGANIZERID
   Future<Stream<QuerySnapshot>> getEventByOrganizerId(String id) async {
     return await FirebaseFirestore.instance
         .collection("Event")
@@ -33,6 +41,7 @@ class DatabaseMethods {
         .snapshots();
   }
 
+  // FETCHING ALL EVENTS DATA FROM FIRESTORE DATABASE USING EVENTID
   Future<Stream<QuerySnapshot>> getEventById(String id) async {
     return await FirebaseFirestore.instance
         .collection("Event")
@@ -40,6 +49,8 @@ class DatabaseMethods {
         .snapshots();
   }
 
+  // UPDATING EVENT DATA IN FIRESTORE DATABASE USING EVENTID
+  // Here we are updating the EventApproved field to true, which means the event is approved by the admin.
   Future approveEvent(String id) async {
     return await FirebaseFirestore.instance.collection("Event").doc(id).update({
       "EventApproved": true,
@@ -65,11 +76,7 @@ class DatabaseMethods {
         .add(userInfoMap);
   }
 
-  Future updateBookingStatus(
-    String customerId,
-    String eventId,
-    String bookingId,
-  ) async {
+  Future updateBookingStatus(String customerId, String bookingId) async {
     return await FirebaseFirestore.instance
         .collection("users")
         .doc(customerId)
@@ -86,6 +93,7 @@ class DatabaseMethods {
         .snapshots();
   }
 
+  // FETCHING ALL EVENTS DATA FROM FIRESTORE DATABASE USING CATEGORY FIELD
   Future<Stream<QuerySnapshot>> getEventCategories(String category) async {
     return await FirebaseFirestore.instance
         .collection("Event")
@@ -120,14 +128,15 @@ class DatabaseMethods {
     }
   }
 
-  Future<Stream<DocumentSnapshot<Map<String, dynamic>>>> getBookingsByUserId(
-    String id,
+  Future<Stream<QuerySnapshot>> getBookingByUserId(
+    String customerId,
+    String bookingId,
   ) async {
-    return await FirebaseFirestore.instance
+    return FirebaseFirestore.instance
         .collection("users")
-        .doc(id)
+        .doc(customerId)
         .collection("booking")
-        .doc(id)
+        .where("BookingId", isEqualTo: bookingId)
         .snapshots();
   }
 }

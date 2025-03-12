@@ -3,13 +3,8 @@ import 'package:pretty_qr_code/pretty_qr_code.dart';
 
 class QrTicket extends StatefulWidget {
   String? customerId;
-  String? eventId;
   String? bookingId;
-  QrTicket({
-    required this.customerId,
-    required this.eventId,
-    required this.bookingId,
-  });
+  QrTicket({required this.customerId, required this.bookingId});
 
   @override
   State<QrTicket> createState() => _QrTicketState();
@@ -30,8 +25,7 @@ class _QrTicketState extends State<QrTicket> {
           children: [
             Container(
               child: PrettyQrView.data(
-                data:
-                    "${widget.customerId!}#${widget.eventId!}#${widget.bookingId!}",
+                data: "${widget.customerId!}#${widget.bookingId!}",
               ),
             ),
           ],

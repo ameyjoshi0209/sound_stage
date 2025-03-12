@@ -1,7 +1,9 @@
+// This file contains the authentication methods for the user, organizer, and admin,
+// as well as the methods to check if the user is logged in or not.
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:sound_stage/admin/admin_dashboard.dart';
 import 'package:sound_stage/admin/admin_signin.dart';
 import 'package:sound_stage/organizer/org_dash.dart';
