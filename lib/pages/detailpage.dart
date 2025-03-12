@@ -19,7 +19,8 @@ class DetailPage extends StatefulWidget {
       price,
       ageAllowed,
       category,
-      eventid;
+      eventid,
+      time;
   DetailPage({
     required this.image,
     required this.name,
@@ -30,6 +31,7 @@ class DetailPage extends StatefulWidget {
     required this.ageAllowed,
     required this.category,
     required this.eventid,
+    required this.time,
   });
 
   @override
@@ -427,6 +429,7 @@ class _DetailPageState extends State<DetailPage> {
               "CustomerEmail": email,
               "CustomerId": id,
               "EventId": widget.eventid,
+              "EventTime": widget.time,
               "BookingId": addId,
               "CustomerImage": userImage,
               "Attended": false,
@@ -457,6 +460,11 @@ class _DetailPageState extends State<DetailPage> {
                                   (context) => QrTicket(
                                     customerId: id,
                                     bookingId: addId,
+                                    customerName: name,
+                                    eventName: widget.name,
+                                    location: widget.location,
+                                    eventDate: widget.date,
+                                    eventTime: widget.date,
                                   ),
                             ),
                           );

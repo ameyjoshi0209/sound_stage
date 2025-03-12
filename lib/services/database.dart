@@ -82,7 +82,7 @@ class DatabaseMethods {
         .doc(customerId)
         .collection("booking")
         .doc(bookingId)
-        .update({"Attended": false});
+        .update({"Attended": true});
   }
 
   Future<Stream<QuerySnapshot>> getbookings(String id) async {

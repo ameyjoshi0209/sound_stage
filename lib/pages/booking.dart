@@ -15,10 +15,11 @@ class Booking extends StatefulWidget {
 
 class _BookingState extends State<Booking> {
   Stream? bookingStream;
-  String? id;
+  String? id, name;
 
   getthesharedpref() async {
     id = await SharedPreferenceHelper().getUserId();
+    name = await SharedPreferenceHelper().getUserName();
     setState(() {});
   }
 
@@ -48,13 +49,15 @@ class _BookingState extends State<Booking> {
                 itemBuilder: (context, index) {
                   DocumentSnapshot ds = snapshot.data.docs[index];
                   return BookingCard(
-                    image: ds['Image'],
+                    image: ds['EventImage'],
                     title: ds['EventName'],
-                    location: ds['Location'],
+                    location: ds['EventLocation'],
                     amount: ds['Total'],
                     people: ds['Number'] + ' People',
-                    date: ds['Date'],
+                    date: ds['EventDate'],
+                    time: ds['EventTime'],
                     customerId: id!,
+                    customerName: name!,
                     bookingId: ds["BookingId"],
                   );
                 },
@@ -68,6 +71,18 @@ class _BookingState extends State<Booking> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          "My Bookings",
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 24,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+      ),
       backgroundColor: Color(0xffede9ff),
       body: SafeArea(
         child: Column(
@@ -137,8 +152,10 @@ class BookingCard extends StatelessWidget {
   final String amount;
   final String people;
   final String date;
+  final String time;
   final String customerId;
   final String bookingId;
+  final String customerName;
 
   const BookingCard({
     required this.image,
@@ -147,8 +164,10 @@ class BookingCard extends StatelessWidget {
     required this.amount,
     required this.people,
     required this.date,
+    required this.time,
     required this.customerId,
     required this.bookingId,
+    required this.customerName,
   });
 
   String formatDate(String date) {
@@ -161,139 +180,140 @@ class BookingCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 8.0),
-      child: Card(
-        color: Color(0xfff0ebff),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        elevation: 8,
-        child: Column(
-          children: [
-            // Stack to overlay date on top of image
-            Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(25),
-                  child: Image.network(
-                    image,
-                    height: 190,
-                    width: double.infinity, // Ensures image covers the width
-                    fit: BoxFit.cover,
+      padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 10.0),
+      child: GestureDetector(
+        onTap: () {
+          HapticFeedback.lightImpact();
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder:
+                  (context) => QrTicket(
+                    customerId: customerId,
+                    bookingId: bookingId,
+                    eventName: title,
+                    location: location,
+                    eventDate: date,
+                    customerName: customerName,
+                    eventTime: time,
                   ),
-                ),
-                // Positioned date at the top-left corner
-                Positioned(
-                  top: 10,
-                  left: 10,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.5), // Background color
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: Text(
-                      formatDate(date), // Format the date
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
             ),
-            // Padding for spacing
-            SizedBox(height: 15),
-            // Data content
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+          );
+        },
+        child: Card(
+          color: Color(0xfff0ebff),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          elevation: 8,
+          child: Column(
+            children: [
+              // Stack to overlay date on top of image
+              Stack(
                 children: [
-                  Text(
-                    title,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(25),
+                    child: Image.network(
+                      image,
+                      height: 190,
+                      width: double.infinity, // Ensures image covers the width
+                      fit: BoxFit.cover,
+                    ),
                   ),
-                  SizedBox(height: 5),
-                  Row(
-                    children: [
-                      Icon(Icons.location_on, color: Colors.redAccent.shade200),
-                      Text(
-                        location,
+                  // Positioned date at the top-left corner
+                  Positioned(
+                    top: 10,
+                    left: 10,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(
+                          0.5,
+                        ), // Background color
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Text(
+                        formatDate(date), // Format the date
                         style: TextStyle(
-                          color: Colors.grey.shade600,
-                          fontSize: 17,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
                         ),
                       ),
-                    ],
-                  ),
-                  SizedBox(height: 15),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Icon(Icons.attach_money, color: Colors.green),
-                      SizedBox(width: 2),
-                      Text(amount),
-                      SizedBox(width: 15),
-                      Icon(Icons.people, color: Colors.blue),
-                      SizedBox(width: 5),
-                      Text(people),
-                      SizedBox(width: 15),
-                    ],
-                  ),
-                  SizedBox(height: 5),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: Color.fromARGB(255, 205, 199, 240),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(
-                      "Active",
-                      style: TextStyle(color: Color.fromARGB(255, 87, 66, 248)),
                     ),
                   ),
                 ],
               ),
-            ),
-            // Button at the bottom
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16.0,
-                vertical: 10.0,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      HapticFeedback.lightImpact();
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder:
-                              (context) => QrTicket(
-                                customerId: customerId,
-                                bookingId: bookingId,
-                              ),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xff6351ec),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
+              // Padding for spacing
+              SizedBox(height: 15),
+              // Data content
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 23,
                       ),
                     ),
-                    child: Text(
-                      "View Ticket",
-                      style: TextStyle(color: Colors.white),
+                    SizedBox(height: 5),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.location_on,
+                          color: Colors.redAccent.shade200,
+                        ),
+                        Text(
+                          location,
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: 17,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
+                    SizedBox(height: 15),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Icon(Icons.currency_rupee_rounded, color: Colors.green),
+                        SizedBox(width: 2),
+                        Text(amount),
+                        SizedBox(width: 15),
+                        Icon(Icons.people, color: Colors.blue),
+                        SizedBox(width: 5),
+                        Text(people),
+                        SizedBox(width: 15),
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 5,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Color.fromARGB(255, 205, 199, 240),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            "Active",
+                            style: TextStyle(
+                              color: Color.fromARGB(255, 87, 66, 248),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 30),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
