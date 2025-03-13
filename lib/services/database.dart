@@ -76,6 +76,19 @@ class DatabaseMethods {
         .add(userInfoMap);
   }
 
+  Future updateTicketStatus(String customerId, String bookingId) async {
+    QuerySnapshot querySnapshot =
+        await FirebaseFirestore.instance
+            .collection("Tickets")
+            .where("BookingId", isEqualTo: bookingId)
+            .where("CustomerId", isEqualTo: customerId)
+            .get();
+
+    for (var doc in querySnapshot.docs) {
+      await doc.reference.update({"Attended": true});
+    }
+  }
+
   Future updateBookingStatus(String customerId, String bookingId) async {
     return await FirebaseFirestore.instance
         .collection("users")
@@ -101,8 +114,11 @@ class DatabaseMethods {
         .snapshots();
   }
 
-  Future<Stream<QuerySnapshot>> getTickets() async {
-    return await FirebaseFirestore.instance.collection("Tickets").snapshots();
+  Future<Stream<QuerySnapshot>> getTicketsByEventId(String eventId) async {
+    return await FirebaseFirestore.instance
+        .collection("Tickets")
+        .where("EventId", isEqualTo: eventId)
+        .snapshots();
   }
 
   Future<Stream<QuerySnapshot>> getAllUsers() async {

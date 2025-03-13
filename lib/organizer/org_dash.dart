@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:sound_stage/organizer/org_profile.dart';
 import 'package:sound_stage/organizer/qr_scanner.dart';
-import 'package:sound_stage/organizer/ticket_event.dart';
 import 'package:sound_stage/organizer/upload_event.dart';
 import 'package:sound_stage/organizer/view_events.dart';
 import 'package:sound_stage/services/auth.dart';

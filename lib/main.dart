@@ -10,7 +10,7 @@ import 'package:sound_stage/admin/create_organizer.dart';
 import 'package:sound_stage/organizer/org_dash.dart';
 import 'package:sound_stage/organizer/org_signin.dart';
 import 'package:sound_stage/organizer/qr_scanner.dart';
-import 'package:sound_stage/organizer/ticket_event.dart';
+import 'package:sound_stage/organizer/ticket_data.dart';
 import 'package:sound_stage/organizer/upload_event.dart';
 import 'package:sound_stage/pages/bottomnav.dart';
 import 'package:sound_stage/pages/categories_event.dart';

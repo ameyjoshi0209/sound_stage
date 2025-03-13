@@ -42,15 +42,14 @@ class _QrScannerState extends State<QrScanner> {
                   bookingId!,
                 );
 
-                // Once the stream is set, show the dialog
                 if (bookingStream != null) {
                   // Show a loading dialog until the stream provides data
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
-                      return StreamBuilder<QuerySnapshot>(
+                      return StreamBuilder(
                         stream: bookingStream,
-                        builder: (context, snapshot) {
+                        builder: (context, AsyncSnapshot snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
                             return AlertDialog(
@@ -75,7 +74,7 @@ class _QrScannerState extends State<QrScanner> {
                               content: Text('No booking data found.'),
                             );
                           } else {
-                            HapticFeedback.heavyImpact();
+                            HapticFeedback.vibrate();
                             var bookingData = snapshot.data!.docs.first;
                             return bookingData['Attended'] == false
                                 ? Dialog(
@@ -88,7 +87,7 @@ class _QrScannerState extends State<QrScanner> {
                                     height: 400,
                                     width: 350,
                                     child: Column(
-                                      children: <Widget>[
+                                      children: [
                                         CircleAvatar(
                                           radius: 60,
                                           backgroundImage: NetworkImage(
@@ -138,7 +137,14 @@ class _QrScannerState extends State<QrScanner> {
                                                 .updateBookingStatus(
                                                   customerId!,
                                                   bookingId!,
-                                                );
+                                                )
+                                                .then((value) async {
+                                                  await DatabaseMethods()
+                                                      .updateTicketStatus(
+                                                        customerId!,
+                                                        bookingId!,
+                                                      );
+                                                });
                                             Navigator.pop(context);
                                           },
                                           style: ElevatedButton.styleFrom(

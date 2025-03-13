@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:sound_stage/organizer/org_event_detail.dart';
+import 'package:sound_stage/organizer/ticket_data.dart';
 import 'package:sound_stage/organizer/upload_event.dart';
 import 'package:sound_stage/services/database.dart';
 import 'package:sound_stage/services/shared_pref.dart';
@@ -166,6 +168,11 @@ class BookingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var eventDateTime = DateFormat('yyyy-MM-dd HH:mm').parse('$date $time');
+    var currentDateTime = DateTime.now();
+
+    // Check if there are tickets and the event is in the future
+    bool showLiveBadge = eventDateTime.isAfter(currentDateTime);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: GestureDetector(
@@ -175,6 +182,20 @@ class BookingCard extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) => OrgViewEvent(eventId: eventId),
+              ),
+            );
+          } else {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (context) => TicketData(
+                      eventId: eventId,
+                      eventName: name,
+                      eventDate: date,
+                      eventTime: time,
+                      eventImage: image,
+                    ),
               ),
             );
           }
@@ -226,6 +247,24 @@ class BookingCard extends StatelessWidget {
                       ),
                     ),
                   ),
+                  Positioned(
+                    top: 10,
+                    right: 16,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.transparent,
+                        borderRadius: BorderRadius.circular(
+                          12,
+                        ), // Border radius added
+                      ),
+                      child:
+                          showLiveBadge ? BlinkingLiveBadge() : UpcomingBadge(),
+                    ),
+                  ),
                 ],
               ),
               // Card details below the image
@@ -248,13 +287,14 @@ class BookingCard extends StatelessWidget {
                         // Age allowed displayed in the same row with icon
                         Row(
                           children: [
-                            Icon(Icons.person, size: 20, color: Colors.orange),
+                            Icon(Icons.person, size: 20, color: Colors.red),
                             SizedBox(width: 5),
                             Text(
-                              ageAllowed + '+',
+                              '$ageAllowed+',
                               style: TextStyle(
                                 fontSize: 16,
-                                color: Colors.orange,
+                                color: Colors.red,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                           ],
@@ -395,6 +435,121 @@ class BookingCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class BlinkingLiveBadge extends StatefulWidget {
+  @override
+  _BlinkingLiveBadgeState createState() => _BlinkingLiveBadgeState();
+}
+
+class _BlinkingLiveBadgeState extends State<BlinkingLiveBadge>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            return Container(
+              width: 10,
+              height: 10,
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(_controller.value),
+                shape: BoxShape.circle,
+              ),
+            );
+          },
+        ),
+        const SizedBox(width: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+          decoration: BoxDecoration(
+            color: Colors.green,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: const Text(
+            'Live',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class UpcomingBadge extends StatefulWidget {
+  @override
+  _UpcomingBadgeState createState() => _UpcomingBadgeState();
+}
+
+class _UpcomingBadgeState extends State<UpcomingBadge>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1), // Blinking duration
+    )..repeat(reverse: true); // Repeats the animation back and forth
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        // Animated background color and text opacity (blinking effect)
+        AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            return Container(
+              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+              decoration: BoxDecoration(
+                color: Colors.orange.withOpacity(
+                  _controller.value,
+                ), // Blinking effect on background
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                'Upcoming',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(
+                    _controller.value,
+                  ), // Blinking effect on text color
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 }

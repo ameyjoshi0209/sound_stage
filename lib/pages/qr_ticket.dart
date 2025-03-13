@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
+import 'package:sound_stage/services/database.dart';
 
 class QrTicket extends StatefulWidget {
   final String? customerId;
@@ -28,6 +30,38 @@ class QrTicket extends StatefulWidget {
 
 class _QrTicketState extends State<QrTicket> {
   String? qrData;
+  bool? showMessage;
+  Stream? bookingStream;
+
+  Future<void> checkStatus() async {
+    DocumentSnapshot ds =
+        await FirebaseFirestore.instance
+            .collection("users")
+            .doc(widget.customerId)
+            .collection("booking")
+            .doc(widget.bookingId)
+            .get();
+
+    if (ds.exists) {
+      if (ds["Attended"] == false) {
+        showMessage = true;
+      }
+    }
+  }
+
+  ontheload() async {
+    bookingStream = await DatabaseMethods().getBookingByUserId(
+      widget.customerId!,
+      widget.bookingId!,
+    );
+    checkStatus();
+  }
+
+  @override
+  void initState() {
+    ontheload();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -125,6 +159,42 @@ class _QrTicketState extends State<QrTicket> {
                     ),
                   ),
                 ),
+                if (showMessage == true)
+                  StreamBuilder(
+                    stream: bookingStream,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return AlertDialog(
+                          title: Text('Loading...'),
+                          content: SizedBox(
+                            height: 400,
+                            width: 300,
+                            child: Center(child: CircularProgressIndicator()),
+                          ),
+                        );
+                      } else if (snapshot.hasError) {
+                        return AlertDialog(
+                          title: Text('Error'),
+                          content: Text('Error: ${snapshot.error}'),
+                        );
+                      } else if (!snapshot.hasData ||
+                          snapshot.data!.docs.isEmpty) {
+                        return AlertDialog(
+                          title: Text('No Data'),
+                          content: Text('No booking data found.'),
+                        );
+                      } else {
+                        var bookingData = snapshot.data.docs[0];
+                        if (bookingData["Attended"] == true) {
+                          WidgetsBinding.instance!.addPostFrameCallback((_) {
+                            _showScanDialog();
+                          });
+                          return Container();
+                        }
+                      }
+                      return Container();
+                    },
+                  ),
                 SizedBox(height: 30),
                 // Booking ID
                 Text(
@@ -147,6 +217,40 @@ class _QrTicketState extends State<QrTicket> {
           ),
         ],
       ),
+    );
+  }
+
+  // Function to show the dialog
+  // Function to show the dialog
+  Future<dynamic> _showScanDialog() async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Welcome to the Event!'),
+          content: Text(
+            'Hello ${widget.customerName ?? "Customer"},\n\n'
+            'You have successfully checked in to the event: ${widget.eventName ?? "Event Name"}.\n'
+            'Enjoy the event!',
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                HapticFeedback.lightImpact();
+                Navigator.pop(context);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple,
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              ),
+              child: Text(
+                'OK',
+                style: TextStyle(fontSize: 15, color: Colors.white),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
