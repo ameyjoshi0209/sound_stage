@@ -76,141 +76,144 @@ class _QrScannerState extends State<QrScanner> {
                           } else {
                             HapticFeedback.vibrate();
                             var bookingData = snapshot.data!.docs.first;
-                            return bookingData['Attended'] == false
-                                ? Dialog(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  elevation: 16,
-                                  child: Container(
-                                    padding: EdgeInsets.all(20),
-                                    height: 400,
-                                    width: 350,
-                                    child: Column(
-                                      children: [
-                                        CircleAvatar(
-                                          radius: 60,
-                                          backgroundImage: NetworkImage(
-                                            bookingData['CustomerImage'],
-                                          ),
+                            if (bookingData["Attended"] == false) {
+                              return Dialog(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                elevation: 16,
+                                child: Container(
+                                  padding: EdgeInsets.all(20),
+                                  height: 400,
+                                  width: 350,
+                                  child: Column(
+                                    children: [
+                                      CircleAvatar(
+                                        radius: 60,
+                                        backgroundImage: NetworkImage(
+                                          bookingData['CustomerImage'],
                                         ),
-                                        SizedBox(height: 15),
-                                        Text(
-                                          bookingData['CustomerName'],
-                                          style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black87,
-                                          ),
+                                      ),
+                                      SizedBox(height: 15),
+                                      Text(
+                                        bookingData['CustomerName'],
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black87,
                                         ),
-                                        SizedBox(height: 5),
-                                        Text(
-                                          bookingData['CustomerEmail'],
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.grey[600],
-                                          ),
+                                      ),
+                                      SizedBox(height: 5),
+                                      Text(
+                                        bookingData['CustomerEmail'],
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey[600],
                                         ),
-                                        SizedBox(height: 10),
-                                        Text(
-                                          "Amount: \$${bookingData['Total']}",
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.green[700],
-                                          ),
+                                      ),
+                                      SizedBox(height: 10),
+                                      Text(
+                                        "Amount: \$${bookingData['Total']}",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.green[700],
                                         ),
-                                        SizedBox(height: 10),
-                                        Text(
-                                          "Total Attendees: ${bookingData['Number']}",
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.green[700],
-                                          ),
+                                      ),
+                                      SizedBox(height: 10),
+                                      Text(
+                                        "Total Attendees: ${bookingData['Number']}",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.green[700],
                                         ),
-                                        Spacer(),
-                                        ElevatedButton(
-                                          onPressed: () async {
-                                            HapticFeedback.lightImpact();
-                                            await DatabaseMethods()
-                                                .updateBookingStatus(
-                                                  customerId!,
-                                                  bookingId!,
-                                                )
-                                                .then((value) async {
-                                                  await DatabaseMethods()
-                                                      .updateTicketStatus(
-                                                        customerId!,
-                                                        bookingId!,
-                                                      );
-                                                });
-                                            Navigator.pop(context);
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                            padding: EdgeInsets.symmetric(
-                                              horizontal: 30,
-                                              vertical: 12,
+                                      ),
+                                      Spacer(),
+                                      ElevatedButton(
+                                        onPressed: () async {
+                                          HapticFeedback.lightImpact();
+                                          await DatabaseMethods()
+                                              .updateBookingStatus(
+                                                customerId!,
+                                                bookingId!,
+                                              );
+                                          await DatabaseMethods()
+                                              .updateTicketStatus(
+                                                customerId!,
+                                                bookingId!,
+                                              );
+                                          Navigator.pop(context);
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 30,
+                                            vertical: 12,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              50,
                                             ),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(50),
-                                            ),
-                                            backgroundColor: Colors.blueAccent,
                                           ),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Icon(
-                                                Icons.verified_rounded,
+                                          backgroundColor: Colors.blueAccent,
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              Icons.verified_rounded,
+                                              color: Colors.white,
+                                              size: 20,
+                                            ),
+                                            SizedBox(width: 10),
+                                            Text(
+                                              "Check In",
+                                              style: TextStyle(
+                                                fontSize: 16,
                                                 color: Colors.white,
-                                                size: 20,
+                                                fontWeight: FontWeight.bold,
                                               ),
-                                              SizedBox(width: 10),
-                                              Text(
-                                                "Check In",
-                                                style: TextStyle(
-                                                  fontSize: 16,
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
+                                            ),
+                                          ],
                                         ),
-                                      ],
-                                    ),
-                                  ),
-                                )
-                                : AlertDialog(
-                                  title: Text(
-                                    'Already Checked In',
-                                    style: TextStyle(
-                                      color: Colors.red,
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  content: Text(
-                                    'This booking has already been checked in.',
-                                  ),
-                                  actions: [
-                                    ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.deepPurple,
                                       ),
-                                      onPressed: () {
-                                        HapticFeedback.lightImpact();
-                                        Navigator.pop(context);
-                                      },
-                                      child: Text(
-                                        "Close",
-                                        style: TextStyle(color: Colors.white),
-                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }
+                            if (bookingData["Attended"]) {
+                              return AlertDialog(
+                                title: Text(
+                                  'Already Checked In',
+                                  style: TextStyle(
+                                    color: Colors.red,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                content: Text(
+                                  'This booking has already been checked in.',
+                                ),
+                                actions: [
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.deepPurple,
                                     ),
-                                  ],
-                                );
+                                    onPressed: () {
+                                      HapticFeedback.lightImpact();
+                                      Navigator.pop(context);
+                                    },
+                                    child: Text(
+                                      "Close",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }
                           }
+                          return Container();
                         },
                       );
                     },

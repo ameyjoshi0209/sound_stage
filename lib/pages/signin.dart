@@ -14,6 +14,7 @@ class SignIn extends StatefulWidget {
 class _SignInState extends State<SignIn> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool isLoading = false; // Track loading state
 
   @override
   void initState() {
@@ -142,21 +143,46 @@ class _SignInState extends State<SignIn> {
                                 ),
                                 minimumSize: Size(double.infinity, 55),
                               ),
-                              onPressed: () async {
-                                HapticFeedback.mediumImpact();
-                                await AuthService().signin(
-                                  context: context,
-                                  email: _emailController.text,
-                                  password: _passwordController.text,
-                                );
-                              },
-                              child: Text(
-                                "Sign In",
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.white,
-                                ),
-                              ),
+                              onPressed:
+                                  isLoading
+                                      ? null
+                                      : () async {
+                                        HapticFeedback.mediumImpact();
+                                        setState(() {
+                                          isLoading =
+                                              true; // Show loading indicator
+                                        });
+                                        await AuthService().signin(
+                                          context: context,
+                                          email: _emailController.text,
+                                          password: _passwordController.text,
+                                        );
+                                        setState(() {
+                                          isLoading =
+                                              false; // Hide loading indicator
+                                        });
+                                      },
+                              child:
+                                  isLoading
+                                      ? SizedBox(
+                                        width: 26,
+                                        height: 26,
+                                        child: CircularProgressIndicator(
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                Colors.white,
+                                              ),
+                                          strokeWidth:
+                                              3, // For a smooth Google-like animation
+                                        ),
+                                      )
+                                      : Text(
+                                        "Sign In",
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          color: Colors.white,
+                                        ),
+                                      ),
                             ),
                             Container(
                               margin: EdgeInsets.only(top: 20),

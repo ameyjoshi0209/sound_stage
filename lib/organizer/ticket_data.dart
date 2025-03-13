@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:sound_stage/services/database.dart';
@@ -51,14 +50,111 @@ class _TicketDataState extends State<TicketData> {
 
             if (snapshot.hasError) {
               return Center(
-                child: Text('Error: ${snapshot.error}'),
-              ); // Handle errors
+                child: Text('Error fetching data. Please try again later.'),
+              );
             }
 
             if (!snapshot.hasData || snapshot.data.docs.isEmpty) {
-              return Center(
-                child: Text('No event data found!'),
-              ); // Handle no data scenario
+              return Column(
+                children: [
+                  // Increased height to prevent clipping of overlapping cards
+                  SizedBox(
+                    height: 380, // Extra space to accommodate the overlap
+                    child: Stack(
+                      clipBehavior: Clip.none, // Allow overflow
+                      children: [
+                        ClipRRect(
+                          borderRadius: const BorderRadius.only(
+                            bottomLeft: Radius.circular(20),
+                            bottomRight: Radius.circular(20),
+                          ),
+                          child: Image.network(
+                            widget.eventImage!,
+                            width: double.infinity,
+                            height: 750,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        // ✅ Move title up so it's visible
+                        Positioned(
+                          top: 55, // Moves it above the cards
+                          left: 16,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                widget.eventName!,
+                                style: TextStyle(
+                                  fontSize: 38,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                '${widget.eventDate!} ${widget.eventTime!}',
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 20,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // ✅ Cards half inside the image
+                        Positioned(
+                          bottom: -60, // Half inside, half below the image
+                          left: 16,
+                          right: 16,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Expanded(
+                                child: _infoCard(
+                                  Icons.currency_rupee_rounded,
+                                  'Sales',
+                                  '0',
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: _infoCard(
+                                  Icons.local_activity,
+                                  'Tickets Sold',
+                                  '0',
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 80), // Adjusted for proper spacing
+                        Text(
+                          'Live Attendees',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 30),
+                        Center(
+                          child: Text(
+                            'No tickets sold yet',
+                            style: TextStyle(fontSize: 16, color: Colors.grey),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
             }
 
             double getTicketSales() {
@@ -144,7 +240,7 @@ class _TicketDataState extends State<TicketData> {
                           children: [
                             Expanded(
                               child: _infoCard(
-                                Icons.attach_money,
+                                Icons.currency_rupee_rounded,
                                 'Sales',
                                 getTicketSales().toStringAsFixed(2),
                               ),
@@ -152,7 +248,7 @@ class _TicketDataState extends State<TicketData> {
                             const SizedBox(width: 16),
                             Expanded(
                               child: _infoCard(
-                                Icons.visibility,
+                                Icons.local_activity,
                                 'Tickets Sold',
                                 snapshot.data.docs.length.toString(),
                               ),

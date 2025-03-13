@@ -27,6 +27,7 @@ class _UploadEventState extends State<UploadEvent> {
   TextEditingController detailController = TextEditingController();
   TextEditingController locationController = TextEditingController();
   TextEditingController ageController = TextEditingController();
+  bool isLoading = false; // Track loading state
 
   getthesharedpref() async {
     id = await SharedPreferenceHelper().getOrganizerId();
@@ -440,67 +441,78 @@ class _UploadEventState extends State<UploadEvent> {
               ),
               SizedBox(height: 40),
               GestureDetector(
-                onTap: () async {
-                  HapticFeedback.lightImpact();
-                  String addId = randomAlphaNumeric(10);
-                  String? url = await uploadtoCloudinary(selectedImage);
-                  String? uploadedImageUrl;
-                  if (widget.edit) {
-                    if (imageurl == null) {
-                      uploadedImageUrl = url;
-                    } else {
-                      if (imageurl == url) {
-                        uploadedImageUrl = url;
-                      } else {
-                        await deleteFromCloudinary(imageurl!);
-                        uploadedImageUrl = url;
-                      }
-                    }
-                  }
-                  Map<String, dynamic> uploadevent = {
-                    "Image": widget.edit ? uploadedImageUrl : url,
-                    "Name": nameController.text,
-                    "Price": priceController.text,
-                    "Category": value,
-                    "AgeAllowed": ageController.text,
-                    "Location": locationController.text,
-                    "Details": detailController.text,
-                    "Date": DateFormat("dd-MM-yyyy").format(selectedDate),
-                    "Time": formatTimeOfDay(selectedTime),
-                    "OrganizerId": id,
-                    "EventApproved": false,
-                    "EventId": widget.edit ? widget.eventId : addId,
-                  };
-                  await DatabaseMethods()
-                      .addEvent(
-                        uploadevent,
-                        widget.edit ? widget.eventId! : addId,
-                      )
-                      .then((value) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            backgroundColor: Colors.green,
-                            content: Text(
-                              "Event uploaded successfully!",
-                              style: TextStyle(fontSize: 20.0),
-                            ),
-                          ),
-                        );
-                        widget.edit
-                            ? setState(() {})
-                            : setState(() {
-                              nameController.clear();
-                              priceController.clear();
-                              detailController.clear();
-                              locationController.clear();
-                              ageController.clear();
-                              selectedImage = null;
-                              value = null;
-                              imageurl = null;
-                              selectedDate = DateTime.now();
-                            });
-                      });
-                },
+                onTap:
+                    isLoading
+                        ? null
+                        : () async {
+                          setState(() {
+                            isLoading = true;
+                          });
+                          HapticFeedback.lightImpact();
+                          String addId = randomAlphaNumeric(10);
+                          String? url = await uploadtoCloudinary(selectedImage);
+                          String? uploadedImageUrl;
+                          if (widget.edit) {
+                            if (imageurl == null) {
+                              uploadedImageUrl = url;
+                            } else {
+                              if (imageurl == url) {
+                                uploadedImageUrl = url;
+                              } else {
+                                await deleteFromCloudinary(imageurl!);
+                                uploadedImageUrl = url;
+                              }
+                            }
+                          }
+                          Map<String, dynamic> uploadevent = {
+                            "Image": widget.edit ? uploadedImageUrl : url,
+                            "Name": nameController.text,
+                            "Price": priceController.text,
+                            "Category": value,
+                            "AgeAllowed": ageController.text,
+                            "Location": locationController.text,
+                            "Details": detailController.text,
+                            "Date": DateFormat(
+                              "dd-MM-yyyy",
+                            ).format(selectedDate),
+                            "Time": formatTimeOfDay(selectedTime),
+                            "OrganizerId": id,
+                            "EventApproved": false,
+                            "EventId": widget.edit ? widget.eventId : addId,
+                          };
+                          await DatabaseMethods()
+                              .addEvent(
+                                uploadevent,
+                                widget.edit ? widget.eventId! : addId,
+                              )
+                              .then((value) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    backgroundColor: Colors.green,
+                                    content: Text(
+                                      "Event uploaded successfully!",
+                                      style: TextStyle(fontSize: 20.0),
+                                    ),
+                                  ),
+                                );
+                                widget.edit
+                                    ? setState(() {
+                                      isLoading = false;
+                                    })
+                                    : setState(() {
+                                      isLoading = false;
+                                      nameController.clear();
+                                      priceController.clear();
+                                      detailController.clear();
+                                      locationController.clear();
+                                      ageController.clear();
+                                      selectedImage = null;
+                                      value = null;
+                                      imageurl = null;
+                                      selectedDate = DateTime.now();
+                                    });
+                              });
+                        },
                 child: Center(
                   child: Container(
                     margin: EdgeInsets.only(bottom: 50),
@@ -509,16 +521,29 @@ class _UploadEventState extends State<UploadEvent> {
                       color: Color(0xff6351ec),
                       borderRadius: BorderRadius.circular(50),
                     ),
-                    width: 200,
+                    width: double.infinity,
                     child: Center(
-                      child: Text(
-                        "Upload",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 23.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      child:
+                          isLoading
+                              ? SizedBox(
+                                width: 26,
+                                height: 26,
+                                child: CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.white,
+                                  ),
+                                  strokeWidth:
+                                      3, // For a smooth Google-like animation
+                                ),
+                              )
+                              : Text(
+                                "Upload",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 23.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                     ),
                   ),
                 ),

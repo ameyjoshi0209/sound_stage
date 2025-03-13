@@ -417,6 +417,7 @@ class _DetailPageState extends State<DetailPage> {
           .presentPaymentSheet()
           .then((value) async {
             String addId = randomAlphaNumeric(10);
+            String ticketId = randomAlphaNumeric(10);
             Map<String, dynamic> bookingdetail = {
               "Number": ticket.toString(),
               "Total": total.toString(),
@@ -437,7 +438,10 @@ class _DetailPageState extends State<DetailPage> {
             await DatabaseMethods()
                 .addUserBooking(bookingdetail, id!, addId)
                 .then((value) async {
-                  await DatabaseMethods().addAdminTickets(bookingdetail);
+                  await DatabaseMethods().addAdminTickets(
+                    bookingdetail,
+                    ticketId,
+                  );
                 });
             showDialog(
               context: context,

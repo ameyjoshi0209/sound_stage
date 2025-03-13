@@ -70,10 +70,11 @@ class DatabaseMethods {
         .set(userInfoMap);
   }
 
-  Future addAdminTickets(Map<String, dynamic> userInfoMap) async {
+  Future addAdminTickets(Map<String, dynamic> userInfoMap, String id) async {
     return await FirebaseFirestore.instance
         .collection("Tickets")
-        .add(userInfoMap);
+        .doc(id)
+        .set(userInfoMap);
   }
 
   Future updateTicketStatus(String customerId, String bookingId) async {
