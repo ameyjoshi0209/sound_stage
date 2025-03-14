@@ -381,7 +381,7 @@ class BookingCard extends StatelessWidget {
                         Row(
                           children: [
                             Icon(
-                              Icons.attach_money,
+                              Icons.currency_rupee,
                               size: 20,
                               color: Colors.green,
                             ),

@@ -178,7 +178,7 @@ class _OrgViewEventState extends State<OrgViewEvent> {
 
                           // Price
                           _buildInfoCard(
-                            Icons.attach_money,
+                            Icons.currency_rupee,
                             'Price',
                             '₹' + ds['Price'],
                           ),

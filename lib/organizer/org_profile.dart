@@ -73,6 +73,18 @@ class _OrganizerProfileState extends State<OrganizerProfile> {
   }
 
   @override
+  void dispose() {
+    _orgNameController.dispose();
+    _orgEmailController.dispose();
+    _orgPhoneController.dispose();
+    _orgPasswordController.dispose();
+    _orgAddressController.dispose();
+    _orgWebsiteController.dispose();
+    _orgFacebookController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(

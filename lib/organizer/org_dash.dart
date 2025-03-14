@@ -174,27 +174,89 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
                   color: Colors.white,
                 ),
               ),
+              SizedBox(height: 35),
               Expanded(
-                child: GridView(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                  ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _buildSectionCard(context, "Post Events", Icons.add),
-                    _buildSectionCard(
-                      context,
-                      "Ticket Details",
-                      Icons.event_seat,
+                    // Rectangular card on top
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => QrScanner()),
+                        );
+                      },
+                      child: Container(
+                        // margin: EdgeInsets.all(10),
+                        padding: EdgeInsets.all(10),
+                        height: 80,
+                        decoration: BoxDecoration(
+                          color: Colors.deepPurple.shade200, // Card color
+                          borderRadius: BorderRadius.circular(
+                            17,
+                          ), // Rounded corners
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 6,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.qr_code_rounded,
+                                  color: Colors.white,
+                                  size: 35,
+                                ),
+                                SizedBox(width: 10),
+                                Text(
+                                  'Scan Ticket QR',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                    _buildSectionCard(
-                      context,
-                      "Financial Reports",
-                      Icons.attach_money,
+                    // GridView section
+                    Expanded(
+                      child: GridView(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                        ),
+                        children: [
+                          _buildSectionCard(context, "Post Events", Icons.add),
+                          _buildSectionCard(
+                            context,
+                            "Ticket Details",
+                            Icons.event_seat,
+                          ),
+                          _buildSectionCard(
+                            context,
+                            "Financial Reports",
+                            Icons.currency_rupee,
+                          ),
+                          _buildSectionCard(
+                            context,
+                            "Manage Events",
+                            Icons.event,
+                          ),
+                        ],
+                      ),
                     ),
-                    _buildSectionCard(context, "Manage Events", Icons.event),
-                    _buildSectionCard(context, "Scan", Icons.qr_code),
                   ],
                 ),
               ),

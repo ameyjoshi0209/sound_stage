@@ -164,6 +164,13 @@ class _TicketDataState extends State<TicketData> {
               );
             }
 
+            int getTicketsSold() {
+              return snapshot.data.docs.fold(
+                0,
+                (total, doc) => total + int.parse(doc['Number']),
+              );
+            }
+
             // Parse the event date and time into DateTime
             var eventDateTime = DateFormat(
               'yyyy-MM-dd HH:mm',
@@ -250,7 +257,7 @@ class _TicketDataState extends State<TicketData> {
                               child: _infoCard(
                                 Icons.local_activity,
                                 'Tickets Sold',
-                                snapshot.data.docs.length.toString(),
+                                getTicketsSold().toString(),
                               ),
                             ),
                           ],
@@ -266,7 +273,7 @@ class _TicketDataState extends State<TicketData> {
                     children: [
                       SizedBox(height: 80), // Adjusted for proper spacing
                       const Text(
-                        'Live Attendees',
+                        'Attendees',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
