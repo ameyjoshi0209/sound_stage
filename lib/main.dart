@@ -8,12 +8,15 @@ import 'package:sound_stage/admin/admin_view_event.dart';
 import 'package:sound_stage/admin/admin_view_profile.dart';
 import 'package:sound_stage/admin/create_organizer.dart';
 import 'package:sound_stage/organizer/org_dash.dart';
+import 'package:sound_stage/organizer/org_profile.dart';
 import 'package:sound_stage/organizer/org_signin.dart';
-import 'package:sound_stage/organizer/ticket_event.dart';
+import 'package:sound_stage/organizer/qr_scanner.dart';
+import 'package:sound_stage/organizer/ticket_data.dart';
 import 'package:sound_stage/organizer/upload_event.dart';
 import 'package:sound_stage/pages/bottomnav.dart';
 import 'package:sound_stage/pages/categories_event.dart';
 import 'package:sound_stage/pages/home.dart';
+import 'package:sound_stage/pages/qr_ticket.dart';
 import 'package:sound_stage/pages/signin.dart';
 import 'package:sound_stage/pages/signup.dart';
 import 'package:sound_stage/pages/user_profile.dart';
@@ -54,7 +57,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: OrgSignIn(),
+      home: SignIn(),
       routes: {
         '/signup': (context) => const SignUp(),
         '/signin': (context) => const SignIn(),

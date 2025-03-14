@@ -15,6 +15,7 @@ class _SignUpState extends State<SignUp> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmpasswordController =
       TextEditingController();
+  bool isLoading = false; // Track loading state
 
   @override
   void dispose() {
@@ -170,24 +171,49 @@ class _SignUpState extends State<SignUp> {
                                 ),
                                 minimumSize: Size(double.infinity, 55),
                               ),
-                              onPressed: () async {
-                                HapticFeedback.mediumImpact();
-                                AuthService().signup(
-                                  context: context,
-                                  name: _nameController.text,
-                                  email: _emailController.text,
-                                  password: _passwordController.text,
-                                  confirmPassword:
-                                      _confirmpasswordController.text,
-                                );
-                              },
-                              child: Text(
-                                "Sign Up",
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.white,
-                                ),
-                              ),
+                              onPressed:
+                                  isLoading
+                                      ? null
+                                      : () async {
+                                        HapticFeedback.mediumImpact();
+                                        setState(() {
+                                          isLoading =
+                                              true; // Show loading indicator
+                                        });
+                                        AuthService().signup(
+                                          context: context,
+                                          name: _nameController.text,
+                                          email: _emailController.text,
+                                          password: _passwordController.text,
+                                          confirmPassword:
+                                              _confirmpasswordController.text,
+                                        );
+                                        setState(() {
+                                          isLoading =
+                                              false; // Hide loading indicator
+                                        });
+                                      },
+                              child:
+                                  isLoading
+                                      ? SizedBox(
+                                        width: 26,
+                                        height: 26,
+                                        child: CircularProgressIndicator(
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                Colors.white,
+                                              ),
+                                          strokeWidth:
+                                              3, // For a smooth Google-like animation
+                                        ),
+                                      )
+                                      : Text(
+                                        "Sign Up",
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          color: Colors.white,
+                                        ),
+                                      ),
                             ),
                             Container(
                               margin: EdgeInsets.only(top: 20),

@@ -1,30 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
+import 'package:sound_stage/pages/qr_ticket.dart';
 import 'package:sound_stage/services/database.dart';
 import 'package:sound_stage/services/shared_pref.dart';
-
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primaryColor: Color(0xff6351ec),
-        colorScheme: ColorScheme.fromSwatch().copyWith(
-          secondary: Color(0xff8071f2),
-          primary: Color(0xff6351ec),
-        ),
-        scaffoldBackgroundColor: Color(0xffede9ff),
-      ),
-      home: Booking(),
-    );
-  }
-}
 
 class Booking extends StatefulWidget {
   const Booking({super.key});
@@ -35,10 +15,11 @@ class Booking extends StatefulWidget {
 
 class _BookingState extends State<Booking> {
   Stream? bookingStream;
-  String? id;
+  String? id, name;
 
   getthesharedpref() async {
     id = await SharedPreferenceHelper().getUserId();
+    name = await SharedPreferenceHelper().getUserName();
     setState(() {});
   }
 
@@ -55,32 +36,88 @@ class _BookingState extends State<Booking> {
   }
 
   int selectedIndex = 0;
-  final List<String> filters = ["All", "Active", "Completed", "Cancelled"];
+  final List<String> filters = ["All", "Active", "Completed", "Upcoming"];
 
   Widget allBookings() {
     return StreamBuilder(
       stream: bookingStream,
       builder: (context, AsyncSnapshot snapshot) {
-        return snapshot.hasData
-            ? Expanded(
-              child: ListView.builder(
-                itemCount: snapshot.data.docs.length,
-                itemBuilder: (context, index) {
-                  DocumentSnapshot ds = snapshot.data.docs[index];
-                  return BookingCard(
-                    image: ds['Image'],
-                    title: ds['Event'],
-                    location: ds['Location'],
-                    status: 'Paid',
-                    buttonText: 'View Ticket',
-                    amount: ds['Total'],
-                    people: ds['Number'] + ' People',
-                    date: ds['Date'],
+        if (!snapshot.hasData) {
+          return Container();
+        }
+        var filteredEvents =
+            snapshot.data.docs.where((ds) {
+              // Parse the date and time fields separately
+              String dateString = ds["EventDate"]; // e.g., "14-03-2025"
+              String timeString = ds["EventTime"]; // e.g., "10:00 AM"
+
+              // Remove non-breaking spaces and trim any leading/trailing spaces
+              timeString =
+                  timeString
+                      .replaceAll(RegExp(r'\s+'), ' ')
+                      .trim(); // Remove unwanted spaces and trim
+
+              // First, parse the date in dd-MM-yyyy format
+              DateTime eventDate = DateFormat('dd-MM-yyyy').parse(dateString);
+
+              // Then, parse the time in 12-hour format (hh:mm a)
+              DateTime eventTime;
+              try {
+                eventTime = DateFormat('hh:mm a').parse(timeString);
+              } catch (e) {
+                return false; // Skip event if time parsing fails
+              }
+
+              // Combine date and time
+              DateTime eventDateTime = DateTime(
+                eventDate.year,
+                eventDate.month,
+                eventDate.day,
+                eventTime.hour,
+                eventTime.minute,
+              );
+
+              DateTime currentDateTime = DateTime.now();
+
+              switch (selectedIndex) {
+                case 1: // Active filter
+                  return eventDateTime.isBefore(
+                        currentDateTime.add(Duration(days: 1)),
+                      ) &&
+                      eventDateTime.isAfter(
+                        currentDateTime.subtract(Duration(days: 1)),
+                      );
+                case 2: // Completed filter
+                  return eventDateTime.isBefore(
+                    currentDateTime.subtract(Duration(days: 1)),
                   );
-                },
-              ),
-            )
-            : Container();
+                case 3: // Upcoming filter
+                  return eventDateTime.isAfter(currentDateTime);
+                default: // All events
+                  return true;
+              }
+            }).toList();
+
+        return Expanded(
+          child: ListView.builder(
+            itemCount: filteredEvents.length,
+            itemBuilder: (context, index) {
+              DocumentSnapshot ds = filteredEvents[index];
+              return BookingCard(
+                image: ds['EventImage'],
+                title: ds['EventName'],
+                location: ds['EventLocation'],
+                amount: ds['Total'],
+                people: ds['Number'] + ' People',
+                date: ds['EventDate'],
+                time: ds['EventTime'],
+                customerId: id!,
+                customerName: name!,
+                bookingId: ds["BookingId"],
+              );
+            },
+          ),
+        );
       },
     );
   }
@@ -88,6 +125,18 @@ class _BookingState extends State<Booking> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          "My Bookings",
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 24,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+      ),
       backgroundColor: Color(0xffede9ff),
       body: SafeArea(
         child: Column(
@@ -154,82 +203,147 @@ class BookingCard extends StatelessWidget {
   final String image;
   final String title;
   final String location;
-  final String status;
-  final String buttonText;
   final String amount;
   final String people;
   final String date;
+  final String time;
+  final String customerId;
+  final String bookingId;
+  final String customerName;
 
   const BookingCard({
     required this.image,
     required this.title,
     required this.location,
-    required this.status,
-    required this.buttonText,
     required this.amount,
     required this.people,
     required this.date,
+    required this.time,
+    required this.customerId,
+    required this.bookingId,
+    required this.customerName,
   });
+
+  String formatDate(String date) {
+    DateTime parsedDate = DateFormat('dd-MM-yyyy').parse(date);
+    return DateFormat(
+      'd, MMM yyyy',
+    ).format(parsedDate); // Returns the date in "12, Dec 2023" format
+  }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Card(
-        color: Color(0xfff0ebff),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        elevation: 8,
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 10.0),
+      child: GestureDetector(
+        onTap: () {
+          HapticFeedback.lightImpact();
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder:
+                  (context) => QrTicket(
+                    customerId: customerId,
+                    bookingId: bookingId,
+                    eventName: title,
+                    location: location,
+                    eventDate: date,
+                    customerName: customerName,
+                    eventTime: time,
+                  ),
+            ),
+          );
+        },
+        child: Card(
+          color: Color(0xfff0ebff),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          elevation: 8,
+          child: Column(
+            children: [
+              // Stack to overlay date on top of image
+              Stack(
                 children: [
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(15),
+                    borderRadius: BorderRadius.circular(25),
                     child: Image.network(
                       image,
-                      height: 140,
-                      width: 140,
+                      height: 190,
+                      width: double.infinity, // Ensures image covers the width
                       fit: BoxFit.cover,
                     ),
                   ),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  // Positioned date at the top-left corner
+                  Positioned(
+                    top: 10,
+                    left: 10,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(
+                          0.5,
+                        ), // Background color
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Text(
+                        formatDate(date), // Format the date
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              // Padding for spacing
+              SizedBox(height: 15),
+              // Data content
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 23,
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    Row(
                       children: [
+                        Icon(
+                          Icons.location_on,
+                          color: Colors.redAccent.shade200,
+                        ),
                         Text(
-                          title,
+                          location,
                           style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
+                            color: Colors.grey.shade600,
+                            fontSize: 17,
                           ),
                         ),
-                        SizedBox(height: 5),
-                        Text(location, style: TextStyle(color: Colors.grey)),
-                        SizedBox(height: 5),
-                        Row(
-                          children: [
-                            Icon(Icons.attach_money, color: Colors.green),
-                            SizedBox(width: 3),
-                            Text(amount),
-                            SizedBox(width: 10),
-                            Icon(Icons.people, color: Colors.blue),
-                            SizedBox(width: 3),
-                            Text(people),
-                          ],
-                        ),
-                        SizedBox(height: 5),
-                        Row(
-                          children: [
-                            Icon(Icons.date_range, color: Colors.orange),
-                            SizedBox(width: 5),
-                            Text(date),
-                          ],
-                        ),
-                        SizedBox(height: 5),
+                      ],
+                    ),
+                    SizedBox(height: 15),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Icon(Icons.currency_rupee_rounded, color: Colors.green),
+                        SizedBox(width: 2),
+                        Text(amount),
+                        SizedBox(width: 15),
+                        Icon(Icons.people, color: Colors.blue),
+                        SizedBox(width: 5),
+                        Text(people),
+                        SizedBox(width: 15),
                         Container(
                           padding: EdgeInsets.symmetric(
                             horizontal: 10,
@@ -240,7 +354,7 @@ class BookingCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Text(
-                            status,
+                            "Active",
                             style: TextStyle(
                               color: Color.fromARGB(255, 87, 66, 248),
                             ),
@@ -248,35 +362,12 @@ class BookingCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                  ),
-                ],
+                    SizedBox(height: 30),
+                  ],
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16.0,
-                vertical: 10.0,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xff6351ec),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                    ),
-                    child: Text(
-                      buttonText,
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

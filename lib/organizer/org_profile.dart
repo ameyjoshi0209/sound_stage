@@ -17,6 +17,7 @@ class OrganizerProfile extends StatefulWidget {
 class _OrganizerProfileState extends State<OrganizerProfile> {
   String? id, imageUrl;
   bool _isPasswordVisible = false; // Track password visibility
+  bool isLoading = false;
 
   final TextEditingController _orgNameController = TextEditingController();
   final TextEditingController _orgEmailController = TextEditingController();
@@ -69,6 +70,18 @@ class _OrganizerProfileState extends State<OrganizerProfile> {
   void initState() {
     ontheload();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _orgNameController.dispose();
+    _orgEmailController.dispose();
+    _orgPhoneController.dispose();
+    _orgPasswordController.dispose();
+    _orgAddressController.dispose();
+    _orgWebsiteController.dispose();
+    _orgFacebookController.dispose();
+    super.dispose();
   }
 
   @override
@@ -240,77 +253,95 @@ class _OrganizerProfileState extends State<OrganizerProfile> {
                     // Create Profile Button
                     Center(
                       child: ElevatedButton(
-                        onPressed: () async {
-                          HapticFeedback.lightImpact();
-                          SharedPreferenceHelper().saveOrganizerId(id!);
-                          SharedPreferenceHelper().saveOrganizerEmail(
-                            _orgEmailController.text,
-                          );
-                          SharedPreferenceHelper().saveOrganizerName(
-                            _orgNameController.text,
-                          );
-                          SharedPreferenceHelper().saveOrganizerPassword(
-                            _orgPasswordController.text,
-                          );
-                          String? profileurl;
-
-                          if (imageUrl == null) {
-                            profileurl = await uploadtoCloudinary(
-                              selectedImage,
-                            );
-                          } else {
-                            if (selectedImage != null) {
-                              await deleteFromCloudinary(imageUrl!);
-                              profileurl = await uploadtoCloudinary(
-                                selectedImage,
-                              );
-                            } else {
-                              profileurl = imageUrl;
-                            }
-                          }
-                          Map<String, dynamic> organizerInfoMap = {
-                            "orgname": _orgNameController.text,
-                            "orgemail": _orgEmailController.text,
-                            "orgpassword": _orgPasswordController.text,
-                            "orgphone": _orgPhoneController.text,
-                            "orgaddress": _orgAddressController.text,
-                            "orgwebsite": _orgWebsiteController.text,
-                            "orgfacebook": _orgFacebookController.text,
-                            "orgimage": profileurl,
-                            "role": "organizer",
-                            "orgid": id,
-                          };
-
-                          await DatabaseMethods()
-                              .addOrganizerDetail(organizerInfoMap, id!)
-                              .then(
-                                (value) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      backgroundColor: Colors.green,
-                                      content: Text(
-                                        "Organizer data updated successfully!",
-                                        style: TextStyle(fontSize: 20.0),
-                                      ),
-                                    ),
+                        onPressed:
+                            isLoading
+                                ? null
+                                : () async {
+                                  HapticFeedback.lightImpact();
+                                  setState(() {
+                                    isLoading = true;
+                                  });
+                                  SharedPreferenceHelper().saveOrganizerId(id!);
+                                  SharedPreferenceHelper().saveOrganizerEmail(
+                                    _orgEmailController.text,
                                   );
-                                  ontheload(); // Reload the data
-                                  setState(() {});
-                                },
-                                onError: (error) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      backgroundColor: Colors.red,
-                                      content: Text(
-                                        "Failed to upload data. Please try again.",
-                                        style: TextStyle(fontSize: 20.0),
-                                      ),
-                                    ),
+                                  SharedPreferenceHelper().saveOrganizerName(
+                                    _orgNameController.text,
                                   );
+                                  SharedPreferenceHelper()
+                                      .saveOrganizerPassword(
+                                        _orgPasswordController.text,
+                                      );
+                                  String? profileurl;
+
+                                  if (imageUrl == null) {
+                                    profileurl = await uploadtoCloudinary(
+                                      selectedImage,
+                                    );
+                                  } else {
+                                    if (selectedImage != null) {
+                                      await deleteFromCloudinary(imageUrl!);
+                                      profileurl = await uploadtoCloudinary(
+                                        selectedImage,
+                                      );
+                                    } else {
+                                      profileurl = imageUrl;
+                                    }
+                                  }
+                                  Map<String, dynamic> organizerInfoMap = {
+                                    "orgname": _orgNameController.text,
+                                    "orgemail": _orgEmailController.text,
+                                    "orgpassword": _orgPasswordController.text,
+                                    "orgphone": _orgPhoneController.text,
+                                    "orgaddress": _orgAddressController.text,
+                                    "orgwebsite": _orgWebsiteController.text,
+                                    "orgfacebook": _orgFacebookController.text,
+                                    "orgimage": profileurl,
+                                    "role": "organizer",
+                                    "orgid": id,
+                                  };
+
+                                  await DatabaseMethods()
+                                      .addOrganizerDetail(organizerInfoMap, id!)
+                                      .then(
+                                        (value) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              backgroundColor: Colors.green,
+                                              content: Text(
+                                                "Organizer data updated successfully!",
+                                                style: TextStyle(
+                                                  fontSize: 20.0,
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                          ontheload(); // Reload the data
+                                          setState(() {
+                                            isLoading = false;
+                                          });
+                                        },
+                                        onError: (error) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              backgroundColor: Colors.red,
+                                              content: Text(
+                                                "Failed to upload data. Please try again.",
+                                                style: TextStyle(
+                                                  fontSize: 20.0,
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      );
                                 },
-                              );
-                        },
                         style: ElevatedButton.styleFrom(
+                          minimumSize: Size(double.infinity, 50),
                           backgroundColor: Colors.deepPurple,
                           foregroundColor: Colors.white,
                           padding: EdgeInsets.symmetric(
@@ -322,10 +353,25 @@ class _OrganizerProfileState extends State<OrganizerProfile> {
                           ),
                           elevation: 5,
                         ),
-                        child: Text(
-                          'Update Profile',
-                          style: TextStyle(fontSize: 18),
-                        ),
+                        child:
+                            isLoading
+                                ? SizedBox(
+                                  width: 26,
+                                  height: 26,
+                                  child: CircularProgressIndicator(
+                                    color: Color(0xFF2A2A2A),
+                                    backgroundColor: Colors.deepPurple,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white,
+                                    ),
+                                    strokeWidth:
+                                        3, // For a smooth Google-like animation
+                                  ),
+                                )
+                                : Text(
+                                  'Update Profile',
+                                  style: TextStyle(fontSize: 18),
+                                ),
                       ),
                     ),
                     SizedBox(height: 40),

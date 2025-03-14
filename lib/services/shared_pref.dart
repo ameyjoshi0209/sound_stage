@@ -1,6 +1,10 @@
+// This file is a shared preference helper class that contains functions to save, get, and remove
+// user, organizer, and admin data from shared preferences.
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPreferenceHelper {
+  // KEYS FOR USER DATA
   static String userIdKey = "USERKEY";
   static String userNameKey = "USERNAMEKEY";
   static String userEmailKey = "USEREMAILKEY";
@@ -9,14 +13,17 @@ class SharedPreferenceHelper {
   static String userPasswordKey = "USERPASSWORDKEY";
   static String userImageKey = "USERIMAGEKEY";
 
+  // KEYS FOR ORGANIZER DATA
   static String organizerIdKey = "ORGANIZERKEY";
   static String organizerEmailKey = "ORGANIZEREMAILKEY";
   static String organizerPasswordKey = "ORGANIZERPASSWORDKEY";
   static String organizerNameKey = "ORGANIZERNAMEKEY";
 
+  // KEYS FOR ADMIN DATA
   static String adminEmailKey = "ADMINEMAILKEY";
   static String adminPasswordKey = "ADMINPASSWORDKEY";
 
+  // SAVE SHAREDPREFERENCES FOR USER DATA
   Future<bool> saveUserId(String getUserId) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.setString(userIdKey, getUserId);
@@ -52,6 +59,7 @@ class SharedPreferenceHelper {
     return prefs.setString(userImageKey, getUserImage);
   }
 
+  // GET SHAREDPREFERENCES FOR USER DATA
   Future<String?> getUserId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(userIdKey);
@@ -87,6 +95,7 @@ class SharedPreferenceHelper {
     return prefs.getString(userImageKey);
   }
 
+  // REMOVE SHAREDPREFERENCES FOR USER DATA
   Future<String?> removeUserId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove(userIdKey);
@@ -122,6 +131,7 @@ class SharedPreferenceHelper {
     prefs.remove(userImageKey);
   }
 
+  // SAVE SHAREDPREFERENCES FOR ORGANIZER DATA
   Future<bool> saveOrganizerId(String getOrganizerId) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.setString(organizerIdKey, getOrganizerId);
@@ -142,6 +152,7 @@ class SharedPreferenceHelper {
     return prefs.setString(organizerPasswordKey, getOrganizerPassword);
   }
 
+  // GET SHAREDPREFERENCES FOR ORGANIZER DATA
   Future<String?> getOrganizerId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(organizerIdKey);
@@ -162,6 +173,7 @@ class SharedPreferenceHelper {
     return prefs.getString(organizerPasswordKey);
   }
 
+  // REMOVE SHAREDPREFERENCES FOR ORGANIZER DATA
   Future<String?> removeOrganizerId() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove(organizerIdKey);
@@ -182,6 +194,7 @@ class SharedPreferenceHelper {
     prefs.remove(organizerPasswordKey);
   }
 
+  // SAVE SHAREDPREFERENCES FOR ADMIN DATA
   Future<bool> saveAdminEmail(String getAdminEmail) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.setString(adminEmailKey, getAdminEmail);
@@ -192,6 +205,7 @@ class SharedPreferenceHelper {
     return prefs.setString(adminPasswordKey, getAdminPassword);
   }
 
+  // GET SHAREDPREFERENCES FOR ADMIN DATA
   Future<String?> getAdminEmail() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(adminEmailKey);
@@ -202,6 +216,7 @@ class SharedPreferenceHelper {
     return prefs.getString(adminPasswordKey);
   }
 
+  // REMOVE SHAREDPREFERENCES FOR ADMIN DATA
   Future<String?> removeAdminEmail() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove(adminEmailKey);

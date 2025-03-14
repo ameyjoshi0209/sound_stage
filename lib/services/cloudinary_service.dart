@@ -1,3 +1,9 @@
+// This file contains the code to upload and delete images from Cloudinary.
+// It uses the http package to send requests to the Cloudinary API.
+// The uploadtoCloudinary function takes a File object as input and uploads the image to Cloudinary.
+// The deleteFromCloudinary function takes the URL of the image to delete and deletes it from Cloudinary.
+// The generateSignature function is a helper function to generate the signature required for deleting an image from Cloudinary.
+
 import 'dart:io';
 
 import 'package:http/http.dart' as http;

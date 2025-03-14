@@ -73,6 +73,9 @@ class _HomeState extends State<Home> {
                           MaterialPageRoute(
                             builder:
                                 (context) => DetailPage(
+                                  organizerId: ds["OrganizerId"],
+                                  time: ds["Time"],
+                                  eventid: ds["EventId"],
                                   category: ds["Category"],
                                   ageAllowed: ds["AgeAllowed"],
                                   date: ds["Date"],
@@ -232,7 +235,7 @@ class _HomeState extends State<Home> {
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return Text(
-                          "Hello, ...",
+                          "Hello,",
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 35.0,

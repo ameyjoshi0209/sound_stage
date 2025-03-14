@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:sound_stage/organizer/org_event_detail.dart';
+import 'package:sound_stage/organizer/ticket_data.dart';
 import 'package:sound_stage/organizer/upload_event.dart';
 import 'package:sound_stage/services/database.dart';
 import 'package:sound_stage/services/shared_pref.dart';
@@ -36,36 +38,92 @@ class _ViewEventsState extends State<ViewEvents> {
   }
 
   int selectedIndex = 0;
-  final List<String> filters = ["All", "Active", "Completed", "Cancelled"];
+  final List<String> filters = ["All", "Active", "Completed", "Upcoming"];
 
   Widget allBookings() {
     return StreamBuilder(
       stream: eventStream,
       builder: (context, AsyncSnapshot snapshot) {
-        return snapshot.hasData
-            ? Expanded(
-              child: ListView.builder(
-                itemCount: snapshot.data.docs.length,
-                itemBuilder: (context, index) {
-                  DocumentSnapshot ds = snapshot.data.docs[index];
-                  return BookingCard(
-                    manage: widget.manage!,
-                    eventId: ds["EventId"],
-                    ageAllowed: ds["AgeAllowed"],
-                    category: ds["Category"],
-                    date: ds["Date"],
-                    details: ds["Details"],
-                    location: ds["Location"],
-                    name: ds["Name"],
-                    price: ds["Price"],
-                    image: ds["Image"],
-                    time: ds["Time"],
-                    approvalStatus: ds["EventApproved"],
+        if (!snapshot.hasData) {
+          return Container();
+        }
+
+        // Filter events based on the selected filter
+        var filteredEvents =
+            snapshot.data.docs.where((ds) {
+              // Parse the date and time fields separately
+              String dateString = ds["Date"]; // e.g., "14-03-2025"
+              String timeString = ds["Time"]; // e.g., "10:00 AM"
+
+              // Remove non-breaking spaces and trim any leading/trailing spaces
+              timeString =
+                  timeString
+                      .replaceAll(RegExp(r'\s+'), ' ')
+                      .trim(); // Remove unwanted spaces and trim
+
+              // First, parse the date in dd-MM-yyyy format
+              DateTime eventDate = DateFormat('dd-MM-yyyy').parse(dateString);
+
+              // Then, parse the time in 12-hour format (hh:mm a)
+              DateTime eventTime;
+              try {
+                eventTime = DateFormat('hh:mm a').parse(timeString);
+              } catch (e) {
+                return false; // Skip event if time parsing fails
+              }
+
+              // Combine date and time
+              DateTime eventDateTime = DateTime(
+                eventDate.year,
+                eventDate.month,
+                eventDate.day,
+                eventTime.hour,
+                eventTime.minute,
+              );
+
+              DateTime currentDateTime = DateTime.now();
+
+              switch (selectedIndex) {
+                case 1: // Active filter
+                  return eventDateTime.isBefore(
+                        currentDateTime.add(Duration(days: 1)),
+                      ) &&
+                      eventDateTime.isAfter(
+                        currentDateTime.subtract(Duration(days: 1)),
+                      );
+                case 2: // Completed filter
+                  return eventDateTime.isBefore(
+                    currentDateTime.subtract(Duration(days: 1)),
                   );
-                },
-              ),
-            )
-            : Container();
+                case 3: // Upcoming filter
+                  return eventDateTime.isAfter(currentDateTime);
+                default: // All events
+                  return true;
+              }
+            }).toList();
+
+        return Expanded(
+          child: ListView.builder(
+            itemCount: filteredEvents.length,
+            itemBuilder: (context, index) {
+              DocumentSnapshot ds = filteredEvents[index];
+              return BookingCard(
+                manage: widget.manage!,
+                eventId: ds["EventId"],
+                ageAllowed: ds["AgeAllowed"],
+                category: ds["Category"],
+                date: ds["Date"],
+                details: ds["Details"],
+                location: ds["Location"],
+                name: ds["Name"],
+                price: ds["Price"],
+                image: ds["Image"],
+                time: ds["Time"],
+                approvalStatus: ds["EventApproved"],
+              );
+            },
+          ),
+        );
       },
     );
   }
@@ -89,7 +147,8 @@ class _ViewEventsState extends State<ViewEvents> {
                         onTap: () {
                           HapticFeedback.lightImpact();
                           setState(() {
-                            selectedIndex = idx;
+                            selectedIndex =
+                                idx; // Set the filter to the selected filter index
                           });
                         },
                         child: Container(
@@ -166,8 +225,13 @@ class BookingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var eventDateTime = DateFormat('yyyy-MM-dd HH:mm').parse('$date $time');
+    var currentDateTime = DateTime.now();
+
+    // Check if there are tickets and the event is in the future
+    bool showLiveBadge = eventDateTime.isAfter(currentDateTime);
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 8.0),
       child: GestureDetector(
         onTap: () {
           if (manage) {
@@ -175,6 +239,20 @@ class BookingCard extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) => OrgViewEvent(eventId: eventId),
+              ),
+            );
+          } else {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (context) => TicketData(
+                      eventId: eventId,
+                      eventName: name,
+                      eventDate: date,
+                      eventTime: time,
+                      eventImage: image,
+                    ),
               ),
             );
           }
@@ -226,6 +304,24 @@ class BookingCard extends StatelessWidget {
                       ),
                     ),
                   ),
+                  Positioned(
+                    top: 10,
+                    right: 16,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.transparent,
+                        borderRadius: BorderRadius.circular(
+                          12,
+                        ), // Border radius added
+                      ),
+                      child:
+                          showLiveBadge ? BlinkingLiveBadge() : UpcomingBadge(),
+                    ),
+                  ),
                 ],
               ),
               // Card details below the image
@@ -248,13 +344,14 @@ class BookingCard extends StatelessWidget {
                         // Age allowed displayed in the same row with icon
                         Row(
                           children: [
-                            Icon(Icons.person, size: 20, color: Colors.orange),
+                            Icon(Icons.person, size: 20, color: Colors.red),
                             SizedBox(width: 5),
                             Text(
-                              ageAllowed + '+',
+                              '$ageAllowed+',
                               style: TextStyle(
                                 fontSize: 16,
-                                color: Colors.orange,
+                                color: Colors.red,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                           ],
@@ -284,7 +381,7 @@ class BookingCard extends StatelessWidget {
                         Row(
                           children: [
                             Icon(
-                              Icons.attach_money,
+                              Icons.currency_rupee,
                               size: 20,
                               color: Colors.green,
                             ),
@@ -395,6 +492,121 @@ class BookingCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class BlinkingLiveBadge extends StatefulWidget {
+  @override
+  _BlinkingLiveBadgeState createState() => _BlinkingLiveBadgeState();
+}
+
+class _BlinkingLiveBadgeState extends State<BlinkingLiveBadge>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            return Container(
+              width: 10,
+              height: 10,
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(_controller.value),
+                shape: BoxShape.circle,
+              ),
+            );
+          },
+        ),
+        const SizedBox(width: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+          decoration: BoxDecoration(
+            color: Colors.green,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: const Text(
+            'Live',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class UpcomingBadge extends StatefulWidget {
+  @override
+  _UpcomingBadgeState createState() => _UpcomingBadgeState();
+}
+
+class _UpcomingBadgeState extends State<UpcomingBadge>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1), // Blinking duration
+    )..repeat(reverse: true); // Repeats the animation back and forth
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        // Animated background color and text opacity (blinking effect)
+        AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            return Container(
+              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+              decoration: BoxDecoration(
+                color: Colors.orange.withOpacity(
+                  _controller.value,
+                ), // Blinking effect on background
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                'Upcoming',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(
+                    _controller.value,
+                  ), // Blinking effect on text color
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 }

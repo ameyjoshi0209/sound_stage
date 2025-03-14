@@ -1,12 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:sound_stage/organizer/org_profile.dart';
 import 'package:sound_stage/organizer/qr_scanner.dart';
-import 'package:sound_stage/organizer/ticket_event.dart';
 import 'package:sound_stage/organizer/upload_event.dart';
 import 'package:sound_stage/organizer/view_events.dart';
 import 'package:sound_stage/services/auth.dart';
+import 'package:sound_stage/services/database.dart';
+import 'package:sound_stage/services/shared_pref.dart';
 
 class OrganizerDashboard extends StatefulWidget {
   @override
@@ -14,6 +15,24 @@ class OrganizerDashboard extends StatefulWidget {
 }
 
 class _OrganizerDashboardState extends State<OrganizerDashboard> {
+  String? id;
+
+  getthesharedpref() async {
+    id = await SharedPreferenceHelper().getOrganizerId();
+    setState(() {});
+  }
+
+  ontheload() async {
+    await getthesharedpref();
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    ontheload();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,19 +93,74 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
               Row(
                 children: [
                   Expanded(
-                    child: _buildRollingNumberCard(
-                      context,
-                      "Total Collection",
-                      15000,
-                      isCurrency: true,
+                    child: StreamBuilder(
+                      stream:
+                          FirebaseFirestore.instance
+                              .collection('Tickets')
+                              .where('OrganizerId', isEqualTo: id)
+                              .snapshots(),
+                      builder: (
+                        context,
+                        AsyncSnapshot<QuerySnapshot> snapshot,
+                      ) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return _buildRollingNumberCard(
+                            context,
+                            "Total Collection",
+                            0,
+                            isCurrency: true,
+                          );
+                        } else if (snapshot.hasError) {
+                          return Text('Error');
+                        } else {
+                          return _buildRollingNumberCard(
+                            context,
+                            "Total Collection",
+                            snapshot.data!.docs.fold(
+                              0,
+                              (total, doc) => total + int.parse(doc['Total']),
+                            ),
+                            isCurrency: true,
+                          );
+                        }
+                      },
                     ),
                   ),
                   SizedBox(width: 16),
                   Expanded(
-                    child: _buildRollingNumberCard(
-                      context,
-                      "Participants",
-                      1200,
+                    child: StreamBuilder(
+                      stream:
+                          FirebaseFirestore.instance
+                              .collection('Tickets')
+                              .where('OrganizerId', isEqualTo: id)
+                              .snapshots(),
+                      builder: (
+                        context,
+                        AsyncSnapshot<QuerySnapshot> snapshot,
+                      ) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return _buildRollingNumberCard(
+                            context,
+                            "Total Attendees",
+                            0,
+                            isCurrency: false,
+                          );
+                        } else if (snapshot.hasError) {
+                          return Text('Error');
+                        } else {
+                          return _buildRollingNumberCard(
+                            context,
+                            "Total Attendees",
+                            snapshot.data!.docs.fold(
+                              0,
+                              (total, doc) => total + int.parse(doc['Number']),
+                            ),
+                            isCurrency: false,
+                          );
+                        }
+                      },
                     ),
                   ),
                 ],
@@ -100,27 +174,89 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
                   color: Colors.white,
                 ),
               ),
+              SizedBox(height: 35),
               Expanded(
-                child: GridView(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                  ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _buildSectionCard(context, "Post Events", Icons.add),
-                    _buildSectionCard(
-                      context,
-                      "View Tickets",
-                      Icons.event_seat,
+                    // Rectangular card on top
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => QrScanner()),
+                        );
+                      },
+                      child: Container(
+                        // margin: EdgeInsets.all(10),
+                        padding: EdgeInsets.all(10),
+                        height: 80,
+                        decoration: BoxDecoration(
+                          color: Colors.deepPurple.shade200, // Card color
+                          borderRadius: BorderRadius.circular(
+                            17,
+                          ), // Rounded corners
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 6,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.qr_code_rounded,
+                                  color: Colors.white,
+                                  size: 35,
+                                ),
+                                SizedBox(width: 10),
+                                Text(
+                                  'Scan Ticket QR',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                    _buildSectionCard(
-                      context,
-                      "Financial Reports",
-                      Icons.attach_money,
+                    // GridView section
+                    Expanded(
+                      child: GridView(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                        ),
+                        children: [
+                          _buildSectionCard(context, "Post Events", Icons.add),
+                          _buildSectionCard(
+                            context,
+                            "Ticket Details",
+                            Icons.event_seat,
+                          ),
+                          _buildSectionCard(
+                            context,
+                            "Financial Reports",
+                            Icons.currency_rupee,
+                          ),
+                          _buildSectionCard(
+                            context,
+                            "Manage Events",
+                            Icons.event,
+                          ),
+                        ],
+                      ),
                     ),
-                    _buildSectionCard(context, "Manage Events", Icons.event),
-                    _buildSectionCard(context, "Scan", Icons.qr_code),
                   ],
                 ),
               ),
@@ -153,7 +289,7 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
               duration: Duration(seconds: 2),
               builder: (context, value, child) {
                 return Text(
-                  isCurrency ? "\$${value.toString()}" : value.toString(),
+                  isCurrency ? "₹${value.toString()}" : value.toString(),
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
@@ -181,7 +317,7 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
                 switch (title) {
                   case "Post Events":
                     return UploadEvent(edit: false);
-                  case "View Tickets":
+                  case "Ticket Details":
                     return ViewEvents(manage: false);
                   case "Manage Events":
                     return ViewEvents(manage: true);

@@ -30,6 +30,7 @@ class _UserProfileState extends State<UserProfile> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController ageController = TextEditingController();
+  bool isLoading = false; // Track loading state
 
   getthesharedpref() async {
     id = await SharedPreferenceHelper().getUserId();
@@ -58,6 +59,16 @@ class _UserProfileState extends State<UserProfile> {
   void initState() {
     ontheload();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    phoneController.dispose();
+    ageController.dispose();
+    super.dispose();
   }
 
   Future getImage() async {
@@ -173,72 +184,92 @@ class _UserProfileState extends State<UserProfile> {
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: () async {
-                    HapticFeedback.lightImpact();
-                    // Update data in shared pref and database
-                    SharedPreferenceHelper().saveUserEmail(
-                      emailController.text,
-                    );
-                    SharedPreferenceHelper().saveUserName(nameController.text);
-                    SharedPreferenceHelper().saveUserPassword(
-                      passwordController.text,
-                    );
-                    SharedPreferenceHelper().saveUserPhone(
-                      phoneController.text,
-                    );
-                    SharedPreferenceHelper().saveUserAge(ageController.text);
-                    String? profileurl;
-                    if (image == null) {
-                      profileurl = await uploadtoCloudinary(selectedImage);
-                      SharedPreferenceHelper().saveUserImage(profileurl);
-                    } else {
-                      if (selectedImage != null) {
-                        await deleteFromCloudinary(image!);
-                        profileurl = await uploadtoCloudinary(selectedImage);
-                        SharedPreferenceHelper().saveUserImage(profileurl);
-                      } else {
-                        profileurl = image;
-                      }
-                    }
-                    Map<String, dynamic> userInfoMap = {
-                      "name": nameController.text,
-                      "email": emailController.text,
-                      "password": passwordController.text,
-                      "phone": phoneController.text,
-                      "age": ageController.text,
-                      "image": profileurl,
-                      "userid": id,
-                      "role": "customer",
-                    };
+                  onPressed:
+                      isLoading
+                          ? null
+                          : () async {
+                            HapticFeedback.lightImpact();
+                            setState(() {
+                              isLoading = true;
+                            });
+                            // Update data in shared pref and database
+                            SharedPreferenceHelper().saveUserEmail(
+                              emailController.text,
+                            );
+                            SharedPreferenceHelper().saveUserName(
+                              nameController.text,
+                            );
+                            SharedPreferenceHelper().saveUserPassword(
+                              passwordController.text,
+                            );
+                            SharedPreferenceHelper().saveUserPhone(
+                              phoneController.text,
+                            );
+                            SharedPreferenceHelper().saveUserAge(
+                              ageController.text,
+                            );
+                            String? profileurl;
+                            if (image == null) {
+                              profileurl = await uploadtoCloudinary(
+                                selectedImage,
+                              );
+                              SharedPreferenceHelper().saveUserImage(
+                                profileurl,
+                              );
+                            } else {
+                              if (selectedImage != null) {
+                                await deleteFromCloudinary(image!);
+                                profileurl = await uploadtoCloudinary(
+                                  selectedImage,
+                                );
+                                SharedPreferenceHelper().saveUserImage(
+                                  profileurl,
+                                );
+                              } else {
+                                profileurl = image;
+                              }
+                            }
+                            Map<String, dynamic> userInfoMap = {
+                              "name": nameController.text,
+                              "email": emailController.text,
+                              "password": passwordController.text,
+                              "phone": phoneController.text,
+                              "age": ageController.text,
+                              "image": profileurl,
+                              "userid": id,
+                              "role": "customer",
+                            };
 
-                    await DatabaseMethods()
-                        .addUserDetail(userInfoMap, id!)
-                        .then(
-                          (value) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                backgroundColor: Colors.green,
-                                content: Text(
-                                  "User updated successfully!",
-                                  style: TextStyle(fontSize: 20.0),
-                                ),
-                              ),
-                            );
-                            setState(() {});
+                            await DatabaseMethods()
+                                .addUserDetail(userInfoMap, id!)
+                                .then(
+                                  (value) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        backgroundColor: Colors.green,
+                                        content: Text(
+                                          "User updated successfully!",
+                                          style: TextStyle(fontSize: 20.0),
+                                        ),
+                                      ),
+                                    );
+                                    setState(() {
+                                      isLoading = false;
+                                    });
+                                  },
+                                  onError: (error) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        backgroundColor: Colors.red,
+                                        content: Text(
+                                          "Failed to upload event. Please try again.",
+                                          style: TextStyle(fontSize: 20.0),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
                           },
-                          onError: (error) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                backgroundColor: Colors.red,
-                                content: Text(
-                                  "Failed to upload event. Please try again.",
-                                  style: TextStyle(fontSize: 20.0),
-                                ),
-                              ),
-                            );
-                          },
-                        );
-                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xff6351ec),
                     foregroundColor: Colors.black,
@@ -246,14 +277,29 @@ class _UserProfileState extends State<UserProfile> {
                       borderRadius: BorderRadius.circular(50),
                     ),
                   ),
-                  child: Text(
-                    "Edit Profile",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
+                  child:
+                      isLoading
+                          ? SizedBox(
+                            width: 26,
+                            height: 26,
+                            child: CircularProgressIndicator(
+                              color: Color(0xFF2A2A2A),
+                              backgroundColor: Colors.deepPurple,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white,
+                              ),
+                              strokeWidth:
+                                  3, // For a smooth Google-like animation
+                            ),
+                          )
+                          : Text(
+                            "Edit Profile",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
                 ),
               ),
               SizedBox(height: MediaQuery.of(context).size.height * 0.1),

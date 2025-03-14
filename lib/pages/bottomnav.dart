@@ -33,10 +33,10 @@ class _BottomNavState extends State<BottomNav> {
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: CurvedNavigationBar(
-        height: 65,
+        height: 67,
         backgroundColor: Colors.transparent,
         color: Colors.black,
-        animationDuration: const Duration(milliseconds: 500),
+        animationDuration: const Duration(milliseconds: 450),
         onTap: (int index) {
           HapticFeedback.heavyImpact();
           setState(() {
@@ -45,7 +45,7 @@ class _BottomNavState extends State<BottomNav> {
         },
         items: [
           Icon(Icons.home_outlined, color: Colors.white, size: 30),
-          Icon(Icons.book, color: Colors.white, size: 30),
+          Icon(Icons.local_activity_sharp, color: Colors.white, size: 30),
           Icon(Icons.person_outline, color: Colors.white, size: 30),
         ],
       ),

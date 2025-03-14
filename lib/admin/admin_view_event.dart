@@ -176,7 +176,7 @@ class _AdminViewEventState extends State<AdminViewEvent> {
 
                           // Price
                           _buildInfoCard(
-                            Icons.attach_money,
+                            Icons.currency_rupee,
                             'Price',
                             '₹' + ds['Price'],
                           ),
