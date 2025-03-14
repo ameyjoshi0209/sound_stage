@@ -20,7 +20,8 @@ class DetailPage extends StatefulWidget {
       ageAllowed,
       category,
       eventid,
-      time;
+      time,
+      organizerId;
   DetailPage({
     required this.image,
     required this.name,
@@ -32,6 +33,7 @@ class DetailPage extends StatefulWidget {
     required this.category,
     required this.eventid,
     required this.time,
+    required this.organizerId,
   });
 
   @override
@@ -417,7 +419,6 @@ class _DetailPageState extends State<DetailPage> {
           .presentPaymentSheet()
           .then((value) async {
             String addId = randomAlphaNumeric(10);
-            String ticketId = randomAlphaNumeric(10);
             Map<String, dynamic> bookingdetail = {
               "Number": ticket.toString(),
               "Total": total.toString(),
@@ -433,15 +434,13 @@ class _DetailPageState extends State<DetailPage> {
               "EventTime": widget.time,
               "BookingId": addId,
               "CustomerImage": userImage,
+              "OrganizerId": widget.organizerId,
               "Attended": false,
             };
             await DatabaseMethods()
                 .addUserBooking(bookingdetail, id!, addId)
                 .then((value) async {
-                  await DatabaseMethods().addAdminTickets(
-                    bookingdetail,
-                    ticketId,
-                  );
+                  await DatabaseMethods().addAdminTickets(bookingdetail);
                 });
             showDialog(
               context: context,

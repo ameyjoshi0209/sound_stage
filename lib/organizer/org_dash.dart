@@ -1,11 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:sound_stage/organizer/org_profile.dart';
 import 'package:sound_stage/organizer/qr_scanner.dart';
 import 'package:sound_stage/organizer/upload_event.dart';
 import 'package:sound_stage/organizer/view_events.dart';
 import 'package:sound_stage/services/auth.dart';
+import 'package:sound_stage/services/database.dart';
+import 'package:sound_stage/services/shared_pref.dart';
 
 class OrganizerDashboard extends StatefulWidget {
   @override
@@ -13,6 +15,24 @@ class OrganizerDashboard extends StatefulWidget {
 }
 
 class _OrganizerDashboardState extends State<OrganizerDashboard> {
+  String? id;
+
+  getthesharedpref() async {
+    id = await SharedPreferenceHelper().getOrganizerId();
+    setState(() {});
+  }
+
+  ontheload() async {
+    await getthesharedpref();
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    ontheload();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -73,19 +93,74 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
               Row(
                 children: [
                   Expanded(
-                    child: _buildRollingNumberCard(
-                      context,
-                      "Total Collection",
-                      15000,
-                      isCurrency: true,
+                    child: StreamBuilder(
+                      stream:
+                          FirebaseFirestore.instance
+                              .collection('Tickets')
+                              .where('OrganizerId', isEqualTo: id)
+                              .snapshots(),
+                      builder: (
+                        context,
+                        AsyncSnapshot<QuerySnapshot> snapshot,
+                      ) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return _buildRollingNumberCard(
+                            context,
+                            "Total Collection",
+                            0,
+                            isCurrency: true,
+                          );
+                        } else if (snapshot.hasError) {
+                          return Text('Error');
+                        } else {
+                          return _buildRollingNumberCard(
+                            context,
+                            "Total Collection",
+                            snapshot.data!.docs.fold(
+                              0,
+                              (total, doc) => total + int.parse(doc['Total']),
+                            ),
+                            isCurrency: true,
+                          );
+                        }
+                      },
                     ),
                   ),
                   SizedBox(width: 16),
                   Expanded(
-                    child: _buildRollingNumberCard(
-                      context,
-                      "Participants",
-                      1200,
+                    child: StreamBuilder(
+                      stream:
+                          FirebaseFirestore.instance
+                              .collection('Tickets')
+                              .where('OrganizerId', isEqualTo: id)
+                              .snapshots(),
+                      builder: (
+                        context,
+                        AsyncSnapshot<QuerySnapshot> snapshot,
+                      ) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return _buildRollingNumberCard(
+                            context,
+                            "Total Attendees",
+                            0,
+                            isCurrency: false,
+                          );
+                        } else if (snapshot.hasError) {
+                          return Text('Error');
+                        } else {
+                          return _buildRollingNumberCard(
+                            context,
+                            "Total Attendees",
+                            snapshot.data!.docs.fold(
+                              0,
+                              (total, doc) => total + int.parse(doc['Number']),
+                            ),
+                            isCurrency: false,
+                          );
+                        }
+                      },
                     ),
                   ),
                 ],
@@ -110,7 +185,7 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
                     _buildSectionCard(context, "Post Events", Icons.add),
                     _buildSectionCard(
                       context,
-                      "View Tickets",
+                      "Ticket Details",
                       Icons.event_seat,
                     ),
                     _buildSectionCard(
@@ -152,7 +227,7 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
               duration: Duration(seconds: 2),
               builder: (context, value, child) {
                 return Text(
-                  isCurrency ? "\$${value.toString()}" : value.toString(),
+                  isCurrency ? "₹${value.toString()}" : value.toString(),
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
@@ -180,7 +255,7 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
                 switch (title) {
                   case "Post Events":
                     return UploadEvent(edit: false);
-                  case "View Tickets":
+                  case "Ticket Details":
                     return ViewEvents(manage: false);
                   case "Manage Events":
                     return ViewEvents(manage: true);

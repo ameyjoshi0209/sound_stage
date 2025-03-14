@@ -36,34 +36,88 @@ class _BookingState extends State<Booking> {
   }
 
   int selectedIndex = 0;
-  final List<String> filters = ["All", "Active", "Completed", "Cancelled"];
+  final List<String> filters = ["All", "Active", "Completed", "Upcoming"];
 
   Widget allBookings() {
     return StreamBuilder(
       stream: bookingStream,
       builder: (context, AsyncSnapshot snapshot) {
-        return snapshot.hasData
-            ? Expanded(
-              child: ListView.builder(
-                itemCount: snapshot.data.docs.length,
-                itemBuilder: (context, index) {
-                  DocumentSnapshot ds = snapshot.data.docs[index];
-                  return BookingCard(
-                    image: ds['EventImage'],
-                    title: ds['EventName'],
-                    location: ds['EventLocation'],
-                    amount: ds['Total'],
-                    people: ds['Number'] + ' People',
-                    date: ds['EventDate'],
-                    time: ds['EventTime'],
-                    customerId: id!,
-                    customerName: name!,
-                    bookingId: ds["BookingId"],
+        if (!snapshot.hasData) {
+          return Container();
+        }
+        var filteredEvents =
+            snapshot.data.docs.where((ds) {
+              // Parse the date and time fields separately
+              String dateString = ds["EventDate"]; // e.g., "14-03-2025"
+              String timeString = ds["EventTime"]; // e.g., "10:00 AM"
+
+              // Remove non-breaking spaces and trim any leading/trailing spaces
+              timeString =
+                  timeString
+                      .replaceAll(RegExp(r'\s+'), ' ')
+                      .trim(); // Remove unwanted spaces and trim
+
+              // First, parse the date in dd-MM-yyyy format
+              DateTime eventDate = DateFormat('dd-MM-yyyy').parse(dateString);
+
+              // Then, parse the time in 12-hour format (hh:mm a)
+              DateTime eventTime;
+              try {
+                eventTime = DateFormat('hh:mm a').parse(timeString);
+              } catch (e) {
+                return false; // Skip event if time parsing fails
+              }
+
+              // Combine date and time
+              DateTime eventDateTime = DateTime(
+                eventDate.year,
+                eventDate.month,
+                eventDate.day,
+                eventTime.hour,
+                eventTime.minute,
+              );
+
+              DateTime currentDateTime = DateTime.now();
+
+              switch (selectedIndex) {
+                case 1: // Active filter
+                  return eventDateTime.isBefore(
+                        currentDateTime.add(Duration(days: 1)),
+                      ) &&
+                      eventDateTime.isAfter(
+                        currentDateTime.subtract(Duration(days: 1)),
+                      );
+                case 2: // Completed filter
+                  return eventDateTime.isBefore(
+                    currentDateTime.subtract(Duration(days: 1)),
                   );
-                },
-              ),
-            )
-            : Container();
+                case 3: // Upcoming filter
+                  return eventDateTime.isAfter(currentDateTime);
+                default: // All events
+                  return true;
+              }
+            }).toList();
+
+        return Expanded(
+          child: ListView.builder(
+            itemCount: filteredEvents.length,
+            itemBuilder: (context, index) {
+              DocumentSnapshot ds = filteredEvents[index];
+              return BookingCard(
+                image: ds['EventImage'],
+                title: ds['EventName'],
+                location: ds['EventLocation'],
+                amount: ds['Total'],
+                people: ds['Number'] + ' People',
+                date: ds['EventDate'],
+                time: ds['EventTime'],
+                customerId: id!,
+                customerName: name!,
+                bookingId: ds["BookingId"],
+              );
+            },
+          ),
+        );
       },
     );
   }

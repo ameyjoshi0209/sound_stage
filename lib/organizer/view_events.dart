@@ -38,36 +38,92 @@ class _ViewEventsState extends State<ViewEvents> {
   }
 
   int selectedIndex = 0;
-  final List<String> filters = ["All", "Active", "Completed", "Cancelled"];
+  final List<String> filters = ["All", "Active", "Completed", "Upcoming"];
 
   Widget allBookings() {
     return StreamBuilder(
       stream: eventStream,
       builder: (context, AsyncSnapshot snapshot) {
-        return snapshot.hasData
-            ? Expanded(
-              child: ListView.builder(
-                itemCount: snapshot.data.docs.length,
-                itemBuilder: (context, index) {
-                  DocumentSnapshot ds = snapshot.data.docs[index];
-                  return BookingCard(
-                    manage: widget.manage!,
-                    eventId: ds["EventId"],
-                    ageAllowed: ds["AgeAllowed"],
-                    category: ds["Category"],
-                    date: ds["Date"],
-                    details: ds["Details"],
-                    location: ds["Location"],
-                    name: ds["Name"],
-                    price: ds["Price"],
-                    image: ds["Image"],
-                    time: ds["Time"],
-                    approvalStatus: ds["EventApproved"],
+        if (!snapshot.hasData) {
+          return Container();
+        }
+
+        // Filter events based on the selected filter
+        var filteredEvents =
+            snapshot.data.docs.where((ds) {
+              // Parse the date and time fields separately
+              String dateString = ds["Date"]; // e.g., "14-03-2025"
+              String timeString = ds["Time"]; // e.g., "10:00 AM"
+
+              // Remove non-breaking spaces and trim any leading/trailing spaces
+              timeString =
+                  timeString
+                      .replaceAll(RegExp(r'\s+'), ' ')
+                      .trim(); // Remove unwanted spaces and trim
+
+              // First, parse the date in dd-MM-yyyy format
+              DateTime eventDate = DateFormat('dd-MM-yyyy').parse(dateString);
+
+              // Then, parse the time in 12-hour format (hh:mm a)
+              DateTime eventTime;
+              try {
+                eventTime = DateFormat('hh:mm a').parse(timeString);
+              } catch (e) {
+                return false; // Skip event if time parsing fails
+              }
+
+              // Combine date and time
+              DateTime eventDateTime = DateTime(
+                eventDate.year,
+                eventDate.month,
+                eventDate.day,
+                eventTime.hour,
+                eventTime.minute,
+              );
+
+              DateTime currentDateTime = DateTime.now();
+
+              switch (selectedIndex) {
+                case 1: // Active filter
+                  return eventDateTime.isBefore(
+                        currentDateTime.add(Duration(days: 1)),
+                      ) &&
+                      eventDateTime.isAfter(
+                        currentDateTime.subtract(Duration(days: 1)),
+                      );
+                case 2: // Completed filter
+                  return eventDateTime.isBefore(
+                    currentDateTime.subtract(Duration(days: 1)),
                   );
-                },
-              ),
-            )
-            : Container();
+                case 3: // Upcoming filter
+                  return eventDateTime.isAfter(currentDateTime);
+                default: // All events
+                  return true;
+              }
+            }).toList();
+
+        return Expanded(
+          child: ListView.builder(
+            itemCount: filteredEvents.length,
+            itemBuilder: (context, index) {
+              DocumentSnapshot ds = filteredEvents[index];
+              return BookingCard(
+                manage: widget.manage!,
+                eventId: ds["EventId"],
+                ageAllowed: ds["AgeAllowed"],
+                category: ds["Category"],
+                date: ds["Date"],
+                details: ds["Details"],
+                location: ds["Location"],
+                name: ds["Name"],
+                price: ds["Price"],
+                image: ds["Image"],
+                time: ds["Time"],
+                approvalStatus: ds["EventApproved"],
+              );
+            },
+          ),
+        );
       },
     );
   }
@@ -91,7 +147,8 @@ class _ViewEventsState extends State<ViewEvents> {
                         onTap: () {
                           HapticFeedback.lightImpact();
                           setState(() {
-                            selectedIndex = idx;
+                            selectedIndex =
+                                idx; // Set the filter to the selected filter index
                           });
                         },
                         child: Container(
@@ -174,7 +231,7 @@ class BookingCard extends StatelessWidget {
     // Check if there are tickets and the event is in the future
     bool showLiveBadge = eventDateTime.isAfter(currentDateTime);
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 8.0),
       child: GestureDetector(
         onTap: () {
           if (manage) {
