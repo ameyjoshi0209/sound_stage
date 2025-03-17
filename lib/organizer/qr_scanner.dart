@@ -32,6 +32,29 @@ class _QrScannerState extends State<QrScanner> {
               if (barcodes.isNotEmpty) {
                 String barcode = barcodes.first.rawValue!;
                 final splitBarcode = barcode.split('#');
+                if (splitBarcode.length < 2) {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text('Invalid QR Code'),
+                        content: Text(
+                          'The QR code scanned is invalid. Please try with valid QR.',
+                        ),
+                        actions: [
+                          ElevatedButton(
+                            onPressed: () {
+                              HapticFeedback.lightImpact();
+                              Navigator.pop(context);
+                            },
+                            child: Text('Close'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                  return;
+                }
                 customerId = splitBarcode[0];
                 bookingId =
                     splitBarcode[1]; // Fix the index here, assuming bookingId is at index 1.

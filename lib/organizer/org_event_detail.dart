@@ -5,7 +5,8 @@ import 'package:sound_stage/services/database.dart';
 
 class OrgViewEvent extends StatefulWidget {
   String? eventId;
-  OrgViewEvent({required this.eventId});
+  bool? showLiveBadge;
+  OrgViewEvent({required this.eventId, required this.showLiveBadge});
 
   @override
   State<OrgViewEvent> createState() => _OrgViewEventState();
@@ -186,7 +187,8 @@ class _OrgViewEventState extends State<OrgViewEvent> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    if (ds['EventApproved'] == true)
+                    if (ds['EventApproved'] == true &&
+                        widget.showLiveBadge == false)
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Row(
