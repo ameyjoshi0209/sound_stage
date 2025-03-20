@@ -2,10 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:sound_stage/admin/admin_approve_org.dart';
 import 'package:sound_stage/admin/admin_event_approvals.dart';
 import 'package:sound_stage/admin/admin_manage_users.dart';
-import 'package:sound_stage/admin/admin_signin.dart';
-import 'package:sound_stage/admin/create_organizer.dart';
 import 'package:sound_stage/services/auth.dart';
 import 'package:sound_stage/services/database.dart';
 
@@ -169,8 +168,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     ),
                     _buildSectionCard(
                       context,
-                      "Add Organizer",
-                      Icons.person_add_alt_1,
+                      "Organizer Approvals",
+                      Icons.person_add_alt_1_rounded,
                     ),
                     _buildSectionCard(
                       context,
@@ -235,8 +234,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
             MaterialPageRoute(
               builder: (context) {
                 switch (title) {
-                  case "Add Organizer":
-                    return AdminCreateOrg();
+                  case "Organizer Approvals":
+                    return AdminApproveOrg();
                   case "Manage Users":
                     return AdminManageProfiles();
                   case "Event Approvals":

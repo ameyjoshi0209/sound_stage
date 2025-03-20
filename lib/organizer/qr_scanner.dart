@@ -32,7 +32,7 @@ class _QrScannerState extends State<QrScanner> {
               if (barcodes.isNotEmpty) {
                 String barcode = barcodes.first.rawValue!;
                 final splitBarcode = barcode.split('#');
-                if (splitBarcode.length < 2) {
+                if (splitBarcode.length != 2) {
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {

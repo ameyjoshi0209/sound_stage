@@ -187,6 +187,7 @@ class AuthService {
         "orgimage": orgImage,
         "role": "organizer",
         "orgid": signupID,
+        "orgApproved": false,
       };
       await DatabaseMethods()
           .addOrganizerDetail(uploadOrganizer, signupID)
@@ -194,8 +195,15 @@ class AuthService {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 backgroundColor: Colors.green,
-                content: const Text('Organizer Profile Created Successfully'),
+                content: const Text(
+                  'Organizer Profile Created. Please wait for approval.',
+                ),
               ),
+            );
+            Future.delayed(const Duration(seconds: 1));
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (BuildContext context) => OrgSignIn()),
             );
           });
     } on FirebaseAuthException catch (e) {
@@ -235,6 +243,16 @@ class AuthService {
               .doc(userId)
               .get();
       if (userDoc.exists) {
+        if (userDoc['orgApproved'] == false) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Colors.red,
+              content: const Text('Organizer Account Not Approved'),
+            ),
+          );
+          return;
+        }
+
         String name = userDoc['orgname'];
 
         await Future.delayed(const Duration(seconds: 1));
