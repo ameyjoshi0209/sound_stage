@@ -25,7 +25,7 @@ class _BookingState extends State<Booking> {
 
   ontheload() async {
     await getthesharedpref();
-    bookingStream = await DatabaseMethods().getbookings(id!);
+    bookingStream = await DatabaseMethods().getTicketsByCustomerId(id!);
     setState(() {});
   }
 

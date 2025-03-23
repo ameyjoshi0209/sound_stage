@@ -60,9 +60,8 @@ class _QrScannerState extends State<QrScanner> {
                     splitBarcode[1]; // Fix the index here, assuming bookingId is at index 1.
 
                 // Fetch the stream from the database
-                bookingStream = await DatabaseMethods().getBookingByUserId(
+                bookingStream = await DatabaseMethods().getTicketsByCustomerId(
                   customerId!,
-                  bookingId!,
                 );
 
                 if (bookingStream != null) {
@@ -157,15 +156,7 @@ class _QrScannerState extends State<QrScanner> {
                                         onPressed: () async {
                                           HapticFeedback.lightImpact();
                                           await DatabaseMethods()
-                                              .updateBookingStatus(
-                                                customerId!,
-                                                bookingId!,
-                                              );
-                                          await DatabaseMethods()
-                                              .updateTicketStatus(
-                                                customerId!,
-                                                bookingId!,
-                                              );
+                                              .updateTicketStatus(customerId!);
                                           Navigator.pop(context);
                                         },
                                         style: ElevatedButton.styleFrom(

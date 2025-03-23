@@ -52,9 +52,8 @@ class _QrTicketState extends State<QrTicket> {
   }
 
   ontheload() async {
-    bookingStream = await DatabaseMethods().getBookingByUserId(
+    bookingStream = await DatabaseMethods().getTicketsByCustomerId(
       widget.customerId!,
-      widget.bookingId!,
     );
     checkStatus();
   }

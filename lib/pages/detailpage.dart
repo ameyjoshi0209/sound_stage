@@ -437,11 +437,7 @@ class _DetailPageState extends State<DetailPage> {
               "OrganizerId": widget.organizerId,
               "Attended": false,
             };
-            await DatabaseMethods()
-                .addUserBooking(bookingdetail, id!, addId)
-                .then((value) async {
-                  await DatabaseMethods().addAdminTickets(bookingdetail);
-                });
+            await DatabaseMethods().addAdminTickets(bookingdetail);
             showDialog(
               context: context,
               builder:
