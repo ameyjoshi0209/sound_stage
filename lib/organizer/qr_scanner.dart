@@ -32,14 +32,36 @@ class _QrScannerState extends State<QrScanner> {
               if (barcodes.isNotEmpty) {
                 String barcode = barcodes.first.rawValue!;
                 final splitBarcode = barcode.split('#');
+                if (splitBarcode.length != 2) {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text('Invalid QR Code'),
+                        content: Text(
+                          'The QR code scanned is invalid. Please try with valid QR.',
+                        ),
+                        actions: [
+                          ElevatedButton(
+                            onPressed: () {
+                              HapticFeedback.lightImpact();
+                              Navigator.pop(context);
+                            },
+                            child: Text('Close'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                  return;
+                }
                 customerId = splitBarcode[0];
                 bookingId =
                     splitBarcode[1]; // Fix the index here, assuming bookingId is at index 1.
 
                 // Fetch the stream from the database
-                bookingStream = await DatabaseMethods().getBookingByUserId(
+                bookingStream = await DatabaseMethods().getTicketsByCustomerId(
                   customerId!,
-                  bookingId!,
                 );
 
                 if (bookingStream != null) {
@@ -134,15 +156,7 @@ class _QrScannerState extends State<QrScanner> {
                                         onPressed: () async {
                                           HapticFeedback.lightImpact();
                                           await DatabaseMethods()
-                                              .updateBookingStatus(
-                                                customerId!,
-                                                bookingId!,
-                                              );
-                                          await DatabaseMethods()
-                                              .updateTicketStatus(
-                                                customerId!,
-                                                bookingId!,
-                                              );
+                                              .updateTicketStatus(customerId!);
                                           Navigator.pop(context);
                                         },
                                         style: ElevatedButton.styleFrom(

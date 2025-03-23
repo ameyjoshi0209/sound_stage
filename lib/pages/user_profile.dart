@@ -209,7 +209,7 @@ class _UserProfileState extends State<UserProfile> {
                               ageController.text,
                             );
                             String? profileurl;
-                            if (image == null) {
+                            if (image == null && selectedImage != null) {
                               profileurl = await uploadtoCloudinary(
                                 selectedImage,
                               );

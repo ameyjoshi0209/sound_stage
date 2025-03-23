@@ -28,6 +28,13 @@ class DatabaseMethods {
         .set(userInfoMap);
   }
 
+  Future deleteEvent(String id) async {
+    return await FirebaseFirestore.instance
+        .collection("Event")
+        .doc(id)
+        .delete();
+  }
+
   // FETCHING ALL EVENTS DATA FROM FIRESTORE DATABASE USING USERID
   Future<Stream<QuerySnapshot>> getallEvents() async {
     return await FirebaseFirestore.instance.collection("Event").snapshots();
@@ -57,53 +64,22 @@ class DatabaseMethods {
     });
   }
 
-  Future addUserBooking(
-    Map<String, dynamic> userInfoMap,
-    String id,
-    String bookId,
-  ) async {
-    return await FirebaseFirestore.instance
-        .collection("users")
-        .doc(id)
-        .collection("booking")
-        .doc(bookId)
-        .set(userInfoMap);
-  }
-
   Future addAdminTickets(Map<String, dynamic> userInfoMap) async {
     return await FirebaseFirestore.instance
         .collection("Tickets")
         .add(userInfoMap);
   }
 
-  Future updateTicketStatus(String customerId, String bookingId) async {
+  Future updateTicketStatus(String customerId) async {
     QuerySnapshot querySnapshot =
         await FirebaseFirestore.instance
             .collection("Tickets")
-            .where("BookingId", isEqualTo: bookingId)
             .where("CustomerId", isEqualTo: customerId)
             .get();
 
     for (var doc in querySnapshot.docs) {
       await doc.reference.update({"Attended": true});
     }
-  }
-
-  Future updateBookingStatus(String customerId, String bookingId) async {
-    return await FirebaseFirestore.instance
-        .collection("users")
-        .doc(customerId)
-        .collection("booking")
-        .doc(bookingId)
-        .update({"Attended": true});
-  }
-
-  Future<Stream<QuerySnapshot>> getbookings(String id) async {
-    return await FirebaseFirestore.instance
-        .collection("users")
-        .doc(id)
-        .collection("booking")
-        .snapshots();
   }
 
   // FETCHING ALL EVENTS DATA FROM FIRESTORE DATABASE USING CATEGORY FIELD
@@ -118,6 +94,15 @@ class DatabaseMethods {
     return await FirebaseFirestore.instance
         .collection("Tickets")
         .where("EventId", isEqualTo: eventId)
+        .snapshots();
+  }
+
+  Future<Stream<QuerySnapshot>> getTicketsByCustomerId(
+    String customerId,
+  ) async {
+    return FirebaseFirestore.instance
+        .collection("Tickets")
+        .where("CustomerId", isEqualTo: customerId)
         .snapshots();
   }
 
@@ -142,17 +127,5 @@ class DatabaseMethods {
     } else {
       throw Exception("Invalid role: $role");
     }
-  }
-
-  Future<Stream<QuerySnapshot>> getBookingByUserId(
-    String customerId,
-    String bookingId,
-  ) async {
-    return FirebaseFirestore.instance
-        .collection("users")
-        .doc(customerId)
-        .collection("booking")
-        .where("BookingId", isEqualTo: bookingId)
-        .snapshots();
   }
 }

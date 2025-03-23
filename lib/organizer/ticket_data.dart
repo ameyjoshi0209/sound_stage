@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:sound_stage/organizer/view_events.dart';
 import 'package:sound_stage/services/database.dart';
 
 class TicketData extends StatefulWidget {
@@ -54,6 +55,23 @@ class _TicketDataState extends State<TicketData> {
               );
             }
 
+            String timeString = widget.eventTime!;
+            timeString =
+                timeString
+                    .replaceAll(RegExp(r'\s+'), ' ')
+                    .trim(); // Remove unwanted spaces and trim
+
+            // Parse the event date and time into DateTime
+            var eventDateTime = DateFormat(
+              'dd-MM-yyyy HH:mm a',
+            ).parse('${widget.eventDate} $timeString');
+            var currentDateTime = DateTime.now();
+
+            // Check if the event is live
+            bool isLive = currentDateTime.isAfter(
+              eventDateTime.subtract(const Duration(hours: 1)), // 1 hour buffer
+            );
+
             if (!snapshot.hasData || snapshot.data.docs.isEmpty) {
               return Column(
                 children: [
@@ -74,6 +92,20 @@ class _TicketDataState extends State<TicketData> {
                             height: 750,
                             fit: BoxFit.cover,
                           ),
+                        ),
+                        Positioned(
+                          top: 150,
+                          left: 16, // Moves it above the cards
+                          child:
+                              isLive
+                                  ? currentDateTime.isBefore(
+                                        eventDateTime.add(
+                                          const Duration(hours: 24),
+                                        ),
+                                      )
+                                      ? BlinkingLiveBadge()
+                                      : CompletedBadge()
+                                  : UpcomingBadge(),
                         ),
                         // ✅ Move title up so it's visible
                         Positioned(
@@ -171,22 +203,11 @@ class _TicketDataState extends State<TicketData> {
               );
             }
 
-            // Parse the event date and time into DateTime
-            var eventDateTime = DateFormat(
-              'yyyy-MM-dd HH:mm',
-            ).parse('${widget.eventDate} ${widget.eventTime}');
-            var currentDateTime = DateTime.now();
-
-            // Check if there are tickets and the event is in the future
-            bool showLiveBadge =
-                snapshot.data.docs.isNotEmpty &&
-                eventDateTime.isAfter(currentDateTime);
-
             return Column(
               children: [
                 // Increased height to prevent clipping of overlapping cards
                 SizedBox(
-                  height: 380, // Extra space to accommodate the overlap
+                  height: 390, // Extra space to accommodate the overlap
                   child: Stack(
                     clipBehavior: Clip.none, // Allow overflow
                     children: [
@@ -202,18 +223,9 @@ class _TicketDataState extends State<TicketData> {
                           fit: BoxFit.cover,
                         ),
                       ),
-                      Positioned(
-                        top: 55,
-                        left: 16,
-                        child:
-                            showLiveBadge
-                                ? BlinkingLiveBadge()
-                                : UpcomingBadge(),
-                      ),
-
                       // ✅ Move title up so it's visible
                       Positioned(
-                        top: 95, // Moves it above the cards
+                        top: 130, // Moves it above the cards
                         left: 16,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -403,121 +415,6 @@ class _TicketDataState extends State<TicketData> {
           ),
         ],
       ),
-    );
-  }
-}
-
-class BlinkingLiveBadge extends StatefulWidget {
-  @override
-  _BlinkingLiveBadgeState createState() => _BlinkingLiveBadgeState();
-}
-
-class _BlinkingLiveBadgeState extends State<BlinkingLiveBadge>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 1),
-    )..repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) {
-            return Container(
-              width: 10,
-              height: 10,
-              decoration: BoxDecoration(
-                color: Colors.red.withOpacity(_controller.value),
-                shape: BoxShape.circle,
-              ),
-            );
-          },
-        ),
-        const SizedBox(width: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-          decoration: BoxDecoration(
-            color: Colors.green,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: const Text(
-            'Live',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class UpcomingBadge extends StatefulWidget {
-  @override
-  _UpcomingBadgeState createState() => _UpcomingBadgeState();
-}
-
-class _UpcomingBadgeState extends State<UpcomingBadge>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 500),
-    )..repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        // Animated waiting icon
-        AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) {
-            return Icon(
-              Icons.timer,
-              color: Colors.orange.withOpacity(_controller.value),
-              size: 24,
-            );
-          },
-        ),
-        const SizedBox(width: 8),
-        // Upcoming text inside a container
-        Container(
-          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-          decoration: BoxDecoration(
-            color: Colors.orange,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: const Text(
-            'Upcoming',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          ),
-        ),
-      ],
     );
   }
 }

@@ -2,10 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:sound_stage/admin/admin_approve_org.dart';
 import 'package:sound_stage/admin/admin_event_approvals.dart';
 import 'package:sound_stage/admin/admin_manage_users.dart';
-import 'package:sound_stage/admin/admin_signin.dart';
-import 'package:sound_stage/admin/create_organizer.dart';
 import 'package:sound_stage/services/auth.dart';
 import 'package:sound_stage/services/database.dart';
 
@@ -122,21 +121,53 @@ class _AdminDashboardState extends State<AdminDashboard> {
               SizedBox(height: 16),
               Row(
                 children: [
-                  Expanded(
-                    child: _buildRollingNumberCard(
-                      context,
-                      "Total Collections",
-                      15000,
-                      isCurrency: true,
-                    ),
+                  StreamBuilder(
+                    stream:
+                        FirebaseFirestore.instance
+                            .collection("Tickets")
+                            .snapshots(),
+                    builder: (context, snapshot) {
+                      int totalTickets =
+                          snapshot.hasData
+                              ? snapshot.data!.docs.fold(
+                                0,
+                                (total, doc) =>
+                                    total + (int.parse(doc['Total'])),
+                              )
+                              : 0;
+                      return Expanded(
+                        child: _buildRollingNumberCard(
+                          context,
+                          "Total Collections",
+                          totalTickets,
+                          isCurrency: true,
+                        ),
+                      );
+                    },
                   ),
                   SizedBox(width: 16),
-                  Expanded(
-                    child: _buildRollingNumberCard(
-                      context,
-                      "Total Tickets Sold",
-                      1200,
-                    ),
+                  StreamBuilder(
+                    stream:
+                        FirebaseFirestore.instance
+                            .collection("Tickets")
+                            .snapshots(),
+                    builder: (context, snapshot) {
+                      int soldTickets =
+                          snapshot.hasData
+                              ? snapshot.data!.docs.fold(
+                                0,
+                                (total, doc) =>
+                                    total + (int.parse(doc['Number'])),
+                              )
+                              : 0;
+                      return Expanded(
+                        child: _buildRollingNumberCard(
+                          context,
+                          "Total Tickets Sold",
+                          soldTickets,
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -169,8 +200,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     ),
                     _buildSectionCard(
                       context,
-                      "Add Organizer",
-                      Icons.person_add_alt_1,
+                      "Organizer Approvals",
+                      Icons.person_add_alt_1_rounded,
                     ),
                     _buildSectionCard(
                       context,
@@ -209,7 +240,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
               duration: Duration(seconds: 2),
               builder: (context, value, child) {
                 return Text(
-                  isCurrency ? "\$${value.toString()}" : value.toString(),
+                  isCurrency ? "₹$value" : value.toString(),
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
@@ -235,8 +266,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
             MaterialPageRoute(
               builder: (context) {
                 switch (title) {
-                  case "Add Organizer":
-                    return AdminCreateOrg();
+                  case "Organizer Approvals":
+                    return AdminApproveOrg();
                   case "Manage Users":
                     return AdminManageProfiles();
                   case "Event Approvals":

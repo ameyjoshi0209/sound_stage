@@ -85,11 +85,9 @@ class _ViewEventsState extends State<ViewEvents> {
 
               switch (selectedIndex) {
                 case 1: // Active filter
-                  return eventDateTime.isBefore(
-                        currentDateTime.add(Duration(days: 1)),
-                      ) &&
-                      eventDateTime.isAfter(
-                        currentDateTime.subtract(Duration(days: 1)),
+                  return currentDateTime.isAfter(eventDateTime) &&
+                      currentDateTime.isBefore(
+                        eventDateTime.add(const Duration(hours: 24)),
                       );
                 case 2: // Completed filter
                   return eventDateTime.isBefore(
@@ -225,11 +223,17 @@ class BookingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var eventDateTime = DateFormat('yyyy-MM-dd HH:mm').parse('$date $time');
+    String timeString = time;
+    timeString = timeString.replaceAll(RegExp(r'\s+'), ' ').trim();
+
+    var eventDateTime = DateFormat(
+      'dd-MM-yyyy HH:mm a',
+    ).parse('$date $timeString');
     var currentDateTime = DateTime.now();
 
     // Check if there are tickets and the event is in the future
-    bool showLiveBadge = eventDateTime.isAfter(currentDateTime);
+    bool showLiveBadge = currentDateTime.isAfter(eventDateTime);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 8.0),
       child: GestureDetector(
@@ -238,7 +242,11 @@ class BookingCard extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => OrgViewEvent(eventId: eventId),
+                builder:
+                    (context) => OrgViewEvent(
+                      eventId: eventId,
+                      showLiveBadge: showLiveBadge,
+                    ),
               ),
             );
           } else {
@@ -319,7 +327,15 @@ class BookingCard extends StatelessWidget {
                         ), // Border radius added
                       ),
                       child:
-                          showLiveBadge ? BlinkingLiveBadge() : UpcomingBadge(),
+                          showLiveBadge
+                              ? currentDateTime.isBefore(
+                                    eventDateTime.add(
+                                      const Duration(hours: 24),
+                                    ),
+                                  )
+                                  ? BlinkingLiveBadge()
+                                  : CompletedBadge()
+                              : UpcomingBadge(),
                     ),
                   ),
                 ],
@@ -433,7 +449,7 @@ class BookingCard extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 20),
-                    if (manage && approvalStatus)
+                    if (manage && approvalStatus && !showLiveBadge)
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
@@ -607,6 +623,58 @@ class _UpcomingBadgeState extends State<UpcomingBadge>
           },
         ),
       ],
+    );
+  }
+}
+
+class CompletedBadge extends StatefulWidget {
+  @override
+  _CompletedBadgeState createState() => _CompletedBadgeState();
+}
+
+class _CompletedBadgeState extends State<CompletedBadge>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    )..repeat(reverse: true); // Repeat with reverse to create blinking effect
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Container(
+          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+          decoration: BoxDecoration(
+            color: Colors.blue.withOpacity(
+              _controller.value,
+            ), // Apply animation to the background
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            'Completed',
+            style: TextStyle(
+              color: Colors.white.withOpacity(
+                _controller.value,
+              ), // Apply animation to the text color
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        );
+      },
     );
   }
 }

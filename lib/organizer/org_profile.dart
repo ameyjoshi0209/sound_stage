@@ -274,7 +274,8 @@ class _OrganizerProfileState extends State<OrganizerProfile> {
                                       );
                                   String? profileurl;
 
-                                  if (imageUrl == null) {
+                                  if (imageUrl == null &&
+                                      selectedImage != null) {
                                     profileurl = await uploadtoCloudinary(
                                       selectedImage,
                                     );

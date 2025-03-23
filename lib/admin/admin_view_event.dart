@@ -1,11 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:sound_stage/services/cloudinary_service.dart';
 import 'package:sound_stage/services/database.dart';
 
 class AdminViewEvent extends StatefulWidget {
   String? eventId;
-  String? viewMode;
-  AdminViewEvent({required this.eventId, required this.viewMode});
+  AdminViewEvent({required this.eventId});
 
   @override
   State<AdminViewEvent> createState() => _AdminViewEventState();
@@ -178,7 +179,7 @@ class _AdminViewEventState extends State<AdminViewEvent> {
                           _buildInfoCard(
                             Icons.currency_rupee,
                             'Price',
-                            '₹' + ds['Price'],
+                            "₹$ds['Price']",
                           ),
                         ],
                       ),
@@ -189,47 +190,63 @@ class _AdminViewEventState extends State<AdminViewEvent> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          if (widget.viewMode == 'approve')
-                            Expanded(
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  minimumSize: Size(double.infinity, 50),
-                                  backgroundColor: Colors.green.shade500,
-                                ),
-                                onPressed: () async {
-                                  await DatabaseMethods().approveEvent(
-                                    widget.eventId!,
-                                  );
-                                },
-                                child: Text(
-                                  'Approve Event',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                  ),
-                                ),
+                          // Check if viewMode is 'approve' to show the approve button
+                          Expanded(
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                minimumSize: Size(double.infinity, 50),
+                                backgroundColor: Colors.green.shade500,
                               ),
-                            )
-                          else if (widget.viewMode == 'manage')
-                            Expanded(
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  minimumSize: Size(double.infinity, 50),
-                                  backgroundColor: Colors.red.shade500,
-                                ),
-                                onPressed: () {},
-                                child: Text(
-                                  'Delete Event',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                  ),
+                              onPressed: () async {
+                                HapticFeedback.mediumImpact();
+                                await DatabaseMethods().approveEvent(
+                                  widget.eventId!,
+                                );
+                              },
+                              child: Text(
+                                'Approve Event',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
                                 ),
                               ),
                             ),
+                          ),
+
+                          // Add a space between the buttons
+                          SizedBox(width: 16),
+
+                          // Check if viewMode is 'approve' to show the reject button
+                          Expanded(
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                minimumSize: Size(double.infinity, 50),
+                                backgroundColor: Colors.red.shade500,
+                              ),
+                              onPressed: () async {
+                                HapticFeedback.mediumImpact();
+                                await deleteFromCloudinary(ds["Image"]).then((
+                                  value,
+                                ) {
+                                  DatabaseMethods().deleteEvent(
+                                    widget.eventId!,
+                                  );
+                                });
+                                Navigator.pop(context);
+                              },
+                              child: Text(
+                                'Reject Event',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
+
                     const SizedBox(height: 40),
                   ],
                 ),

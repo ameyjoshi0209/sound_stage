@@ -450,7 +450,22 @@ class _UploadEventState extends State<UploadEvent> {
                           });
                           HapticFeedback.lightImpact();
                           String addId = randomAlphaNumeric(10);
-                          String? url = await uploadtoCloudinary(selectedImage);
+                          if (selectedImage == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                backgroundColor: Colors.red,
+                                content: Text(
+                                  "Please select an image!",
+                                  style: TextStyle(fontSize: 17.0),
+                                ),
+                              ),
+                            );
+                            setState(() {
+                              isLoading = false;
+                            });
+                            return;
+                          }
+                          String url = await uploadtoCloudinary(selectedImage);
                           String? uploadedImageUrl;
                           if (widget.edit) {
                             if (imageurl == null) {
@@ -468,7 +483,7 @@ class _UploadEventState extends State<UploadEvent> {
                             "Image": widget.edit ? uploadedImageUrl : url,
                             "Name": nameController.text,
                             "Price": priceController.text,
-                            "Category": value,
+                            "Category": value ?? "",
                             "AgeAllowed": ageController.text,
                             "Location": locationController.text,
                             "Details": detailController.text,

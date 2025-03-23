@@ -3,22 +3,22 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:random_string/random_string.dart';
 import 'package:sound_stage/services/auth.dart';
 import 'package:sound_stage/services/cloudinary_service.dart';
+import 'package:sound_stage/services/database.dart';
 
-class AdminCreateOrg extends StatefulWidget {
+class OrgSignUp extends StatefulWidget {
   @override
-  _AdminCreateOrgState createState() => _AdminCreateOrgState();
+  _OrgSignUpState createState() => _OrgSignUpState();
 }
 
-class _AdminCreateOrgState extends State<AdminCreateOrg> {
+class _OrgSignUpState extends State<OrgSignUp> {
   final TextEditingController _orgNameController = TextEditingController();
   final TextEditingController _orgEmailController = TextEditingController();
-  final TextEditingController _orgPhoneController = TextEditingController();
   final TextEditingController _orgPasswordController = TextEditingController();
-  final TextEditingController _orgAddressController = TextEditingController();
-  final TextEditingController _orgWebsiteController = TextEditingController();
-  final TextEditingController _orgFacebookController = TextEditingController();
+  final TextEditingController _orgConfirmPasswordController =
+      TextEditingController();
 
   final ImagePicker _picker = ImagePicker();
   File? selectedImage;
@@ -39,44 +39,43 @@ class _AdminCreateOrgState extends State<AdminCreateOrg> {
         height: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              Color(0xFF2575FC), // Blue
-              Color(0xFFFFFFFF), // White
-            ],
+            colors: [Color(0xFF000000), Color(0xFF6A11CB)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // AppBar-like Content in Body, Fixed at the Top
-            Padding(
-              padding: EdgeInsets.only(top: 40, bottom: 10),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.arrow_back_ios_new_rounded),
-                    onPressed: () {
-                      HapticFeedback.lightImpact();
-                      Navigator.pop(context); // Navigate back
-                    },
-                  ),
-                  SizedBox(width: 25),
-                  Text(
-                    "Create Organizer Profile",
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // AppBar-like Content in Body, Fixed at the Top
+              Padding(
+                padding: EdgeInsets.only(top: 40, bottom: 10),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.arrow_back_ios_new_rounded, size: 25),
+                      color: Colors.white,
+                      onPressed: () {
+                        HapticFeedback.lightImpact();
+                        Navigator.pop(context); // Navigate back
+                      },
                     ),
-                  ),
-                ],
+                    SizedBox(width: 25),
+                    Text(
+                      "Create Organizer Profile",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: 20),
+              SizedBox(height: 70),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -124,6 +123,18 @@ class _AdminCreateOrgState extends State<AdminCreateOrg> {
 
                     SizedBox(height: 40),
                     _buildTextField(
+                      label: "Organization Name",
+                      icon: Icons.business,
+                      controller: _orgNameController,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter an organization name';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 20),
+                    _buildTextField(
                       label: "Email Address",
                       icon: Icons.email,
                       controller: _orgEmailController,
@@ -132,18 +143,6 @@ class _AdminCreateOrgState extends State<AdminCreateOrg> {
                             value.isEmpty ||
                             !value.contains('@')) {
                           return 'Please enter a valid email';
-                        }
-                        return null;
-                      },
-                    ),
-                    SizedBox(height: 20),
-                    _buildTextField(
-                      label: "Phone Number",
-                      controller: _orgPhoneController,
-                      icon: Icons.phone,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter a phone number';
                         }
                         return null;
                       },
@@ -163,92 +162,92 @@ class _AdminCreateOrgState extends State<AdminCreateOrg> {
                     ),
                     SizedBox(height: 20),
                     _buildTextField(
-                      label: "Organization Name",
-                      icon: Icons.business,
-                      controller: _orgNameController,
+                      label: "Confirm Password",
+                      icon: Icons.lock,
+                      controller: _orgConfirmPasswordController,
+                      obscureText: true,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter an organization name';
+                          return 'Please enter a password';
                         }
                         return null;
                       },
                     ),
-                    SizedBox(height: 20),
-                    _buildTextField(
-                      label: "Organization Address",
-                      icon: Icons.location_on,
-                      controller: _orgAddressController,
-                    ),
-                    SizedBox(height: 20),
-                    _buildTextField(
-                      label: "Website URL",
-                      icon: Icons.language,
-                      controller: _orgWebsiteController,
-                    ),
-                    SizedBox(height: 20),
-                    _buildTextField(
-                      label: "Facebook Link (Optional)",
-                      icon: Icons.facebook,
-                      controller: _orgFacebookController,
-                    ),
-                    SizedBox(height: 20),
+                    SizedBox(height: 40),
                     // Create Profile Button
                     Center(
                       child: ElevatedButton(
                         onPressed: () async {
                           HapticFeedback.mediumImpact();
+
+                          if (_orgPasswordController.text !=
+                              _orgConfirmPasswordController.text) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Passwords do not match'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                            return;
+                          }
+
                           String? profileurl;
                           if (selectedImage != null) {
                             profileurl = await uploadtoCloudinary(
                               selectedImage,
                             );
                           }
-                          AuthService().registerOrg(
-                            context: context,
-                            orgName: _orgNameController.text,
-                            orgEmail: _orgEmailController.text,
-                            orgPassword: _orgPasswordController.text,
-                            orgPhone: _orgPhoneController.text,
-                            orgAddress: _orgAddressController.text,
-                            orgWebsite: _orgWebsiteController.text,
-                            orgFacebook: _orgFacebookController.text,
-                            orgImage: selectedImage == null ? null : profileurl,
-                          );
+                          String tempId = 'tempId${randomAlphaNumeric(5)}';
+
+                          Map<String, dynamic> data = {
+                            'orgname': _orgNameController.text,
+                            'orgemail': _orgEmailController.text,
+                            'orgpassword': _orgPasswordController.text,
+                            'orgid': tempId,
+                            'orgimage': profileurl,
+                            'role': 'organizer',
+                            'orgphone': '',
+                            'orgaddress': '',
+                            'orgwebsite': '',
+                            'orgfacebook': '',
+                            'orgApproved': false,
+                          };
+                          DatabaseMethods().addOrganizerDetail(data, tempId);
                           setState(() {
                             _orgNameController.clear();
                             _orgEmailController.clear();
-                            _orgPhoneController.clear();
                             _orgPasswordController.clear();
-                            _orgAddressController.clear();
-                            _orgWebsiteController.clear();
-                            _orgFacebookController.clear();
+                            _orgConfirmPasswordController.clear();
                             selectedImage = null;
                           });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Profile sent for approval'),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Color(0xFF2B2B2B),
                           foregroundColor: Colors.white,
                           padding: EdgeInsets.symmetric(
-                            horizontal: 50,
-                            vertical: 16,
+                            horizontal: MediaQuery.of(context).size.width / 3,
+                            vertical: 15,
                           ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(50),
                           ),
                           elevation: 5,
                         ),
-                        child: Text(
-                          'Create Profile',
-                          style: TextStyle(fontSize: 18),
-                        ),
+                        child: Text('Sign Up', style: TextStyle(fontSize: 18)),
                       ),
                     ),
                     SizedBox(height: 40),
                   ],
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -270,7 +269,7 @@ class _AdminCreateOrgState extends State<AdminCreateOrg> {
         obscureText: obscureText,
         validator: validator,
         decoration: InputDecoration(
-          prefixIcon: Icon(icon, color: Colors.blue),
+          prefixIcon: Icon(icon, color: Colors.deepPurple),
           labelText: label,
           labelStyle: TextStyle(color: Colors.black),
           filled: true,
@@ -281,7 +280,7 @@ class _AdminCreateOrgState extends State<AdminCreateOrg> {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(50),
-            borderSide: BorderSide(color: Color(0xFF2575FC), width: 2),
+            borderSide: BorderSide(color: Colors.black87, width: 2),
           ),
         ),
       ),

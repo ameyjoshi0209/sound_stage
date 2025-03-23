@@ -212,6 +212,7 @@ class _AdminManageProfilesState extends State<AdminManageProfiles> {
           !(docData as Map<String, dynamic>).containsKey('role')) {
         return false; // Skip this document if no 'role' field or no data
       }
+
       bool matchesSearchQuery = false;
 
       // Use the correct field based on the role
@@ -219,6 +220,10 @@ class _AdminManageProfilesState extends State<AdminManageProfiles> {
         matchesSearchQuery = doc['orgname'].toString().toLowerCase().contains(
           searchQuery.toLowerCase(),
         );
+        // Hide organizer if 'orgApproved' is false
+        if (doc['orgApproved'] == false) {
+          return false; // Skip this document if orgApproved is false
+        }
       } else if (doc['role'] == 'customer' && doc['name'] != null) {
         matchesSearchQuery = doc['name'].toString().toLowerCase().contains(
           searchQuery.toLowerCase(),
@@ -320,7 +325,7 @@ class _AdminManageProfilesState extends State<AdminManageProfiles> {
                         style: TextStyle(color: Colors.grey),
                       ),
                       Text(
-                        displayId.substring(0, 16),
+                        displayId,
                         style: TextStyle(
                           color: Colors.grey,
                           fontStyle: FontStyle.italic,

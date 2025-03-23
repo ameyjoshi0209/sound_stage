@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sound_stage/admin/admin_view_event.dart';
+import 'package:sound_stage/services/cloudinary_service.dart';
 import 'package:sound_stage/services/database.dart';
 
 class AdminApproveEvents extends StatefulWidget {
@@ -170,9 +171,7 @@ class BookingCard extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder:
-                  (context) =>
-                      AdminViewEvent(eventId: eventid, viewMode: 'approve'),
+              builder: (context) => AdminViewEvent(eventId: eventid),
             ),
           );
         },
@@ -341,10 +340,26 @@ class BookingCard extends StatelessWidget {
                             await DatabaseMethods().approveEvent(eventid);
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green,
+                            backgroundColor: Colors.green.shade700,
                           ),
                           child: Text(
                             'Approve',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        ElevatedButton(
+                          onPressed: () async {
+                            await deleteFromCloudinary(image).then((value) {
+                              DatabaseMethods().deleteEvent(eventid);
+                            });
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            minimumSize: Size(100, 41),
+                          ),
+                          child: Text(
+                            'Reject',
                             style: TextStyle(color: Colors.white),
                           ),
                         ),
