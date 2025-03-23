@@ -121,21 +121,53 @@ class _AdminDashboardState extends State<AdminDashboard> {
               SizedBox(height: 16),
               Row(
                 children: [
-                  Expanded(
-                    child: _buildRollingNumberCard(
-                      context,
-                      "Total Collections",
-                      15000,
-                      isCurrency: true,
-                    ),
+                  StreamBuilder(
+                    stream:
+                        FirebaseFirestore.instance
+                            .collection("Tickets")
+                            .snapshots(),
+                    builder: (context, snapshot) {
+                      int totalTickets =
+                          snapshot.hasData
+                              ? snapshot.data!.docs.fold(
+                                0,
+                                (total, doc) =>
+                                    total + (int.parse(doc['Total'])),
+                              )
+                              : 0;
+                      return Expanded(
+                        child: _buildRollingNumberCard(
+                          context,
+                          "Total Collections",
+                          totalTickets,
+                          isCurrency: true,
+                        ),
+                      );
+                    },
                   ),
                   SizedBox(width: 16),
-                  Expanded(
-                    child: _buildRollingNumberCard(
-                      context,
-                      "Total Tickets Sold",
-                      1200,
-                    ),
+                  StreamBuilder(
+                    stream:
+                        FirebaseFirestore.instance
+                            .collection("Tickets")
+                            .snapshots(),
+                    builder: (context, snapshot) {
+                      int soldTickets =
+                          snapshot.hasData
+                              ? snapshot.data!.docs.fold(
+                                0,
+                                (total, doc) =>
+                                    total + (int.parse(doc['Number'])),
+                              )
+                              : 0;
+                      return Expanded(
+                        child: _buildRollingNumberCard(
+                          context,
+                          "Total Tickets Sold",
+                          soldTickets,
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -208,7 +240,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
               duration: Duration(seconds: 2),
               builder: (context, value, child) {
                 return Text(
-                  isCurrency ? "\$${value.toString()}" : value.toString(),
+                  isCurrency ? "₹$value" : value.toString(),
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,

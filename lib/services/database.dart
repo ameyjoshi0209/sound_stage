@@ -28,6 +28,13 @@ class DatabaseMethods {
         .set(userInfoMap);
   }
 
+  Future deleteEvent(String id) async {
+    return await FirebaseFirestore.instance
+        .collection("Event")
+        .doc(id)
+        .delete();
+  }
+
   // FETCHING ALL EVENTS DATA FROM FIRESTORE DATABASE USING USERID
   Future<Stream<QuerySnapshot>> getallEvents() async {
     return await FirebaseFirestore.instance.collection("Event").snapshots();
