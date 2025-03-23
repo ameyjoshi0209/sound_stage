@@ -187,25 +187,9 @@ class AuthService {
         "orgimage": orgImage,
         "role": "organizer",
         "orgid": signupID,
-        "orgApproved": false,
+        "orgApproved": true,
       };
-      await DatabaseMethods()
-          .addOrganizerDetail(uploadOrganizer, signupID)
-          .then((value) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                backgroundColor: Colors.green,
-                content: const Text(
-                  'Organizer Profile Created. Please wait for approval.',
-                ),
-              ),
-            );
-            Future.delayed(const Duration(seconds: 1));
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (BuildContext context) => OrgSignIn()),
-            );
-          });
+      await DatabaseMethods().addOrganizerDetail(uploadOrganizer, signupID);
     } on FirebaseAuthException catch (e) {
       String message = "";
       if (e.code == 'weak-password') {
@@ -231,6 +215,23 @@ class AuthService {
     required String password,
   }) async {
     try {
+      // Check if the organizer account is approved
+      DocumentSnapshot approval = await FirebaseFirestore.instance
+          .collection("users")
+          .where("orgemail", isEqualTo: email)
+          .get()
+          .then((value) => value.docs.first);
+      if (approval['orgApproved'] == false) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.red,
+            content: const Text('Your account is not approved yet'),
+          ),
+        );
+        return;
+      }
+
+      // Sign in the organizer (Firebase Authentication)
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
         password: password,
@@ -243,16 +244,6 @@ class AuthService {
               .doc(userId)
               .get();
       if (userDoc.exists) {
-        if (userDoc['orgApproved'] == false) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              backgroundColor: Colors.red,
-              content: const Text('Organizer Account Not Approved'),
-            ),
-          );
-          return;
-        }
-
         String name = userDoc['orgname'];
 
         await Future.delayed(const Duration(seconds: 1));
@@ -276,6 +267,8 @@ class AuthService {
         message = 'No user found for that email.';
       } else if (e.code == 'wrong-password') {
         message = 'Wrong password provided for that user.';
+      } else if (e.code == 'user-disabled') {
+        message = 'User account has been disabled.';
       } else {
         message = 'Something went wrong';
       }

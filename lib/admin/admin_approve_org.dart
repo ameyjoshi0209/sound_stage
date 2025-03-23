@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sound_stage/admin/admin_view_profile.dart';
+import 'package:sound_stage/services/auth.dart';
 
 class AdminApproveOrg extends StatefulWidget {
   @override
@@ -202,7 +203,7 @@ class _AdminApproveOrgState extends State<AdminApproveOrg> {
                         style: TextStyle(color: Colors.grey),
                       ),
                       Text(
-                        ds['orgid'].substring(0, 13) ?? 'Unknown ID',
+                        ds['orgid'] ?? 'Unknown ID',
                         style: TextStyle(
                           color: Colors.grey,
                           fontStyle: FontStyle.italic,
@@ -220,10 +221,35 @@ class _AdminApproveOrgState extends State<AdminApproveOrg> {
                           size: 30,
                         ),
                         onPressed: () async {
-                          FirebaseFirestore.instance
+                          // Firstly we get the old account data
+                          DocumentSnapshot oldAcc =
+                              await FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(filteredData[index].id)
+                                  .get();
+
+                          // Then we convert the data to a map
+                          Map<String, dynamic> oldData =
+                              oldAcc.data() as Map<String, dynamic>;
+
+                          // Finally we register the new account and delete the old one
+                          AuthService().registerOrg(
+                            context: context,
+                            orgName: oldData['orgname'],
+                            orgEmail: oldData['orgemail'],
+                            orgPassword: oldData['orgpassword'],
+                            orgPhone: "",
+                            orgAddress: "",
+                            orgWebsite: "",
+                            orgFacebook: "",
+                            orgImage: oldData['orgimage'],
+                          );
+
+                          // Delete the old account
+                          await FirebaseFirestore.instance
                               .collection('users')
                               .doc(filteredData[index].id)
-                              .update({'orgApproved': true});
+                              .delete();
                         },
                       ),
                       IconButton(
@@ -232,8 +258,11 @@ class _AdminApproveOrgState extends State<AdminApproveOrg> {
                           color: Colors.red.shade800,
                           size: 30,
                         ),
-                        onPressed: () {
-                          // Delete user logic here
+                        onPressed: () async {
+                          await FirebaseFirestore.instance
+                              .collection('users')
+                              .doc(filteredData[index].id)
+                              .delete();
                         },
                       ),
                     ],

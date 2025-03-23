@@ -3,8 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:random_string/random_string.dart';
 import 'package:sound_stage/services/auth.dart';
 import 'package:sound_stage/services/cloudinary_service.dart';
+import 'package:sound_stage/services/database.dart';
 
 class OrgSignUp extends StatefulWidget {
   @override
@@ -195,23 +197,35 @@ class _OrgSignUpState extends State<OrgSignUp> {
                               selectedImage,
                             );
                           }
-                          AuthService().registerOrg(
-                            context: context,
-                            orgName: _orgNameController.text,
-                            orgEmail: _orgEmailController.text,
-                            orgPassword: _orgPasswordController.text,
-                            orgPhone: "",
-                            orgAddress: "",
-                            orgWebsite: "",
-                            orgFacebook: "",
-                            orgImage: selectedImage == null ? null : profileurl,
-                          );
+                          String tempId = 'tempId${randomAlphaNumeric(5)}';
+
+                          Map<String, dynamic> data = {
+                            'orgname': _orgNameController.text,
+                            'orgemail': _orgEmailController.text,
+                            'orgpassword': _orgPasswordController.text,
+                            'orgid': tempId,
+                            'orgimage': profileurl,
+                            'role': 'organizer',
+                            'orgphone': '',
+                            'orgaddress': '',
+                            'orgwebsite': '',
+                            'orgfacebook': '',
+                            'orgApproved': false,
+                          };
+                          DatabaseMethods().addOrganizerDetail(data, tempId);
                           setState(() {
                             _orgNameController.clear();
                             _orgEmailController.clear();
                             _orgPasswordController.clear();
+                            _orgConfirmPasswordController.clear();
                             selectedImage = null;
                           });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Profile sent for approval'),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Color(0xFF2B2B2B),
