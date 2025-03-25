@@ -129,7 +129,7 @@ class _UserProfileState extends State<UserProfile> {
                         child: CircleAvatar(
                           radius: 80,
                           backgroundImage:
-                              image == null
+                              image == null || image == ""
                                   ? AssetImage('images/profile.png')
                                   : NetworkImage(image!), // Static image
                         ),

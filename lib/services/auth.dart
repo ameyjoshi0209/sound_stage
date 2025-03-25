@@ -39,9 +39,9 @@ class AuthService {
         "email": email,
         "password": password,
         "role": "customer",
-        "phone": null,
-        "age": null,
-        "image": null,
+        "phone": "",
+        "age": "",
+        "image": "",
         "userid": signupID,
       };
       await DatabaseMethods().addUserDetail(uploadUser, signupID).then((value) {
