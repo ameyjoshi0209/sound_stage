@@ -161,11 +161,11 @@ class AuthService {
 
   Future<void> deleteCustomer({required BuildContext context}) async {
     try {
-      await signout(context: context);
       await DatabaseMethods().deleteUser(
         FirebaseAuth.instance.currentUser!.uid,
       );
       await FirebaseAuth.instance.currentUser!.delete();
+      await signout(context: context);
     } on FirebaseAuthException catch (e) {
       String message = "";
       if (e.code == 'user-not-found') {
@@ -333,6 +333,33 @@ class AuthService {
         context,
         MaterialPageRoute(builder: (BuildContext context) => OrgSignIn()),
         (route) => false,
+      );
+    } catch (e) {
+      log(e.toString());
+    }
+  }
+
+  Future<void> deleteOrganizer({required BuildContext context}) async {
+    try {
+      await DatabaseMethods().deleteEventByOrganizerId(
+        FirebaseAuth.instance.currentUser!.uid,
+      );
+      await DatabaseMethods().deleteUser(
+        FirebaseAuth.instance.currentUser!.uid,
+      );
+      await FirebaseAuth.instance.currentUser!.delete();
+      await orgSignOut(context: context);
+    } on FirebaseAuthException catch (e) {
+      String message = "";
+      if (e.code == 'user-not-found') {
+        message = 'No user found for that email.';
+      } else if (e.code == 'wrong-password') {
+        message = 'Wrong password provided for that user.';
+      } else {
+        message = 'Something went wrong';
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(backgroundColor: Colors.red, content: Text(message)),
       );
     } catch (e) {
       log(e.toString());
