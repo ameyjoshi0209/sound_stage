@@ -63,8 +63,26 @@ class _AdminApproveEventsState extends State<AdminApproveEvents> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          "My Bookings",
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 24,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios, color: Colors.black),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
+      backgroundColor: Color(0xFF2575FC),
       body: Container(
-        padding: EdgeInsets.only(top: 50),
         // Add a gradient as the background
         decoration: BoxDecoration(
           gradient: LinearGradient(
