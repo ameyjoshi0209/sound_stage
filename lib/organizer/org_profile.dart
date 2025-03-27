@@ -375,6 +375,51 @@ class _OrganizerProfileState extends State<OrganizerProfile> {
                                 ),
                       ),
                     ),
+                    SizedBox(height: 30),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Joined 31 October 2022",
+                              style: TextStyle(color: Colors.white70),
+                            ),
+                            Text(
+                              id ?? '',
+                              style: TextStyle(color: Colors.white70),
+                            ),
+                          ],
+                        ),
+
+                        // Delete Button
+                        SizedBox(
+                          height: 40,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              HapticFeedback.mediumImpact();
+                              _showDeleteWarning(context);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0x89F44336),
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(50),
+                                side: BorderSide(
+                                  width: 2,
+                                  color: Color(0xffF44336),
+                                ),
+                              ),
+                            ),
+                            child: Text(
+                              "Delete",
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                     SizedBox(height: 40),
                   ],
                 ),
@@ -451,4 +496,33 @@ class _OrganizerProfileState extends State<OrganizerProfile> {
       },
     );
   }
+}
+
+void _showDeleteWarning(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text("Account Deletion Warning"),
+        content: Text(
+          "Are you sure you want to delete this account? All your events and it's data will be lost permanently.",
+          style: TextStyle(color: Colors.red),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the dialog
+            },
+            child: Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () {
+              AuthService().deleteOrganizer(context: context);
+            },
+            child: Text("Delete", style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      );
+    },
+  );
 }

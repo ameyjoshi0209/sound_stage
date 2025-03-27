@@ -12,12 +12,31 @@ class DatabaseMethods {
         .set(userInfoMap);
   }
 
+  Future deleteUser(String id) async {
+    return await FirebaseFirestore.instance
+        .collection("users")
+        .doc(id)
+        .delete();
+  }
+
   // ADDING ORGANIZER DATA TO FIRESTORE DATABASE USING ORGANIZERID
   Future addOrganizerDetail(Map<String, dynamic> userInfoMap, String id) async {
     return await FirebaseFirestore.instance
         .collection("users")
         .doc(id)
         .set(userInfoMap);
+  }
+
+  Future deleteEventByOrganizerId(String id) async {
+    QuerySnapshot querySnapshot =
+        await FirebaseFirestore.instance
+            .collection("Event")
+            .where('OrganizerId', isEqualTo: id)
+            .get();
+
+    for (var doc in querySnapshot.docs) {
+      await doc.reference.delete();
+    }
   }
 
   // ADDING EVENT DATA TO FIRESTORE DATABASE USING EVENTID

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:sound_stage/pages/signin.dart';
 import 'package:sound_stage/services/auth.dart';
 import 'package:sound_stage/services/cloudinary_service.dart';
 import 'package:sound_stage/services/database.dart';
@@ -129,7 +130,7 @@ class _UserProfileState extends State<UserProfile> {
                         child: CircleAvatar(
                           radius: 80,
                           backgroundImage:
-                              image == null
+                              image == null || image == ""
                                   ? AssetImage('images/profile.png')
                                   : NetworkImage(image!), // Static image
                         ),
@@ -302,7 +303,7 @@ class _UserProfileState extends State<UserProfile> {
                           ),
                 ),
               ),
-              SizedBox(height: MediaQuery.of(context).size.height * 0.1),
+              SizedBox(height: 45),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -426,8 +427,7 @@ class _UserProfileState extends State<UserProfile> {
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-                // Add delete logic here
+                AuthService().deleteCustomer(context: context);
               },
               child: Text("Delete", style: TextStyle(color: Colors.red)),
             ),
