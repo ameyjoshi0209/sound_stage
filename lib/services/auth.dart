@@ -1,6 +1,8 @@
 // This file contains the authentication methods for the user, organizer, and admin,
 // as well as the methods to check if the user is logged in or not.
 
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -67,7 +69,7 @@ class AuthService {
         SnackBar(backgroundColor: Colors.red, content: Text(message)),
       );
     } catch (e) {
-      print(e);
+      log(e.toString());
     }
   }
 
@@ -120,7 +122,7 @@ class AuthService {
         SnackBar(backgroundColor: Colors.red, content: Text(message)),
       );
     } catch (e) {
-      print(e);
+      log(e.toString());
     }
   }
 
@@ -139,7 +141,7 @@ class AuthService {
 
       Navigator.pushNamedAndRemoveUntil(context, '/signin', (route) => false);
     } catch (e) {
-      print(e);
+      log(e.toString());
     }
   }
 
@@ -154,6 +156,30 @@ class AuthService {
       return true;
     } else {
       return false;
+    }
+  }
+
+  Future<void> deleteCustomer({required BuildContext context}) async {
+    try {
+      await signout(context: context);
+      await DatabaseMethods().deleteUser(
+        FirebaseAuth.instance.currentUser!.uid,
+      );
+      await FirebaseAuth.instance.currentUser!.delete();
+    } on FirebaseAuthException catch (e) {
+      String message = "";
+      if (e.code == 'user-not-found') {
+        message = 'No user found for that email.';
+      } else if (e.code == 'wrong-password') {
+        message = 'Wrong password provided for that user.';
+      } else {
+        message = 'Something went wrong';
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(backgroundColor: Colors.red, content: Text(message)),
+      );
+    } catch (e) {
+      log(e.toString());
     }
   }
 
@@ -205,7 +231,7 @@ class AuthService {
         SnackBar(backgroundColor: Colors.red, content: Text(message)),
       );
     } catch (e) {
-      print(e);
+      log(e.toString());
     }
   }
 
@@ -276,7 +302,7 @@ class AuthService {
         SnackBar(backgroundColor: Colors.red, content: Text(message)),
       );
     } catch (e) {
-      print(e);
+      log(e.toString());
     }
   }
 
@@ -309,7 +335,7 @@ class AuthService {
         (route) => false,
       );
     } catch (e) {
-      print(e);
+      log(e.toString());
     }
   }
 
@@ -356,7 +382,7 @@ class AuthService {
         );
       }
     } catch (e) {
-      print(e);
+      log(e.toString());
     }
   }
 
@@ -386,7 +412,7 @@ class AuthService {
         (route) => false,
       );
     } catch (e) {
-      print(e);
+      log(e.toString());
     }
   }
 }

@@ -12,6 +12,13 @@ class DatabaseMethods {
         .set(userInfoMap);
   }
 
+  Future deleteUser(String id) async {
+    return await FirebaseFirestore.instance
+        .collection("users")
+        .doc(id)
+        .delete();
+  }
+
   // ADDING ORGANIZER DATA TO FIRESTORE DATABASE USING ORGANIZERID
   Future addOrganizerDetail(Map<String, dynamic> userInfoMap, String id) async {
     return await FirebaseFirestore.instance
