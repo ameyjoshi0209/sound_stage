@@ -169,18 +169,20 @@ class _SignUpState extends State<SignUp> {
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(50),
                                 ),
-                                minimumSize: Size(double.infinity, 55),
+                                minimumSize: Size(
+                                  double.infinity,
+                                  55,
+                                ), // Ensure the button is large enough
                               ),
                               onPressed:
                                   isLoading
                                       ? null
                                       : () async {
-                                        HapticFeedback.mediumImpact();
                                         setState(() {
-                                          isLoading =
-                                              true; // Show loading indicator
+                                          isLoading = true;
                                         });
-                                        AuthService().signup(
+                                        HapticFeedback.mediumImpact();
+                                        await AuthService().signup(
                                           context: context,
                                           name: _nameController.text,
                                           email: _emailController.text,
@@ -195,16 +197,18 @@ class _SignUpState extends State<SignUp> {
                                       },
                               child:
                                   isLoading
-                                      ? SizedBox(
-                                        width: 26,
-                                        height: 26,
-                                        child: CircularProgressIndicator(
-                                          valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                                Colors.white,
-                                              ),
-                                          strokeWidth:
-                                              3, // For a smooth Google-like animation
+                                      ? Center(
+                                        child: SizedBox(
+                                          width: 26,
+                                          height: 26,
+                                          child: CircularProgressIndicator(
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                                  Colors.white,
+                                                ),
+                                            strokeWidth:
+                                                3, // For a smooth Google-like animation
+                                          ),
                                         ),
                                       )
                                       : Text(
