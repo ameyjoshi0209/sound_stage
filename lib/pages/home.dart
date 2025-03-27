@@ -20,6 +20,7 @@ class _HomeState extends State<Home> {
   String searchQuery = '';
   TextEditingController searchController = TextEditingController();
   FocusNode focusNode = FocusNode();
+  bool showClosableContainer = true;
 
   ontheload() async {
     eventStream = await DatabaseMethods().getallEvents();
@@ -211,6 +212,40 @@ class _HomeState extends State<Home> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                if (userAge == 0 && showClosableContainer)
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Container(
+                      padding: EdgeInsets.all(16.0),
+                      decoration: BoxDecoration(
+                        color: Colors.black38,
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Please complete your profile to view events',
+                              style: TextStyle(
+                                fontSize: 18.0,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.close),
+                            onPressed: () {
+                              setState(() {
+                                showClosableContainer =
+                                    false; // Hide the container on close
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 Padding(
                   padding: const EdgeInsets.only(left: 15.0),
                   child: Row(

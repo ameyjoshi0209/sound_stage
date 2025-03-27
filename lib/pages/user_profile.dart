@@ -247,7 +247,8 @@ class _UserProfileState extends State<UserProfile> {
                                   (value) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        backgroundColor: Colors.green,
+                                        duration: Duration(seconds: 1),
+                                        backgroundColor: Colors.green.shade600,
                                         content: Text(
                                           "User updated successfully!",
                                           style: TextStyle(fontSize: 20.0),
