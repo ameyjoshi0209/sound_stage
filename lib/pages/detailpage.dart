@@ -446,8 +446,10 @@ class _DetailPageState extends State<DetailPage> {
                       "Payment Successful",
                       style: TextStyle(color: Colors.green),
                     ),
-                    content: Text(
-                      "You have successfully booked $ticket tickets for ${widget.name}",
+                    icon: Icon(
+                      Icons.check_circle,
+                      color: Colors.green,
+                      size: 50,
                     ),
                     actions: [
                       TextButton(
