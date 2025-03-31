@@ -316,7 +316,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
-              child: Text("Cancel"),
+              child: Text("Cancel", style: TextStyle(color: Colors.black)),
             ),
             TextButton(
               onPressed: () {

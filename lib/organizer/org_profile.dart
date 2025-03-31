@@ -1,9 +1,11 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:sound_stage/services/auth.dart';
 import 'package:sound_stage/services/cloudinary_service.dart';
 import 'package:sound_stage/services/database.dart';
@@ -84,6 +86,12 @@ class _OrganizerProfileState extends State<OrganizerProfile> {
     super.dispose();
   }
 
+  String formatDate(DateTime date) {
+    return DateFormat(
+      'd, MMM yyyy',
+    ).format(date); // Returns the date in "12, Dec 2023" format
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -113,6 +121,7 @@ class _OrganizerProfileState extends State<OrganizerProfile> {
                     icon: Icon(
                       Icons.arrow_back_ios_new_rounded,
                       color: Colors.black87,
+                      size: 25,
                     ),
                     onPressed: () {
                       HapticFeedback.lightImpact();
@@ -122,7 +131,7 @@ class _OrganizerProfileState extends State<OrganizerProfile> {
                   Text(
                     "Organizer Profile",
                     style: TextStyle(
-                      fontSize: 24,
+                      fontSize: 26,
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
                     ),
@@ -132,7 +141,7 @@ class _OrganizerProfileState extends State<OrganizerProfile> {
                       HapticFeedback.lightImpact();
                       _showLogoutWarning(context);
                     },
-                    icon: Icon(Icons.logout),
+                    icon: Icon(Icons.logout, size: 25),
                     color: Colors.red,
                   ),
                 ],
@@ -383,11 +392,11 @@ class _OrganizerProfileState extends State<OrganizerProfile> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "Joined 31 October 2022",
-                              style: TextStyle(color: Colors.white70),
+                              "Joined On: ${formatDate(FirebaseAuth.instance.currentUser!.metadata.creationTime!)}",
+                              style: TextStyle(color: Colors.black54),
                             ),
                             Text(
-                              id ?? '',
+                              id?.substring(0, 21) ?? '',
                               style: TextStyle(color: Colors.white70),
                             ),
                           ],

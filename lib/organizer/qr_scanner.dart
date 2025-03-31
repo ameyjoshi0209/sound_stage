@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:sound_stage/services/database.dart';
 
@@ -208,6 +209,55 @@ class _QrScannerState extends State<QrScanner> {
                                 ),
                                 content: Text(
                                   'This booking has already been checked in.',
+                                ),
+                                actions: [
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.deepPurple,
+                                    ),
+                                    onPressed: () {
+                                      HapticFeedback.lightImpact();
+                                      Navigator.pop(context);
+                                    },
+                                    child: Text(
+                                      "Close",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }
+                            String timeString = bookingData['EventTime'];
+                            String dateString = bookingData['EventDate'];
+                            timeString =
+                                timeString
+                                    .replaceAll(RegExp(r'\s+'), ' ')
+                                    .trim(); // Remove unwanted spaces and trim
+
+                            // Parse the event date and time into DateTime
+                            var eventDateTime = DateFormat(
+                              'dd-MM-yyyy HH:mm a',
+                            ).parse('$dateString $timeString');
+                            var currentDateTime = DateTime.now();
+
+                            // Check if the event is live
+                            bool isLive = currentDateTime.isAfter(
+                              eventDateTime.subtract(
+                                const Duration(hours: 1),
+                              ), // 1 hour buffer
+                            );
+                            if (!isLive) {
+                              return AlertDialog(
+                                title: Text(
+                                  'Event Not Live',
+                                  style: TextStyle(
+                                    color: Colors.red,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                content: Text(
+                                  'This event is not live yet. Please wait until the event starts.',
                                 ),
                                 actions: [
                                   ElevatedButton(

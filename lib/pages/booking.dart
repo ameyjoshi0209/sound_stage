@@ -353,11 +353,21 @@ class BookingCard extends StatelessWidget {
                             color: Color.fromARGB(255, 205, 199, 240),
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: Text(
-                            "Active",
-                            style: TextStyle(
-                              color: Color.fromARGB(255, 87, 66, 248),
-                            ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.access_time,
+                                color: Color.fromARGB(255, 87, 66, 248),
+                              ),
+                              SizedBox(width: 5),
+                              Text(
+                                time,
+                                style: TextStyle(
+                                  color: Color.fromARGB(255, 87, 66, 248),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],

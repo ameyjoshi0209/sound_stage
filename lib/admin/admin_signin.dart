@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sound_stage/admin/admin_dashboard.dart';
@@ -18,6 +16,7 @@ class AdminSignIn extends StatefulWidget {
 class _AdminSignInState extends State<AdminSignIn> {
   bool _isPasswordVisible = false;
   bool _isAdmin = true;
+  bool isLoading = false; // Track loading state
 
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -161,18 +160,43 @@ class _AdminSignInState extends State<AdminSignIn> {
                           ),
                           minimumSize: Size(double.infinity, 50),
                         ),
-                        onPressed: () {
-                          HapticFeedback.mediumImpact();
-                          AuthService().adminSignIn(
-                            context: context,
-                            email: emailController.text,
-                            password: passwordController.text,
-                          );
-                        },
-                        child: Text(
-                          "Admin Sign In",
-                          style: TextStyle(fontSize: 18, color: Colors.white),
-                        ),
+                        onPressed:
+                            isLoading
+                                ? null
+                                : () async {
+                                  setState(() {
+                                    isLoading = true;
+                                  });
+                                  HapticFeedback.mediumImpact();
+                                  await AuthService().adminSignIn(
+                                    context: context,
+                                    email: emailController.text,
+                                    password: passwordController.text,
+                                  );
+                                  setState(() {
+                                    isLoading = false;
+                                  });
+                                },
+                        child:
+                            isLoading
+                                ? SizedBox(
+                                  width: 26,
+                                  height: 26,
+                                  child: CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white,
+                                    ),
+                                    strokeWidth:
+                                        3, // For a smooth Google-like animation
+                                  ),
+                                )
+                                : Text(
+                                  "Admin Login",
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.white,
+                                  ),
+                                ),
                       ),
                     ],
                   ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sound_stage/organizer/org_profile.dart';
 import 'package:sound_stage/organizer/qr_scanner.dart';
+import 'package:sound_stage/organizer/report.dart';
 import 'package:sound_stage/organizer/upload_event.dart';
 import 'package:sound_stage/organizer/view_events.dart';
 import 'package:sound_stage/services/auth.dart';
@@ -323,6 +324,8 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
                     return ViewEvents(manage: true);
                   case "Scan":
                     return QrScanner();
+                  case "Financial Reports":
+                    return ReportScreen(organizerId: id);
                   default:
                     return Scaffold(
                       appBar: AppBar(title: Text(title)),

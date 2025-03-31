@@ -140,33 +140,32 @@ class _UploadEventState extends State<UploadEvent> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          "Upload Event",
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 25,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios, color: Colors.black),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
       resizeToAvoidBottomInset: true,
       body: Container(
-        margin: EdgeInsets.only(top: 40, left: 20, right: 20),
+        margin: EdgeInsets.symmetric(horizontal: 20),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child: Icon(Icons.arrow_back_ios_new_outlined),
-                  ),
-                  SizedBox(width: MediaQuery.of(context).size.width / 4.5),
-                  Text(
-                    "Upload Event",
-                    style: TextStyle(
-                      color: Color(0xff6351ec),
-                      fontSize: 27.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 20),
+              SizedBox(height: 5),
               if (selectedImage == null && imageurl == null)
                 GestureDetector(
                   onTap: () {

@@ -1,8 +1,10 @@
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:sound_stage/pages/signin.dart';
 import 'package:sound_stage/services/auth.dart';
 import 'package:sound_stage/services/cloudinary_service.dart';
@@ -78,6 +80,12 @@ class _UserProfileState extends State<UserProfile> {
       selectedImage = File(image.path);
     }
     setState(() {});
+  }
+
+  String formatDate(DateTime date) {
+    return DateFormat(
+      'd, MMM yyyy',
+    ).format(date); // Returns the date in "12, Dec 2023" format
   }
 
   @override
@@ -247,7 +255,8 @@ class _UserProfileState extends State<UserProfile> {
                                   (value) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        backgroundColor: Colors.green,
+                                        duration: Duration(seconds: 1),
+                                        backgroundColor: Colors.green.shade600,
                                         content: Text(
                                           "User updated successfully!",
                                           style: TextStyle(fontSize: 20.0),
@@ -311,10 +320,13 @@ class _UserProfileState extends State<UserProfile> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Joined 31 October 2022",
+                        "Joined On: ${formatDate(FirebaseAuth.instance.currentUser!.metadata.creationTime!)}",
                         style: TextStyle(color: Colors.black54),
                       ),
-                      Text(id ?? '', style: TextStyle(color: Colors.black54)),
+                      Text(
+                        id?.substring(0, 21) ?? '',
+                        style: TextStyle(color: Colors.black54),
+                      ),
                     ],
                   ),
 
