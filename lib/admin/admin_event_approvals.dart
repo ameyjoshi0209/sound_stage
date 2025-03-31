@@ -65,7 +65,7 @@ class _AdminApproveEventsState extends State<AdminApproveEvents> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "My Bookings",
+          "Event Approvals",
           style: TextStyle(
             color: Colors.black,
             fontSize: 24,
