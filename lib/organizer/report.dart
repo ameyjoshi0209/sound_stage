@@ -2,7 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:sound_stage/services/shared_pref.dart';
+import 'package:sound_stage/services/pdf/save_and_open_pdf.dart';
+import 'package:sound_stage/services/pdf/simple_pdf_api.dart';
 
 class ReportData {
   DateTime? _startDate;
@@ -217,8 +218,10 @@ class _ReportScreenState extends State<ReportScreen> {
             bottom: 16.0,
             right: 16.0,
             child: FloatingActionButton(
-              onPressed: () {
+              onPressed: () async {
                 HapticFeedback.mediumImpact();
+                final tablePdf = await SimplePdfApi.generateTablePdf();
+                SaveAndOpenDocument.openPdf(tablePdf);
               },
               child: const Icon(Icons.download),
             ),
