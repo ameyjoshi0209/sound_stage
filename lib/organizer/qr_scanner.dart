@@ -45,7 +45,7 @@ class _QrScannerState extends State<QrScanner> {
                         actions: [
                           ElevatedButton(
                             onPressed: () {
-                              HapticFeedback.lightImpact();
+                              HapticFeedback.mediumImpact();
                               Navigator.pop(context);
                             },
                             child: Text('Close'),
@@ -68,6 +68,7 @@ class _QrScannerState extends State<QrScanner> {
                 if (bookingStream != null) {
                   // Show a loading dialog until the stream provides data
                   showDialog(
+                    barrierDismissible: false,
                     context: context,
                     builder: (BuildContext context) {
                       return StreamBuilder(

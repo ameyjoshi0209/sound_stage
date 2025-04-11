@@ -90,7 +90,7 @@ class _SignInState extends State<SignIn> {
                         Text(
                           'Immerse yourself in the world of music',
                           style: TextStyle(
-                            color: Colors.black45,
+                            color: Colors.white54,
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
@@ -213,14 +213,14 @@ class _SignInState extends State<SignIn> {
                               ),
                             ),
                             Container(
-                              margin: EdgeInsets.only(top: 20),
+                              margin: EdgeInsets.only(top: 10),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   GestureDetector(
                                     onTap: () {
                                       HapticFeedback.mediumImpact();
-                                      Navigator.pushReplacement(
+                                      Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) => OrgSignIn(),
@@ -228,9 +228,9 @@ class _SignInState extends State<SignIn> {
                                       );
                                     },
                                     child: Text(
-                                      'Organizers this way!',
+                                      'Organizing an event?',
                                       style: TextStyle(
-                                        color: Colors.white,
+                                        color: Color(0xff6351ec),
                                         fontSize: 16,
                                       ),
                                     ),

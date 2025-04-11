@@ -138,7 +138,7 @@ class _OrganizerProfileState extends State<OrganizerProfile> {
                   ),
                   IconButton(
                     onPressed: () {
-                      HapticFeedback.lightImpact();
+                      HapticFeedback.mediumImpact();
                       _showLogoutWarning(context);
                     },
                     icon: Icon(Icons.logout, size: 25),
@@ -393,7 +393,7 @@ class _OrganizerProfileState extends State<OrganizerProfile> {
                           children: [
                             Text(
                               "Joined On: ${formatDate(FirebaseAuth.instance.currentUser!.metadata.creationTime!)}",
-                              style: TextStyle(color: Colors.black54),
+                              style: TextStyle(color: Colors.white70),
                             ),
                             Text(
                               id?.substring(0, 21) ?? '',

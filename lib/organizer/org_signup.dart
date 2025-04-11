@@ -32,6 +32,15 @@ class _OrgSignUpState extends State<OrgSignUp> {
   }
 
   @override
+  void dispose() {
+    _orgNameController.dispose();
+    _orgEmailController.dispose();
+    _orgPasswordController.dispose();
+    _orgConfirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(

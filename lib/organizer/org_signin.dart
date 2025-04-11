@@ -34,6 +34,13 @@ class _OrgSignInState extends State<OrgSignIn> {
     _checkLoginStatus();
   }
 
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
   Future<void> _checkLoginStatus() async {
     bool isLoggedIn = await AuthService().checkOrgLoggedIn(context: context);
 
