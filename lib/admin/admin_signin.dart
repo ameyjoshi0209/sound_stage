@@ -140,18 +140,7 @@ class _AdminSignInState extends State<AdminSignIn> {
                           ),
                         ),
                       ),
-                      SizedBox(height: 8),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () {},
-                          child: Text(
-                            "Recovery Password",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 16),
+                      SizedBox(height: 35),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Color(0xFF212121),

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:random_string/random_string.dart';
-import 'package:sound_stage/services/auth.dart';
 import 'package:sound_stage/services/cloudinary_service.dart';
 import 'package:sound_stage/services/database.dart';
 
@@ -66,7 +65,7 @@ class _OrgSignUpState extends State<OrgSignUp> {
                       icon: Icon(Icons.arrow_back_ios_new_rounded, size: 25),
                       color: Colors.white,
                       onPressed: () {
-                        HapticFeedback.lightImpact();
+                        HapticFeedback.mediumImpact();
                         Navigator.pop(context); // Navigate back
                       },
                     ),
@@ -135,26 +134,12 @@ class _OrgSignUpState extends State<OrgSignUp> {
                       label: "Organization Name",
                       icon: Icons.business,
                       controller: _orgNameController,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter an organization name';
-                        }
-                        return null;
-                      },
                     ),
                     SizedBox(height: 20),
                     _buildTextField(
                       label: "Email Address",
                       icon: Icons.email,
                       controller: _orgEmailController,
-                      validator: (value) {
-                        if (value == null ||
-                            value.isEmpty ||
-                            !value.contains('@')) {
-                          return 'Please enter a valid email';
-                        }
-                        return null;
-                      },
                     ),
                     SizedBox(height: 20),
                     _buildTextField(
@@ -162,12 +147,6 @@ class _OrgSignUpState extends State<OrgSignUp> {
                       icon: Icons.lock,
                       controller: _orgPasswordController,
                       obscureText: true,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter a password';
-                        }
-                        return null;
-                      },
                     ),
                     SizedBox(height: 20),
                     _buildTextField(
@@ -175,12 +154,6 @@ class _OrgSignUpState extends State<OrgSignUp> {
                       icon: Icons.lock,
                       controller: _orgConfirmPasswordController,
                       obscureText: true,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter a password';
-                        }
-                        return null;
-                      },
                     ),
                     SizedBox(height: 40),
                     // Create Profile Button
@@ -188,6 +161,22 @@ class _OrgSignUpState extends State<OrgSignUp> {
                       child: ElevatedButton(
                         onPressed: () async {
                           HapticFeedback.mediumImpact();
+
+                          // Check if any field is empty
+                          if (_orgNameController.text.isEmpty ||
+                              _orgEmailController.text.isEmpty ||
+                              _orgPasswordController.text.isEmpty ||
+                              _orgConfirmPasswordController.text.isEmpty) {
+                            // Show snackbar if any field is empty
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Please fill in all fields'),
+                                duration: Duration(seconds: 1),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                            return;
+                          }
 
                           if (_orgPasswordController.text !=
                               _orgConfirmPasswordController.text) {
@@ -266,7 +255,6 @@ class _OrgSignUpState extends State<OrgSignUp> {
     required String label,
     required IconData icon,
     bool obscureText = false,
-    String? Function(String?)? validator,
     required TextEditingController? controller,
   }) {
     return Material(
@@ -276,7 +264,6 @@ class _OrgSignUpState extends State<OrgSignUp> {
       child: TextFormField(
         controller: controller,
         obscureText: obscureText,
-        validator: validator,
         decoration: InputDecoration(
           prefixIcon: Icon(icon, color: Colors.deepPurple),
           labelText: label,

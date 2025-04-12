@@ -136,7 +136,7 @@ class _SignInState extends State<SignIn> {
                                 backgroundColor: Color(0xFF2A2A2A),
                                 side: BorderSide(
                                   color: Color(0xff6351ec),
-                                  width: 3,
+                                  width: 2,
                                 ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(50),
@@ -230,8 +230,9 @@ class _SignInState extends State<SignIn> {
                                     child: Text(
                                       'Organizing an event?',
                                       style: TextStyle(
-                                        color: Color(0xff6351ec),
+                                        color: Colors.white,
                                         fontSize: 16,
+                                        fontStyle: FontStyle.italic,
                                       ),
                                     ),
                                   ),

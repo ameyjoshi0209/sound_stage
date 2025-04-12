@@ -79,7 +79,7 @@ class _OrgSignInState extends State<OrgSignIn> {
           child: Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: 32.0,
-              vertical: 30.0,
+              vertical: 50.0,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -152,18 +152,7 @@ class _OrgSignInState extends State<OrgSignIn> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 8),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: () {},
-                        child: Text(
-                          "Recovery Password",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 26),
+                    SizedBox(height: 35),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xFFB7086E),
@@ -205,7 +194,7 @@ class _OrgSignInState extends State<OrgSignIn> {
                                 ),
                               )
                               : Text(
-                                "Organizer Sign In",
+                                "Organizer Login",
                                 style: TextStyle(
                                   fontSize: 18,
                                   color: Colors.white,
@@ -247,7 +236,7 @@ class _OrgSignInState extends State<OrgSignIn> {
                     ),
                   ],
                 ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.2),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.21),
                 Center(
                   child: ElevatedButton(
                     onPressed: () {
