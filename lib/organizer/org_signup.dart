@@ -19,6 +19,8 @@ class _OrgSignUpState extends State<OrgSignUp> {
   final TextEditingController _orgConfirmPasswordController =
       TextEditingController();
 
+  bool isLoading = false; // Track loading state
+
   final ImagePicker _picker = ImagePicker();
   File? selectedImage;
 
@@ -159,85 +161,128 @@ class _OrgSignUpState extends State<OrgSignUp> {
                     // Create Profile Button
                     Center(
                       child: ElevatedButton(
-                        onPressed: () async {
-                          HapticFeedback.mediumImpact();
+                        onPressed:
+                            isLoading
+                                ? null
+                                : () async {
+                                  HapticFeedback.mediumImpact();
+                                  setState(() {
+                                    isLoading = true; // Set loading state
+                                  });
+                                  // Check if any field is empty
+                                  if (_orgNameController.text.isEmpty ||
+                                      _orgEmailController.text.isEmpty ||
+                                      _orgPasswordController.text.isEmpty ||
+                                      _orgConfirmPasswordController
+                                          .text
+                                          .isEmpty) {
+                                    setState(() {
+                                      isLoading = false; // Reset loading state
+                                    });
+                                    // Show snackbar if any field is empty
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          'Please fill in all fields',
+                                        ),
+                                        duration: Duration(seconds: 1),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                    return;
+                                  }
 
-                          // Check if any field is empty
-                          if (_orgNameController.text.isEmpty ||
-                              _orgEmailController.text.isEmpty ||
-                              _orgPasswordController.text.isEmpty ||
-                              _orgConfirmPasswordController.text.isEmpty) {
-                            // Show snackbar if any field is empty
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Please fill in all fields'),
-                                duration: Duration(seconds: 1),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                            return;
-                          }
+                                  if (_orgPasswordController.text !=
+                                      _orgConfirmPasswordController.text) {
+                                    setState(() {
+                                      isLoading = false; // Reset loading state
+                                    });
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Passwords do not match'),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                    return;
+                                  }
 
-                          if (_orgPasswordController.text !=
-                              _orgConfirmPasswordController.text) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Passwords do not match'),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                            return;
-                          }
+                                  String? profileurl;
+                                  if (selectedImage != null) {
+                                    profileurl = await uploadtoCloudinary(
+                                      selectedImage,
+                                    );
+                                  }
+                                  String tempId =
+                                      'tempId${randomAlphaNumeric(5)}';
 
-                          String? profileurl;
-                          if (selectedImage != null) {
-                            profileurl = await uploadtoCloudinary(
-                              selectedImage,
-                            );
-                          }
-                          String tempId = 'tempId${randomAlphaNumeric(5)}';
-
-                          Map<String, dynamic> data = {
-                            'orgname': _orgNameController.text,
-                            'orgemail': _orgEmailController.text,
-                            'orgpassword': _orgPasswordController.text,
-                            'orgid': tempId,
-                            'orgimage': profileurl,
-                            'role': 'organizer',
-                            'orgphone': '',
-                            'orgaddress': '',
-                            'orgwebsite': '',
-                            'orgfacebook': '',
-                            'orgApproved': false,
-                          };
-                          DatabaseMethods().addOrganizerDetail(data, tempId);
-                          setState(() {
-                            _orgNameController.clear();
-                            _orgEmailController.clear();
-                            _orgPasswordController.clear();
-                            _orgConfirmPasswordController.clear();
-                            selectedImage = null;
-                          });
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Profile sent for approval'),
-                              backgroundColor: Colors.green,
-                            ),
-                          );
-                        },
+                                  Map<String, dynamic> data = {
+                                    'orgname': _orgNameController.text,
+                                    'orgemail': _orgEmailController.text,
+                                    'orgpassword': _orgPasswordController.text,
+                                    'orgid': tempId,
+                                    'orgimage': profileurl,
+                                    'role': 'organizer',
+                                    'orgphone': '',
+                                    'orgaddress': '',
+                                    'orgwebsite': '',
+                                    'orgfacebook': '',
+                                    'orgApproved': false,
+                                  };
+                                  DatabaseMethods().addOrganizerDetail(
+                                    data,
+                                    tempId,
+                                  );
+                                  setState(() {
+                                    _orgNameController.clear();
+                                    _orgEmailController.clear();
+                                    _orgPasswordController.clear();
+                                    _orgConfirmPasswordController.clear();
+                                    selectedImage = null;
+                                  });
+                                  setState(() {
+                                    isLoading = false; // Reset loading state
+                                  });
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'Profile sent for approval',
+                                      ),
+                                      backgroundColor: Colors.green,
+                                    ),
+                                  );
+                                },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Color(0xFF2B2B2B),
                           foregroundColor: Colors.white,
                           padding: EdgeInsets.symmetric(
-                            horizontal: MediaQuery.of(context).size.width / 3,
-                            vertical: 15,
+                            horizontal:
+                                MediaQuery.of(context).size.width / 2.55,
+                            vertical: 16,
                           ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(50),
                           ),
                           elevation: 5,
                         ),
-                        child: Text('Sign Up', style: TextStyle(fontSize: 18)),
+                        child:
+                            isLoading
+                                ? Center(
+                                  child: SizedBox(
+                                    width: 26,
+                                    height: 26,
+                                    child: CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white,
+                                      ),
+                                      strokeWidth:
+                                          3, // For a smooth Google-like animation
+                                    ),
+                                  ),
+                                )
+                                : Text(
+                                  'Sign Up',
+                                  style: TextStyle(fontSize: 18),
+                                ),
                       ),
                     ),
                     SizedBox(height: 40),

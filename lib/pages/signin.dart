@@ -88,14 +88,14 @@ class _SignInState extends State<SignIn> {
                         ),
                         SizedBox(height: 10),
                         Text(
-                          'Immerse yourself in the world of music',
+                          'Immerse yourself in the world of music. Join us to discover and enjoy.',
                           style: TextStyle(
-                            color: Colors.white54,
+                            color: Colors.white60,
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(height: 60),
+                        SizedBox(height: 55),
                         Column(
                           children: [
                             TextFormField(
@@ -213,7 +213,7 @@ class _SignInState extends State<SignIn> {
                               ),
                             ),
                             Container(
-                              margin: EdgeInsets.only(top: 10),
+                              margin: EdgeInsets.only(top: 5),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -230,9 +230,10 @@ class _SignInState extends State<SignIn> {
                                     child: Text(
                                       'Organizing an event?',
                                       style: TextStyle(
-                                        color: Colors.white,
+                                        color: Colors.white54,
                                         fontSize: 16,
                                         fontStyle: FontStyle.italic,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ),
