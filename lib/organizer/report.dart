@@ -2,7 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:sound_stage/services/shared_pref.dart';
+import 'package:sound_stage/services/pdf/save_and_open_pdf.dart';
+import 'package:sound_stage/services/pdf/simple_pdf_api.dart';
 
 class ReportData {
   DateTime? _startDate;
@@ -15,7 +16,7 @@ class ReportData {
   String? _organizerId;
 
   ReportData(String? id) {
-    _startDate = DateTime.now().subtract(const Duration(days: 7));
+    _startDate = DateTime.now().subtract(const Duration(days: 31));
     _endDate = DateTime.now();
     _organizerId = id;
     _calculateReport();
@@ -176,7 +177,7 @@ class _ReportScreenState extends State<ReportScreen> {
                 ),
                 const SizedBox(height: 16),
                 ReportCard(
-                  title: 'Total Revenue',
+                  title: 'Events Revenue',
                   value: NumberFormat.currency(
                     locale: 'en_IN',
                   ).format(reportData.totalRevenue),
@@ -192,9 +193,9 @@ class _ReportScreenState extends State<ReportScreen> {
                 ReportCard(
                   title: 'Average Ticket Price',
                   value: NumberFormat.currency(
-                    locale: 'en_US',
+                    locale: 'en_IN',
                   ).format(reportData.averageTicketPrice),
-                  icon: Icons.monetization_on,
+                  icon: Icons.money_rounded,
                 ),
                 const SizedBox(height: 16),
                 ReportCard(
@@ -204,11 +205,11 @@ class _ReportScreenState extends State<ReportScreen> {
                 ),
                 const SizedBox(height: 16),
                 ReportCard(
-                  title: 'Merchandise Revenue',
+                  title: 'Total Revenue',
                   value: NumberFormat.currency(
-                    locale: 'en_US',
+                    locale: 'en_IN',
                   ).format(reportData.merchandiseRevenue),
-                  icon: Icons.shopping_cart,
+                  icon: Icons.control_point_duplicate_sharp,
                 ),
               ],
             ),
@@ -217,8 +218,14 @@ class _ReportScreenState extends State<ReportScreen> {
             bottom: 16.0,
             right: 16.0,
             child: FloatingActionButton(
-              onPressed: () {
+              onPressed: () async {
                 HapticFeedback.mediumImpact();
+                final tablePdf = await SimplePdfApi.generateTablePdf(
+                  reportData.startDate!,
+                  reportData.endDate!,
+                  widget.organizerId!,
+                );
+                SaveAndOpenDocument.openPdf(tablePdf);
               },
               child: const Icon(Icons.download),
             ),

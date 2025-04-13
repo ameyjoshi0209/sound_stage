@@ -153,6 +153,7 @@ class _ViewEventsState extends State<ViewEvents> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios, color: Colors.black),
           onPressed: () {
+            HapticFeedback.mediumImpact();
             Navigator.pop(context);
           },
         ),

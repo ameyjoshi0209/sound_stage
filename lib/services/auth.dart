@@ -47,11 +47,12 @@ class AuthService {
         "userid": signupID,
       };
       await DatabaseMethods().addUserDetail(uploadUser, signupID).then((value) {
-        Navigator.pushReplacement(
+        Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
             builder: (BuildContext context) => const BottomNav(),
           ),
+          (route) => false,
         );
       });
     } on FirebaseAuthException catch (e) {
@@ -103,9 +104,7 @@ class AuthService {
         await SharedPreferenceHelper().saveUserImage(userDoc['image']);
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(
-            builder: (BuildContext context) => const BottomNav(),
-          ),
+          MaterialPageRoute(builder: (BuildContext context) => BottomNav()),
           (route) => false,
         );
       }
@@ -115,6 +114,16 @@ class AuthService {
         message = 'No user found for that email.';
       } else if (e.code == 'wrong-password') {
         message = 'Wrong password provided for that user.';
+      } else if (e.code == 'user-disabled') {
+        message = 'User account has been disabled.';
+      } else if (e.code == 'invalid-email') {
+        message = 'The email address is badly formatted.';
+      } else if (e.code == 'too-many-requests') {
+        message = 'Too many requests. Try again later.';
+      } else if (e.code == 'operation-not-allowed') {
+        message = 'Email/password accounts are not enabled.';
+      } else if (e.code == 'network-request-failed') {
+        message = 'Network error. Please check your connection.';
       } else {
         message = 'Something went wrong';
       }
@@ -295,6 +304,14 @@ class AuthService {
         message = 'Wrong password provided for that user.';
       } else if (e.code == 'user-disabled') {
         message = 'User account has been disabled.';
+      } else if (e.code == 'invalid-email') {
+        message = 'The email address is badly formatted.';
+      } else if (e.code == 'too-many-requests') {
+        message = 'Too many requests. Try again later.';
+      } else if (e.code == 'operation-not-allowed') {
+        message = 'Email/password accounts are not enabled.';
+      } else if (e.code == 'network-request-failed') {
+        message = 'Network error. Please check your connection.';
       } else {
         message = 'Something went wrong';
       }

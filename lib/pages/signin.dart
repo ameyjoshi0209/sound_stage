@@ -88,14 +88,14 @@ class _SignInState extends State<SignIn> {
                         ),
                         SizedBox(height: 10),
                         Text(
-                          'Immerse yourself in the world of music',
+                          'Immerse yourself in the world of music. Join us to discover and enjoy.',
                           style: TextStyle(
-                            color: Colors.black45,
+                            color: Colors.white60,
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(height: 60),
+                        SizedBox(height: 55),
                         Column(
                           children: [
                             TextFormField(
@@ -136,7 +136,7 @@ class _SignInState extends State<SignIn> {
                                 backgroundColor: Color(0xFF2A2A2A),
                                 side: BorderSide(
                                   color: Color(0xff6351ec),
-                                  width: 3,
+                                  width: 2,
                                 ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(50),
@@ -213,14 +213,14 @@ class _SignInState extends State<SignIn> {
                               ),
                             ),
                             Container(
-                              margin: EdgeInsets.only(top: 20),
+                              margin: EdgeInsets.only(top: 5),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   GestureDetector(
                                     onTap: () {
                                       HapticFeedback.mediumImpact();
-                                      Navigator.pushReplacement(
+                                      Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) => OrgSignIn(),
@@ -228,10 +228,12 @@ class _SignInState extends State<SignIn> {
                                       );
                                     },
                                     child: Text(
-                                      'Organizers this way!',
+                                      'Organizing an event?',
                                       style: TextStyle(
-                                        color: Colors.white,
+                                        color: Colors.white54,
                                         fontSize: 16,
+                                        fontStyle: FontStyle.italic,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ),

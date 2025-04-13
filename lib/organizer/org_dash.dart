@@ -247,8 +247,8 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
                           ),
                           _buildSectionCard(
                             context,
-                            "Financial Reports",
-                            Icons.currency_rupee,
+                            "Reports",
+                            Icons.find_in_page_rounded,
                           ),
                           _buildSectionCard(
                             context,
@@ -324,7 +324,7 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
                     return ViewEvents(manage: true);
                   case "Scan":
                     return QrScanner();
-                  case "Financial Reports":
+                  case "Reports":
                     return ReportScreen(organizerId: id);
                   default:
                     return Scaffold(

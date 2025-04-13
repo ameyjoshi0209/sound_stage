@@ -164,7 +164,7 @@ class _SignUpState extends State<SignUp> {
                                 backgroundColor: Color(0xFF2A2A2A),
                                 side: BorderSide(
                                   color: Color(0xff6351ec),
-                                  width: 3,
+                                  width: 2,
                                 ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(50),
