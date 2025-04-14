@@ -89,4 +89,66 @@ class SimplePdfApi {
     );
     return SaveAndOpenDocument.savePdf(name: "table_pdf.pdf", pdf: pdf);
   }
+
+  static Future<File> generateReportForAdmin(
+    DateTime startDate,
+    DateTime endDate,
+  ) async {
+    final pdf = Document();
+    final headers = [
+      'Name',
+      'Date',
+      'Time',
+      'Location',
+      'Price',
+      'Ticket Count',
+    ];
+    final firestore = FirebaseFirestore.instance;
+    final ticketRef =
+        await firestore.collection('Tickets').where('EventDate').get();
+    final ticket = [];
+
+    if (ticketRef.docs.isNotEmpty) {
+      for (var doc in ticketRef.docs) {
+        String eventDateStr = doc['EventDate'];
+        DateTime eventDate = DateFormat("dd-MM-yyyy").parse(eventDateStr);
+        if (eventDate.isAfter(startDate) && eventDate.isBefore(endDate)) {
+          ticket.add(
+            Ticket(
+              evnetName: doc['EventName'],
+              eventDate: doc['EventDate'],
+              eventTime: doc['EventTime'],
+              eventLocation: doc['EventLocation'],
+              eventPrice: doc['EventPrice'],
+              eventNumberOfTickets: doc['Number'],
+            ),
+          );
+        }
+      }
+    }
+    // final data = users.map((user) => [user.name, user.age]).toList();
+    final data =
+        ticket.map((ticket) {
+          return [
+            ticket.evnetName,
+            ticket.eventDate,
+            ticket.eventTime,
+            ticket.eventLocation,
+            ticket.eventPrice,
+            ticket.eventNumberOfTickets,
+          ];
+        }).toList();
+    pdf.addPage(
+      Page(
+        build:
+            (context) => TableHelper.fromTextArray(
+              data: data,
+              headers: headers,
+              cellAlignment: Alignment.center,
+              tableWidth: TableWidth.max,
+            ),
+      ),
+    );
+    return SaveAndOpenDocument.savePdf(name: "table_pdf.pdf", pdf: pdf);
+  }
 }
