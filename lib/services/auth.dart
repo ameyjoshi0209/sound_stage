@@ -43,7 +43,7 @@ class AuthService {
         "role": "customer",
         "phone": "",
         "age": "",
-        "image": "",
+        "image": "none",
         "userid": signupID,
       };
       await DatabaseMethods().addUserDetail(uploadUser, signupID).then((value) {

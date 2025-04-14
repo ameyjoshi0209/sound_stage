@@ -138,7 +138,7 @@ class _UserProfileState extends State<UserProfile> {
                         child: CircleAvatar(
                           radius: 80,
                           backgroundImage:
-                              image == null || image == ""
+                              image == null || image == "none"
                                   ? AssetImage('images/profile.png')
                                   : NetworkImage(image!), // Static image
                         ),
@@ -218,7 +218,15 @@ class _UserProfileState extends State<UserProfile> {
                               ageController.text,
                             );
                             String? profileurl;
-                            if (image == "" && selectedImage != null) {
+                            if (image == "none" && selectedImage != null) {
+                              profileurl = await uploadtoCloudinary(
+                                selectedImage,
+                              );
+                              await SharedPreferenceHelper().saveUserImage(
+                                profileurl,
+                              );
+                            } else if (selectedImage != null) {
+                              await deleteFromCloudinary(image!);
                               profileurl = await uploadtoCloudinary(
                                 selectedImage,
                               );
@@ -226,17 +234,7 @@ class _UserProfileState extends State<UserProfile> {
                                 profileurl,
                               );
                             } else {
-                              if (selectedImage != null) {
-                                await deleteFromCloudinary(image!);
-                                profileurl = await uploadtoCloudinary(
-                                  selectedImage,
-                                );
-                                SharedPreferenceHelper().saveUserImage(
-                                  profileurl,
-                                );
-                              } else {
-                                profileurl = image;
-                              }
+                              profileurl = image;
                             }
                             Map<String, dynamic> userInfoMap = {
                               "name": nameController.text,
