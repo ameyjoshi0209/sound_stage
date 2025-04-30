@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:sound_stage/admin/admin_approve_org.dart';
 import 'package:sound_stage/admin/admin_event_approvals.dart';
 import 'package:sound_stage/admin/admin_manage_users.dart';
+import 'package:sound_stage/admin/admin_report.dart';
 import 'package:sound_stage/services/auth.dart';
 import 'package:sound_stage/services/database.dart';
 
@@ -195,8 +196,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     ),
                     _buildSectionCard(
                       context,
-                      "Download Reports",
-                      Icons.receipt_long_rounded,
+                      "Reports",
+                      Icons.bar_chart_rounded,
                     ),
                     _buildSectionCard(
                       context,
@@ -272,6 +273,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     return AdminManageProfiles();
                   case "Event Approvals":
                     return AdminApproveEvents();
+                  case "Reports":
+                    return AdminReport();
                   default:
                     return Scaffold(
                       appBar: AppBar(title: Text(title)),

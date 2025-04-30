@@ -288,7 +288,7 @@ class _HomeState extends State<Home> {
                         );
                       } else {
                         return Text(
-                          "Hello, ${snapshot.data}!",
+                          "Hello, ${snapshot.data}",
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 35.0,
@@ -303,9 +303,9 @@ class _HomeState extends State<Home> {
                 Padding(
                   padding: const EdgeInsets.only(left: 20.0),
                   child: Text(
-                    "There are events near your location",
+                    "There are 7 events near your location",
                     style: TextStyle(
-                      color: Color(0xff6351ec),
+                      color: Colors.white70,
                       fontSize: 26.0,
                       fontWeight: FontWeight.bold,
                     ),
