@@ -62,8 +62,11 @@ _SoundStage 🎶 is an innovative and fully-featured mobile application 📱 des
 <p align="center">
   <img src="docs/images/user_login.png" alt="Login Screen" height=490 width=220 />&nbsp;
   <img src="docs/images/user_home.png" alt="Home Screen" height=490 width=220 />&nbsp;
+  <img src="docs/images/org_home.png" alt="Organizer Login" height=490 width=220 />&nbsp;
   <img src="docs/images/org_dash.png" alt="Organizer Dashboard" height=490 width=220 />&nbsp;
-  <img src="docs/images/admin_login.png" alt="Organizer Dashboard" height=490 width=220 />
+  <img src="docs/images/admin_login.png" alt="Admin Login" height=490 width=220 />&nbsp;
+  <img src="docs/images/admin_dash.png" alt="Admin Dashboard" height=490 width=220 />&nbsp;
+
 </p>
 
 
