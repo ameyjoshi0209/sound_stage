@@ -1,4 +1,4 @@
-# 🎶 **SoundStage System Design Diagrams** 🎤
+# 📊📈**SoundStage System Design Diagrams**
 
 This section offers a visual representation of **SoundStage**'s architecture. Below, you'll find various diagrams that showcase key entities, relationships, and interactions within the system. These visuals will help provide a clearer understanding of how different elements of SoundStage integrate and function together. 🔗✨
 
