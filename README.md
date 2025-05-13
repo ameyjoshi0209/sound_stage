@@ -8,12 +8,11 @@
 [![Visual Studio Code](https://img.shields.io/badge/Visual%20Studio%20Code-0078d7.svg?style=flat&logo=visual-studio-code&logoColor=white)](https://code.visualstudio.com/)
 [![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white)](https://github.com/)
 [![Git](https://img.shields.io/badge/git-F05032.svg?style=flat&logo=git&logoColor=white)](https://git-scm.com/)<br>
+[![Windows](https://badgen.net/badge/icon/windows?icon=windows&label)](https://microsoft.com/windows/)
+[![Linux](https://img.shields.io/badge/linux-FCC624.svg?style=flat&logo=linux&logoColor=black)](https://www.linux.org/)
 [![Android](https://img.shields.io/badge/android-4CAF50.svg?style=flat&logo=android&logoColor=white)](https://www.android.com/)
 [![iOS](https://img.shields.io/badge/iOS-000000.svg?style=flat&logo=apple&logoColor=white)](https://www.apple.com/ios/)
 [![Size](https://4.vercel.app/github/size/ameyjoshi0209/sound_stage?icon=github)](src)
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Windows](https://badgen.net/badge/icon/windows?icon=windows&label)](https://microsoft.com/windows/)
-[![Linux](https://badgen.net/badge/icon/linux?icon=linux&label)](https://www.linux.org/)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 <br>
 &nbsp;
