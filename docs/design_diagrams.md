@@ -7,7 +7,7 @@ This section offers a visual representation of **SoundStage**'s architecture. Be
 
 __⚠️ Important Note:__
 
-*__Please note that the diagrams presented in this documentation are based on the current version of the SoundStage application at the time of publication. While every effort has been made to ensure accuracy, there may be discrepancies between these diagrams and future versions of the application. As the system evolves and updates are made, the diagrams may no longer represent the most current architecture or design. 🔄📊__*
+*__Please note that the diagrams presented in this documentation are based on the current version of the SoundStage application at the time of publication. While every effort has been made to ensure accuracy, there may be discrepancies between these diagrams and future versions of the application. As the system evolves and updates are made, the diagrams may no longer represent the most current architecture or design.__*
 
 *__Due to the nature of the system's continuous development, we will not be updating these diagrams with every change to the app. We recommend referring to the latest release notes 📑 or technical documentation 📝 for the most up-to-date information.__*
 

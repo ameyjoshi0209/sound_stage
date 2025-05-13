@@ -18,7 +18,7 @@
 <br>
 &nbsp;
 
-_SoundStage 🎶 is an innovative and fully-featured mobile application 📱 designed to streamline the experience of booking, managing, and attending music events. Built using Flutter and Firebase 🔥, it connects customers 🎟️, event organizers 🎤, and admins 👨‍💻 in a seamless, secure 🔒, and scalable 🌐 environment._
+Welcome to SoundStage🎶 an innovative and fully-featured mobile application 📱 designed to streamline the experience of booking, managing, and attending music events. Built using Flutter and Firebase 🔥, it connects customers 🎟️, event organizers 🎤, and admins 👨‍💻 in a seamless, secure 🔒, and scalable 🌐 environment.
 
 &nbsp;
 ## 🚀 Features
@@ -106,12 +106,12 @@ flutter run
 ```
 
 &nbsp;
-_**Note: For comprehensive setup, refer to the [SoundStage Setup Guide]().**_
+>_**Note: For comprehensive setup, refer to the [SoundStage Setup Guide](docs/setup.md).**_
 
 &nbsp;
 ## 📚 Documentation
 
-- [Project Setup Guide](#)
+- [Project Setup Guide](docs/setup.md)
 - [User Manual](docs/manual.md)
 - [Database Schema](docs/schema.md)
 - [System Design Diagrams](docs/design_diagrams.md)
