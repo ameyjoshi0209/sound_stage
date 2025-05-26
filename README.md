@@ -17,6 +17,12 @@
 <br>
 &nbsp;
 
+<p align="center">
+<img align="center" src="docs\images\banner.png" alt="Agentic Seek Logo">
+<p>
+&nbsp;
+
+
 Welcome to SoundStage🎶 an innovative and fully-featured mobile application 📱 designed to streamline the experience of booking, managing, and attending music events. Built using Flutter and Firebase 🔥, it connects customers 🎟️, event organizers 🎤, and admins 👨‍💻 in a seamless, secure 🔒, and scalable 🌐 environment.
 
 &nbsp;

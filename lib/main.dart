@@ -1,27 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
-import 'package:sound_stage/admin/admin_approve_org.dart';
-import 'package:sound_stage/admin/admin_dashboard.dart';
-import 'package:sound_stage/admin/admin_manage_users.dart';
-import 'package:sound_stage/admin/admin_signin.dart';
-import 'package:sound_stage/admin/admin_view_event.dart';
-import 'package:sound_stage/admin/admin_view_profile.dart';
-import 'package:sound_stage/organizer/org_dash.dart';
-import 'package:sound_stage/organizer/org_profile.dart';
-import 'package:sound_stage/organizer/org_signin.dart';
-import 'package:sound_stage/organizer/qr_scanner.dart';
-import 'package:sound_stage/organizer/report.dart';
-import 'package:sound_stage/organizer/ticket_data.dart';
-import 'package:sound_stage/organizer/upload_event.dart';
-import 'package:sound_stage/pages/bottomnav.dart';
-import 'package:sound_stage/pages/categories_event.dart';
-import 'package:sound_stage/pages/home.dart';
-import 'package:sound_stage/pages/qr_ticket.dart';
+
 import 'package:sound_stage/pages/signin.dart';
 import 'package:sound_stage/pages/signup.dart';
-import 'package:sound_stage/pages/user_profile.dart';
-import 'package:sound_stage/services/auth.dart';
 import 'package:sound_stage/services/data.dart';
 
 Future<void> main() async {

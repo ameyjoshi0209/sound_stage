@@ -6,8 +6,6 @@ import 'package:sound_stage/organizer/qr_scanner.dart';
 import 'package:sound_stage/organizer/report.dart';
 import 'package:sound_stage/organizer/upload_event.dart';
 import 'package:sound_stage/organizer/view_events.dart';
-import 'package:sound_stage/services/auth.dart';
-import 'package:sound_stage/services/database.dart';
 import 'package:sound_stage/services/shared_pref.dart';
 
 class OrganizerDashboard extends StatefulWidget {
